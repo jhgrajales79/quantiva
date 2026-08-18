@@ -1,16 +1,20 @@
 import type { VercelConfig } from "@vercel/config/v1";
 
-// Horarios en UTC. 14:30–21:00 UTC aproxima 9:30–16:00 ET (no ajusta DST
-// automáticamente; revisar en marzo/noviembre si se requiere precisión
-// exacta). Todos los crons llaman rutas protegidas por CRON_SECRET
-// (ver src/lib/cron-auth.ts) — configúralo como variable de entorno en
-// Vercel antes de habilitar estos jobs en producción.
+// El plan Hobby de Vercel limita los Cron Jobs a máximo una ejecución por día
+// por job, así que todas las frecuencias aquí son diarias (no cada 5/15 min
+// como sería ideal para quotes/noticias). El refresco "real" sigue
+// funcionando de todas formas: cada ruta API valida su propio TTL (ver
+// src/lib/cache.ts) y refresca contra el proveedor cuando un usuario visita
+// la página, independientemente del cron — el cron solo pre-calienta el
+// cache. Si se pasa a plan Pro, se puede volver a frecuencias intradía.
+// Todos los crons llaman rutas protegidas por CRON_SECRET
+// (ver src/lib/cron-auth.ts).
 export const config: VercelConfig = {
   framework: "nextjs",
   crons: [
     {
       path: "/api/cron/refresh-quotes",
-      schedule: "*/5 14-21 * * 1-5",
+      schedule: "0 18 * * 1-5", // ~1pm ET, una vez al día en horario de mercado
     },
     {
       path: "/api/cron/refresh-fundamentals",
@@ -22,7 +26,7 @@ export const config: VercelConfig = {
     },
     {
       path: "/api/cron/refresh-news",
-      schedule: "*/15 * * * *",
+      schedule: "0 13 * * *",
     },
   ],
 };
