@@ -65,6 +65,7 @@ export async function GET(
 
         return NextResponse.json({
           symbol,
+          companyName: quote.companyName,
           price: quote.price,
           changeAbs: quote.changeAbs,
           changePct: quote.changePct,
@@ -72,6 +73,12 @@ export async function GET(
           dayLow: quote.dayLow,
           volume: quote.volume,
           marketCap: quote.marketCap,
+          // No persistidos en el cache (cambian poco, no vale la pena una
+          // migración de columnas); solo disponibles cuando el fetch es
+          // fresco, null cuando se sirve desde cache.
+          fiftyTwoWeekLow: quote.fiftyTwoWeekLow,
+          fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh,
+          exchangeName: quote.exchangeName,
           marketStatus,
           source: quote.source,
           fetchedAt: new Date().toISOString(),
@@ -98,6 +105,7 @@ export async function GET(
 
   return NextResponse.json({
     symbol,
+    companyName: null, // no persistido en cache
     price: cached.price,
     changeAbs: cached.changeAbs,
     changePct: cached.changePct,
@@ -105,6 +113,9 @@ export async function GET(
     dayLow: cached.dayLow,
     volume: cached.volume,
     marketCap: cached.marketCap,
+    fiftyTwoWeekLow: null,
+    fiftyTwoWeekHigh: null,
+    exchangeName: null,
     marketStatus: cached.marketStatus,
     source: cached.source,
     fetchedAt: cached.fetchedAt.toISOString(),

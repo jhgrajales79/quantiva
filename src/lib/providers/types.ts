@@ -5,6 +5,7 @@ export interface DateRange {
 
 export interface Quote {
   symbol: string;
+  companyName: string | null;
   price: number;
   changeAbs: number | null;
   changePct: number | null;
@@ -12,6 +13,9 @@ export interface Quote {
   dayLow: number | null;
   volume: number | null;
   marketCap: number | null;
+  fiftyTwoWeekLow: number | null;
+  fiftyTwoWeekHigh: number | null;
+  exchangeName: string | null;
   source: string;
   fetchedAt: string; // ISO timestamp
 }

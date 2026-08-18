@@ -43,6 +43,10 @@ const chartSchema = z.object({
             regularMarketDayHigh: nullableNumber,
             regularMarketDayLow: nullableNumber,
             regularMarketVolume: nullableNumber,
+            fiftyTwoWeekHigh: nullableNumber,
+            fiftyTwoWeekLow: nullableNumber,
+            fullExchangeName: z.string().nullable().optional(),
+            longName: z.string().nullable().optional(),
           }),
           timestamp: z.array(z.number()).optional(),
           indicators: z
@@ -239,6 +243,7 @@ async function fetchScreener(scrId: string, count: number) {
 function screenerQuoteToQuote(q: z.infer<typeof screenerQuoteSchema>, source: string): Quote {
   return {
     symbol: q.symbol,
+    companyName: q.longName ?? q.shortName ?? null,
     price: q.regularMarketPrice ?? 0,
     changeAbs: q.regularMarketChange,
     changePct: q.regularMarketChangePercent,
@@ -246,6 +251,9 @@ function screenerQuoteToQuote(q: z.infer<typeof screenerQuoteSchema>, source: st
     dayLow: q.regularMarketDayLow,
     volume: q.regularMarketVolume,
     marketCap: q.marketCap,
+    fiftyTwoWeekLow: null,
+    fiftyTwoWeekHigh: null,
+    exchangeName: null,
     source,
     fetchedAt: new Date().toISOString(),
   };
@@ -273,6 +281,7 @@ export class YahooFinanceProvider implements MarketDataProvider {
 
     return {
       symbol: meta.symbol,
+      companyName: meta.longName ?? null,
       price: meta.regularMarketPrice,
       changeAbs,
       changePct,
@@ -280,6 +289,9 @@ export class YahooFinanceProvider implements MarketDataProvider {
       dayLow: meta.regularMarketDayLow,
       volume: meta.regularMarketVolume,
       marketCap: null, // requiere quoteSummary (crumb); se omite para mantener getQuote rápido
+      fiftyTwoWeekLow: meta.fiftyTwoWeekLow,
+      fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh,
+      exchangeName: meta.fullExchangeName ?? null,
       source: this.name,
       fetchedAt: new Date().toISOString(),
     };
@@ -289,7 +301,23 @@ export class YahooFinanceProvider implements MarketDataProvider {
     const fromMs = new Date(range.from).getTime();
     const daysSpan = Math.ceil((Date.now() - fromMs) / 86_400_000);
     const yahooRange =
-      daysSpan <= 7 ? "5d" : daysSpan <= 35 ? "1mo" : daysSpan <= 100 ? "3mo" : daysSpan <= 200 ? "6mo" : daysSpan <= 400 ? "1y" : "2y";
+      daysSpan <= 7
+        ? "5d"
+        : daysSpan <= 35
+          ? "1mo"
+          : daysSpan <= 100
+            ? "3mo"
+            : daysSpan <= 200
+              ? "6mo"
+              : daysSpan <= 400
+                ? "1y"
+                : daysSpan <= 800
+                  ? "2y"
+                  : daysSpan <= 2000
+                    ? "5y"
+                    : daysSpan <= 4000
+                      ? "10y"
+                      : "max";
 
     const result = await fetchChart(symbol, yahooRange, "1d");
     if (!result?.timestamp || !result.indicators?.quote?.[0]) return [];

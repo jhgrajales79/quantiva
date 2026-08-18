@@ -140,6 +140,13 @@ export async function GET(
     return NextResponse.json({ symbol, error: "Dato no disponible" }, { status: 404 });
   }
 
+  const historyRows = await db
+    .select()
+    .from(fundamentals)
+    .where(and(eq(fundamentals.assetId, asset.id), eq(fundamentals.period, "annual")))
+    .orderBy(fundamentals.fiscalDate)
+    .limit(8);
+
   return NextResponse.json({
     symbol,
     fundamentals: {
@@ -178,5 +185,12 @@ export async function GET(
           fetchedAt: latestRatio.fetchedAt.toISOString(),
         }
       : null,
+    history: historyRows.map((h) => ({
+      fiscalDate: h.fiscalDate,
+      revenue: h.revenue,
+      netIncome: h.netIncome,
+      eps: h.eps,
+      fcf: h.fcf,
+    })),
   });
 }

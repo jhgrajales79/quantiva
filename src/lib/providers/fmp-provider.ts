@@ -167,6 +167,7 @@ export class FmpProvider implements MarketDataProvider {
 
     return {
       symbol: q.symbol,
+      companyName: null,
       price: q.price ?? 0,
       changeAbs: q.change,
       changePct: q.changePercentage,
@@ -174,6 +175,9 @@ export class FmpProvider implements MarketDataProvider {
       dayLow: q.dayLow,
       volume: q.volume,
       marketCap: q.marketCap,
+      fiftyTwoWeekLow: null,
+      fiftyTwoWeekHigh: null,
+      exchangeName: null,
       source: this.name,
       fetchedAt: new Date().toISOString(),
     };
@@ -363,6 +367,7 @@ export class FmpProvider implements MarketDataProvider {
 
     const toQuote = (q: z.infer<typeof quoteSchema>): Quote => ({
       symbol: q.symbol,
+      companyName: null,
       price: q.price ?? 0,
       changeAbs: q.change,
       changePct: q.changePercentage,
@@ -370,6 +375,9 @@ export class FmpProvider implements MarketDataProvider {
       dayLow: q.dayLow,
       volume: q.volume,
       marketCap: q.marketCap,
+      fiftyTwoWeekLow: null,
+      fiftyTwoWeekHigh: null,
+      exchangeName: null,
       source: this.name,
       fetchedAt: new Date().toISOString(),
     });

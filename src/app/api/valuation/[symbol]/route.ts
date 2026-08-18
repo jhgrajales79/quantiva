@@ -12,6 +12,7 @@ import {
 import { getOrCreateAsset } from "@/lib/assets";
 import { evaluateAsset } from "@/lib/valuation/evaluate";
 import { computePerformance } from "@/lib/performance";
+import { computeHistoricalComparison } from "@/lib/valuation/historical-comparison";
 import { newId } from "@/lib/id";
 import type { RatiosSnapshot } from "@/lib/valuation/types";
 
@@ -76,6 +77,47 @@ export async function GET(
   }));
 
   const latestRatio = historicalRatiosRows[0] ?? null;
+
+  const historicalFundamentalsRows = await db
+    .select()
+    .from(fundamentals)
+    .where(and(eq(fundamentals.assetId, asset.id), eq(fundamentals.period, "annual")))
+    .orderBy(desc(fundamentals.fiscalDate))
+    .limit(8);
+
+  const fcfMargins = historicalFundamentalsRows.map((f) =>
+    f.fcf !== null && f.revenue ? f.fcf / f.revenue : null,
+  );
+  const olderRatios = historicalRatiosRows.slice(1); // excluye el snapshot de hoy del promedio
+  const olderFcfMargins = fcfMargins.slice(1);
+
+  const historicalComparisons = {
+    pe: computeHistoricalComparison(latestRatio?.pe ?? null, olderRatios.map((r) => r.pe)),
+    evEbitda: computeHistoricalComparison(
+      latestRatio?.evEbitda ?? null,
+      olderRatios.map((r) => r.evEbitda),
+    ),
+    ps: computeHistoricalComparison(latestRatio?.ps ?? null, olderRatios.map((r) => r.ps)),
+    pb: computeHistoricalComparison(latestRatio?.pb ?? null, olderRatios.map((r) => r.pb)),
+    fcfYield: computeHistoricalComparison(
+      latestRatio?.fcfYield ?? null,
+      olderRatios.map((r) => r.fcfYield),
+    ),
+    roe: computeHistoricalComparison(latestRatio?.roe ?? null, olderRatios.map((r) => r.roe)),
+    operatingMargin: computeHistoricalComparison(
+      latestRatio?.operatingMargin ?? null,
+      olderRatios.map((r) => r.operatingMargin),
+    ),
+    fcfMargin: computeHistoricalComparison(fcfMargins[0] ?? null, olderFcfMargins),
+    roic: {
+      current: null,
+      average: null,
+      sampleCount: 0,
+      vsAveragePct: null,
+      unavailable: true,
+      reason: "Dato no disponible: Yahoo Finance no expone ROIC directamente.",
+    },
+  };
 
   const [treasury10y] = await db
     .select()
@@ -182,6 +224,7 @@ export async function GET(
       investment: result.investmentScore,
     },
     possibleValueTrap: result.possibleValueTrap,
+    historicalComparisons,
     models: result.models.map((m) => ({
       model: m.model,
       fairValue: m.fairValue,

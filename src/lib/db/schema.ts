@@ -211,7 +211,7 @@ export const dividends = pgTable(
     source: text("source").notNull(),
     fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
   },
-  (table) => [index("dividends_asset_idx").on(table.assetId)],
+  (table) => [uniqueIndex("dividends_asset_exdate_idx").on(table.assetId, table.exDate)],
 );
 
 export const earningsEvents = pgTable(
@@ -229,8 +229,23 @@ export const earningsEvents = pgTable(
     source: text("source").notNull(),
     fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
   },
-  (table) => [index("earnings_asset_idx").on(table.assetId)],
+  (table) => [uniqueIndex("earnings_asset_reportdate_idx").on(table.assetId, table.reportDate)],
 );
+
+export const companyProfiles = pgTable("company_profiles", {
+  assetId: text("asset_id")
+    .primaryKey()
+    .references(() => assets.id, { onDelete: "cascade" }),
+  sector: text("sector"),
+  industry: text("industry"),
+  ceoName: text("ceo_name"),
+  employees: integer("employees"),
+  website: text("website"),
+  businessSummary: text("business_summary"),
+  firstTradeDate: text("first_trade_date"),
+  source: text("source").notNull(),
+  fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
+});
 
 // ---------------------------------------------------------------------------
 // Valuation / Fair Value Engine

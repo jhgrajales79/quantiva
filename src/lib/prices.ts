@@ -38,7 +38,7 @@ export async function getDailyPriceHistory(symbol: string): Promise<PricePoint[]
     try {
       const provider = getMarketDataProvider();
       const range = needsBackfill
-        ? { from: daysAgo(400), to: today }
+        ? { from: daysAgo(3700), to: today } // ~10 años, para soportar rangos largos en el gráfico
         : { from: latest!.date, to: today };
 
       const points = await provider.getDailyPrices(symbol, range);
