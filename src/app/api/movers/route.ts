@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { assets, marketMoversCache } from "@/lib/db/schema";
 import { getMarketDataProvider } from "@/lib/providers/registry";
@@ -44,28 +44,37 @@ export async function GET() {
       ];
 
       for (const [category, quotes] of categories) {
-        for (const quote of quotes) {
-          const asset = await getOrCreateAsset(quote.symbol, "stock");
-          await db
-            .insert(marketMoversCache)
-            .values({
+        if (quotes.length === 0) continue;
+
+        const resolvedAssets = await Promise.all(
+          quotes.map((quote) => getOrCreateAsset(quote.symbol, "stock")),
+        );
+
+        await db
+          .insert(marketMoversCache)
+          .values(
+            quotes.map((quote, i) => ({
               id: newId("mover"),
               date,
               category,
-              assetId: asset.id,
+              assetId: resolvedAssets[i].id,
               changePct: quote.changePct,
               volume: quote.volume,
               fetchedAt,
-            })
-            .onConflictDoUpdate({
-              target: [
-                marketMoversCache.date,
-                marketMoversCache.category,
-                marketMoversCache.assetId,
-              ],
-              set: { changePct: quote.changePct, volume: quote.volume, fetchedAt },
-            });
-        }
+            })),
+          )
+          .onConflictDoUpdate({
+            target: [
+              marketMoversCache.date,
+              marketMoversCache.category,
+              marketMoversCache.assetId,
+            ],
+            set: {
+              changePct: sql`excluded.change_pct`,
+              volume: sql`excluded.volume`,
+              fetchedAt: sql`excluded.fetched_at`,
+            },
+          });
       }
     } catch (error) {
       if (existingGainers.length === 0) {
