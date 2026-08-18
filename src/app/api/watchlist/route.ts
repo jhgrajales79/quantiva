@@ -3,26 +3,9 @@ import { z } from "zod";
 import { and, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/client";
-import { assets, watchlistItems, watchlists } from "@/lib/db/schema";
+import { assets, watchlistItems } from "@/lib/db/schema";
 import { getOrCreateAsset } from "@/lib/assets";
-import { newId } from "@/lib/id";
-
-async function getOrCreateDefaultWatchlist(userId: string) {
-  const [existing] = await db
-    .select()
-    .from(watchlists)
-    .where(eq(watchlists.userId, userId))
-    .limit(1);
-
-  if (existing) return existing;
-
-  const [created] = await db
-    .insert(watchlists)
-    .values({ id: newId("wl"), userId, name: "Mi Watchlist" })
-    .returning();
-
-  return created;
-}
+import { getOrCreateDefaultWatchlist } from "@/lib/watchlist";
 
 export async function GET() {
   const session = await auth();

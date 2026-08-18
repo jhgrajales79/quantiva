@@ -1,38 +1,39 @@
-import { WatchlistTable } from "@/components/tables/WatchlistTable";
-import { LinkCard } from "@/components/cards/LinkCard";
+import { GreetingHeader } from "@/components/dashboard/GreetingHeader";
+import { WatchlistSummaryCard } from "@/components/dashboard/WatchlistSummaryCard";
+import { PortfolioSummaryCard } from "@/components/dashboard/PortfolioSummaryCard";
+import { NewsSummaryCard } from "@/components/dashboard/NewsSummaryCard";
+import { MarketMonitorWidget } from "@/components/dashboard/MarketMonitorWidget";
+import { SectorRotationWidget } from "@/components/dashboard/SectorRotationWidget";
+import { FearGreedWidget } from "@/components/dashboard/FearGreedWidget";
+import { MarketBreadthWidget } from "@/components/dashboard/MarketBreadthWidget";
+import { MacroStrip } from "@/components/dashboard/MacroStrip";
 
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-neutral-50">Market Today</h1>
-        <p className="text-sm text-neutral-500">
-          Tu centro de inteligencia financiera: qué está pasando hoy y cómo afecta a tu
-          portafolio.
-        </p>
+      <GreetingHeader />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <WatchlistSummaryCard />
+        <PortfolioSummaryCard />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <LinkCard href="/markets" title="Mercados">
-          Índices, cripto y commodities en vivo por pestañas.
-        </LinkCard>
-        <LinkCard href="/movers" title="Market Movers">
-          Top gainers, losers y most active del día.
-        </LinkCard>
-        <LinkCard href="/macro" title="Macro">
-          CPI, empleo, Fed Funds, yield curve y más, desde FRED.
-        </LinkCard>
-        <LinkCard href="/news" title="Noticias">
-          Feed de noticias por empresa, categorizado.
-        </LinkCard>
+      <NewsSummaryCard />
+
+      <MarketMonitorWidget />
+
+      <div className="space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          Pulso del mercado
+        </h2>
+        <SectorRotationWidget />
+        <div className="grid gap-4 md:grid-cols-2">
+          <FearGreedWidget />
+          <MarketBreadthWidget />
+        </div>
       </div>
 
-      <WatchlistTable />
-
-      <LinkCard href="/portfolio" title="Mi Portafolio">
-        Crea portafolios, registra transacciones y sigue tu P&amp;L, retorno y peso por
-        posición.
-      </LinkCard>
+      <MacroStrip />
     </div>
   );
 }

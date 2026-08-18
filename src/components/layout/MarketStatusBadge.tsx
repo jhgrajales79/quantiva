@@ -1,40 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Badge, type BadgeVariant } from "@/components/ui/Badge";
+import { useMarketStatus, formatCountdown } from "@/lib/useMarketStatus";
 
-type MarketStatus = "pre-market" | "open" | "after-hours" | "closed";
-
-const LABELS: Record<MarketStatus, { label: string; className: string }> = {
-  "pre-market": { label: "Pre-market", className: "bg-amber-500/15 text-amber-400" },
-  open: { label: "Mercado abierto", className: "bg-emerald-500/15 text-emerald-400" },
-  "after-hours": { label: "After-hours", className: "bg-amber-500/15 text-amber-400" },
-  closed: { label: "Mercado cerrado", className: "bg-neutral-700/40 text-neutral-400" },
+const LABELS: Record<string, { label: string; variant: BadgeVariant; transitionVerb: string }> = {
+  "pre-market": { label: "Pre-market", variant: "warning", transitionVerb: "abre en" },
+  open: { label: "Mercado abierto", variant: "success", transitionVerb: "cierra en" },
+  "after-hours": { label: "After-hours", variant: "warning", transitionVerb: "cierra en" },
+  closed: { label: "Mercado cerrado", variant: "neutral", transitionVerb: "" },
 };
 
 export function MarketStatusBadge() {
-  const [status, setStatus] = useState<MarketStatus | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    fetch("/api/market-status")
-      .then((res) => res.json())
-      .then((data) => {
-        if (mounted) setStatus(data.status);
-      })
-      .catch(() => {
-        if (mounted) setStatus(null);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
+  const { status, minutesToNextTransition } = useMarketStatus();
   if (!status) return null;
-  const { label, className } = LABELS[status];
+
+  const { label, variant, transitionVerb } = LABELS[status];
+  const suffix =
+    minutesToNextTransition !== null
+      ? ` · ${transitionVerb} ${formatCountdown(minutesToNextTransition)}`
+      : "";
 
   return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${className}`}>
+    <Badge variant={variant}>
       {label}
-    </span>
+      {suffix}
+    </Badge>
   );
 }

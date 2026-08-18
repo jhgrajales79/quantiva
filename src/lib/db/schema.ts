@@ -375,6 +375,30 @@ export const macroIndicators = pgTable(
   (table) => [uniqueIndex("macro_code_date_idx").on(table.code, table.date)],
 );
 
+export const fearGreedSnapshot = pgTable("fear_greed_snapshot", {
+  id: text("id").primaryKey().default("latest"), // fila única, siempre se upsertea
+  score: doublePrecision("score").notNull(),
+  rating: text("rating").notNull(),
+  previousClose: doublePrecision("previous_close").notNull(),
+  previousWeek: doublePrecision("previous_week").notNull(),
+  date: text("date").notNull(),
+  source: text("source").notNull(),
+  fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const marketBreadthSnapshots = pgTable("market_breadth_snapshots", {
+  date: text("date").primaryKey(),
+  advancing: integer("advancing").notNull(),
+  declining: integer("declining").notNull(),
+  pctAboveMa50: doublePrecision("pct_above_ma50").notNull(),
+  pctAboveMa200: doublePrecision("pct_above_ma200").notNull(),
+  newHighs52w: integer("new_highs_52w").notNull(),
+  newLows52w: integer("new_lows_52w").notNull(),
+  universeSize: integer("universe_size").notNull(),
+  source: text("source").notNull(),
+  fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
+});
+
 export const marketMoversCache = pgTable(
   "market_movers_cache",
   {

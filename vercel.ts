@@ -28,5 +28,9 @@ export const config: VercelConfig = {
       path: "/api/cron/refresh-news",
       schedule: "0 13 * * *",
     },
+    {
+      path: "/api/cron/refresh-market-breadth",
+      schedule: "0 14 * * 1-5",
+    },
   ],
 };
