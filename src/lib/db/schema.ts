@@ -466,3 +466,15 @@ export const marketMoversCache = pgTable(
     ),
   ],
 );
+
+// Preferencia de widgets del panel principal por usuario: qué widgets están
+// activos y en qué orden. `widgets` guarda solo los ids habilitados, en el
+// orden elegido por el usuario; si no hay fila, el dashboard usa el orden
+// por defecto de `DASHBOARD_WIDGET_DEFS`.
+export const dashboardPreferences = pgTable("dashboard_preferences", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  widgets: text("widgets").array().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});
