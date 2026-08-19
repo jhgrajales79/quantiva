@@ -37,14 +37,30 @@ interface FundamentalsData {
   fundamentals: { cash: number | null; totalDebt: number | null };
 }
 
-interface TabDef {
-  key: string;
-  label: string;
-  target: string; // "top" o id del widget al que hace scroll
+interface HeaderSummary {
+  fairValue: { value: number | null; upsidePct: number | null };
+  analystTarget: { targetMeanPrice: number | null; numberOfAnalysts: number | null };
+  simulator: { fairValue: number | null; upsidePct: number | null };
+  finanzas: { revenue: number | null; fiscalDate: string | null };
+  earnings: {
+    epsActual: number | null;
+    epsEstimate: number | null;
+    surprisePercent: number | null;
+    quarterEndDate: string | null;
+  };
+  previsiones: { label: string | null; epsEstimateAvg: number | null; epsGrowth: number | null };
+  dividendos: { dpsTtm: number | null; dividendYield: number | null };
+  accionistas: { institutionsPct: number | null; insidersPct: number | null };
+  reportesSec: { type: string | null; date: string | null };
 }
 
-const TABS: TabDef[] = [
-  { key: "resumen", label: "Resumen", target: "top" },
+interface SummaryTabDef {
+  key: string;
+  label: string;
+  target: string; // id del widget al que hace scroll
+}
+
+const SUMMARY_TABS: SummaryTabDef[] = [
   { key: "fair_value", label: "Valor justo", target: "widget-scores" },
   { key: "analyst_target", label: "Objetivo analistas", target: "widget-analyst_consensus" },
   { key: "simulator", label: "Simulador", target: "widget-dcf_simulator" },
@@ -63,7 +79,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
   const [fundamentals, setFundamentals] = useState<FundamentalsData | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [watchlistLoaded, setWatchlistLoaded] = useState(false);
-  const [activeTab, setActiveTab] = useState("resumen");
+  const [summary, setSummary] = useState<HeaderSummary | null>(null);
 
   useEffect(() => {
     fetch(`/api/quotes/${symbol}`)
@@ -85,6 +101,12 @@ export function StockHeader({ symbol }: { symbol: string }) {
       .then((res) => (res.ok ? res.json() : null))
       .then(setFundamentals)
       .catch(() => setFundamentals(null));
+
+    setSummary(null);
+    fetch(`/api/header-summary/${symbol}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then(setSummary)
+      .catch(() => setSummary(null));
 
     fetch("/api/watchlist")
       .then((res) => res.json())
@@ -108,13 +130,8 @@ export function StockHeader({ symbol }: { symbol: string }) {
     setIsFavorite(!isFavorite);
   }
 
-  function handleTabClick(tab: TabDef) {
-    setActiveTab(tab.key);
-    if (tab.target === "top") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-    document.getElementById(tab.target)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  function scrollToWidget(target: string) {
+    document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   const changePositive = quote?.changePct !== null && quote?.changePct !== undefined && quote.changePct >= 0;
@@ -230,23 +247,138 @@ export function StockHeader({ symbol }: { symbol: string }) {
         </div>
       </div>
 
-      <div className="mt-4 flex gap-1 overflow-x-auto border-t border-app-border pt-2">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => handleTabClick(tab)}
-            className={`flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium transition ${
-              activeTab === tab.key
-                ? "bg-app-surface-2 text-app-fg"
-                : "text-app-fg-muted hover:bg-app-surface-2 hover:text-app-fg"
-            }`}
-          >
-            {tab.label}
-          </button>
+      <div className="mt-4 grid grid-cols-2 gap-2 border-t border-app-border pt-3 sm:grid-cols-3 lg:grid-cols-9">
+        {SUMMARY_TABS.map((tab) => (
+          <SummaryCard key={tab.key} tab={tab} summary={summary} onClick={() => scrollToWidget(tab.target)} />
         ))}
       </div>
     </div>
   );
+}
+
+function SummaryCard({
+  tab,
+  summary,
+  onClick,
+}: {
+  tab: SummaryTabDef;
+  summary: HeaderSummary | null;
+  onClick: () => void;
+}) {
+  const content = summary ? renderSummaryContent(tab.key, summary) : null;
+
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-start rounded-md border border-app-border bg-app-surface-2/40 px-2.5 py-2 text-left transition hover:bg-app-surface-2"
+    >
+      <span className="text-xs text-app-fg-muted">{tab.label}</span>
+      {!summary ? (
+        <Spinner className="mt-1" />
+      ) : content ? (
+        <>
+          <span className="mt-0.5 text-sm font-semibold text-app-fg">{content.value}</span>
+          {content.sublabel && (
+            <span className={`text-xs ${content.sublabelClass ?? "text-app-fg-faint"}`}>{content.sublabel}</span>
+          )}
+        </>
+      ) : (
+        <span className="mt-0.5 text-xs text-app-fg-faint">Dato no disponible</span>
+      )}
+    </button>
+  );
+}
+
+function renderSummaryContent(
+  key: string,
+  summary: HeaderSummary,
+): { value: string; sublabel?: string; sublabelClass?: string } | null {
+  switch (key) {
+    case "fair_value": {
+      const { value, upsidePct } = summary.fairValue;
+      if (value === null) return null;
+      return {
+        value: formatCurrency(value),
+        sublabel: upsidePct !== null ? `${upsidePct >= 0 ? "+" : ""}${formatPercent(upsidePct)} upside` : undefined,
+        sublabelClass: upsidePct !== null ? (upsidePct >= 0 ? "text-emerald-400" : "text-red-400") : undefined,
+      };
+    }
+    case "analyst_target": {
+      const { targetMeanPrice, numberOfAnalysts } = summary.analystTarget;
+      if (targetMeanPrice === null) return null;
+      return {
+        value: formatCurrency(targetMeanPrice),
+        sublabel: numberOfAnalysts !== null ? `${numberOfAnalysts} analistas` : undefined,
+      };
+    }
+    case "simulator": {
+      const { fairValue, upsidePct } = summary.simulator;
+      if (fairValue === null) return null;
+      return {
+        value: formatCurrency(fairValue),
+        sublabel: upsidePct !== null ? `${upsidePct >= 0 ? "+" : ""}${formatPercent(upsidePct)} upside` : undefined,
+        sublabelClass: upsidePct !== null ? (upsidePct >= 0 ? "text-emerald-400" : "text-red-400") : undefined,
+      };
+    }
+    case "finanzas": {
+      const { revenue, fiscalDate } = summary.finanzas;
+      if (revenue === null) return null;
+      return {
+        value: formatCompact(revenue),
+        sublabel: fiscalDate ? `Ingresos · ${fiscalDate}` : "Ingresos anuales",
+      };
+    }
+    case "earnings": {
+      const { epsActual, surprisePercent, quarterEndDate } = summary.earnings;
+      if (epsActual === null) return null;
+      return {
+        value: formatCurrency(epsActual),
+        sublabel:
+          surprisePercent !== null
+            ? `${surprisePercent >= 0 ? "+" : ""}${formatPercent(surprisePercent)} vs. estimado`
+            : quarterEndDate ?? undefined,
+        sublabelClass: surprisePercent !== null ? (surprisePercent >= 0 ? "text-emerald-400" : "text-red-400") : undefined,
+      };
+    }
+    case "previsiones": {
+      const { epsEstimateAvg, epsGrowth, label } = summary.previsiones;
+      if (epsEstimateAvg === null) return null;
+      return {
+        value: formatCurrency(epsEstimateAvg),
+        sublabel:
+          epsGrowth !== null
+            ? `${epsGrowth >= 0 ? "+" : ""}${formatPercent(epsGrowth)} · ${label ?? "BPA est."}`
+            : label ?? undefined,
+        sublabelClass: epsGrowth !== null ? (epsGrowth >= 0 ? "text-emerald-400" : "text-red-400") : undefined,
+      };
+    }
+    case "dividendos": {
+      const { dpsTtm, dividendYield } = summary.dividendos;
+      if (dpsTtm === null && dividendYield === null) return null;
+      return {
+        value: dividendYield !== null ? formatPercent(dividendYield) : formatCurrency(dpsTtm),
+        sublabel: dpsTtm !== null ? `${formatCurrency(dpsTtm)} DPS TTM` : "yield",
+      };
+    }
+    case "accionistas": {
+      const { institutionsPct } = summary.accionistas;
+      if (institutionsPct === null) return null;
+      return {
+        value: formatPercent(institutionsPct),
+        sublabel: "institucional",
+      };
+    }
+    case "reportes_sec": {
+      const { type, date } = summary.reportesSec;
+      if (type === null) return null;
+      return {
+        value: type,
+        sublabel: date ?? undefined,
+      };
+    }
+    default:
+      return null;
+  }
 }
 
 function Stat({ label, value, sublabel }: { label: string; value: string; sublabel?: string }) {
