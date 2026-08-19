@@ -1,4 +1,4 @@
-import { sanitizeWidgetList as sanitize } from "@/lib/widget-list";
+import { sanitizeWidgetList as sanitize, sanitizeWidgetSizes, type WidgetSize } from "@/lib/widget-list";
 
 export interface DashboardWidgetDef {
   id: string;
@@ -24,4 +24,8 @@ export const DEFAULT_DASHBOARD_WIDGETS = [...DASHBOARD_WIDGET_IDS];
 
 export function sanitizeWidgetList(input: unknown): string[] {
   return sanitize(input, DASHBOARD_WIDGET_IDS, DEFAULT_DASHBOARD_WIDGETS);
+}
+
+export function sanitizeDashboardWidgetSizes(input: unknown): Record<string, WidgetSize> {
+  return sanitizeWidgetSizes(input, DASHBOARD_WIDGET_IDS);
 }

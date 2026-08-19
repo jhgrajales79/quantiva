@@ -496,6 +496,9 @@ export const dashboardPreferences = pgTable("dashboard_preferences", {
     .primaryKey()
     .references(() => users.id, { onDelete: "cascade" }),
   widgets: text("widgets").array().notNull(),
+  // Tamaño elegido por el usuario para cada widget ({ [widgetId]: "half" | "full" }).
+  // Los widgets sin entrada usan el span por defecto del registro.
+  sizes: jsonb("sizes").$type<Record<string, "half" | "full">>().notNull().default({}),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
@@ -507,5 +510,8 @@ export const stockWidgetPreferences = pgTable("stock_widget_preferences", {
     .primaryKey()
     .references(() => users.id, { onDelete: "cascade" }),
   widgets: text("widgets").array().notNull(),
+  // Tamaño elegido por el usuario para cada widget ({ [widgetId]: "half" | "full" }).
+  // Los widgets sin entrada usan el span por defecto del registro.
+  sizes: jsonb("sizes").$type<Record<string, "half" | "full">>().notNull().default({}),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });

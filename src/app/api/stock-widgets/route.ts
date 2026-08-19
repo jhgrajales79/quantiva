@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/client";
 import { stockWidgetPreferences } from "@/lib/db/schema";
-import { DEFAULT_STOCK_WIDGETS, sanitizeStockWidgetList } from "@/lib/stock-widgets";
+import { DEFAULT_STOCK_WIDGETS, sanitizeStockWidgetList, sanitizeStockWidgetSizes } from "@/lib/stock-widgets";
 
 export async function GET() {
   const session = await auth();
@@ -17,7 +17,10 @@ export async function GET() {
     .where(eq(stockWidgetPreferences.userId, session.user.id))
     .limit(1);
 
-  return NextResponse.json({ widgets: pref?.widgets ?? DEFAULT_STOCK_WIDGETS });
+  return NextResponse.json({
+    widgets: pref?.widgets ?? DEFAULT_STOCK_WIDGETS,
+    sizes: pref?.sizes ?? {},
+  });
 }
 
 export async function PUT(request: Request) {
@@ -28,14 +31,15 @@ export async function PUT(request: Request) {
 
   const body = await request.json().catch(() => null);
   const widgets = sanitizeStockWidgetList(body?.widgets);
+  const sizes = sanitizeStockWidgetSizes(body?.sizes);
 
   await db
     .insert(stockWidgetPreferences)
-    .values({ userId: session.user.id, widgets, updatedAt: new Date() })
+    .values({ userId: session.user.id, widgets, sizes, updatedAt: new Date() })
     .onConflictDoUpdate({
       target: stockWidgetPreferences.userId,
-      set: { widgets, updatedAt: new Date() },
+      set: { widgets, sizes, updatedAt: new Date() },
     });
 
-  return NextResponse.json({ widgets });
+  return NextResponse.json({ widgets, sizes });
 }

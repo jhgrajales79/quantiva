@@ -1,4 +1,4 @@
-import { sanitizeWidgetList as sanitize } from "@/lib/widget-list";
+import { sanitizeWidgetList as sanitize, sanitizeWidgetSizes, type WidgetSize } from "@/lib/widget-list";
 
 export interface StockWidgetDef {
   id: string;
@@ -34,4 +34,8 @@ export const DEFAULT_STOCK_WIDGETS = [...STOCK_WIDGET_IDS];
 
 export function sanitizeStockWidgetList(input: unknown): string[] {
   return sanitize(input, STOCK_WIDGET_IDS, DEFAULT_STOCK_WIDGETS);
+}
+
+export function sanitizeStockWidgetSizes(input: unknown): Record<string, WidgetSize> {
+  return sanitizeWidgetSizes(input, STOCK_WIDGET_IDS);
 }
