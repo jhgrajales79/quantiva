@@ -15,6 +15,7 @@ import { NewsFilingsTabs } from "@/components/stock/NewsFilingsTabs";
 import { SimilarCompaniesGrid } from "@/components/stock/SimilarCompaniesGrid";
 import { FairValueModels } from "@/components/cards/FairValueModels";
 import { ScoresPanel } from "@/components/stock/ScoresPanel";
+import { EarningsRevenueCard } from "@/components/stock/EarningsRevenueCard";
 
 interface ValuationModelsResponse {
   possibleValueTrap: boolean;
@@ -49,6 +50,8 @@ export function StockPageClient({ symbol }: { symbol: string }) {
       <PriceChartSection symbol={symbol} />
 
       <FundamentalsMiniCards symbol={symbol} />
+
+      <EarningsRevenueCard symbol={symbol} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <ValuationVsHistoryTable symbol={symbol} />
