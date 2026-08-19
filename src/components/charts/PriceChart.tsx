@@ -20,11 +20,8 @@ function cssVar(name: string, fallback: string): string {
   return value || fallback;
 }
 
-function toIndexed(data: PricePoint[]): { time: string; value: number }[] {
-  if (data.length === 0) return [];
-  const base = data[0].close;
-  if (!base) return [];
-  return data.map((p) => ({ time: p.date, value: ((p.close - base) / base) * 100 }));
+function toSeries(data: PricePoint[]): { time: string; value: number }[] {
+  return data.map((p) => ({ time: p.date, value: p.close }));
 }
 
 export function PriceChart({
@@ -56,10 +53,8 @@ export function PriceChart({
       width: containerRef.current.clientWidth,
       height: 320,
       timeScale: { borderColor: border },
-      rightPriceScale: {
-        borderColor: border,
-        ...(showComparison ? { mode: 0 } : {}),
-      },
+      rightPriceScale: { borderColor: border },
+      leftPriceScale: showComparison ? { visible: true, borderColor: border } : { visible: false },
     });
     chartRef.current = chart;
 
@@ -68,17 +63,19 @@ export function PriceChart({
         color: "#34d399",
         lineWidth: 2,
         title: "Acción",
-        priceFormat: { type: "custom", formatter: (v: number) => `${v.toFixed(1)}%` },
+        priceScaleId: "right",
+        priceFormat: { type: "custom", formatter: (v: number) => `$${v.toFixed(2)}` },
       });
-      stockSeries.setData(toIndexed(data));
+      stockSeries.setData(toSeries(data));
 
       const compareSeries = chart.addSeries(LineSeries, {
         color: compareWith.color,
         lineWidth: 2,
         title: compareWith.label,
-        priceFormat: { type: "custom", formatter: (v: number) => `${v.toFixed(1)}%` },
+        priceScaleId: "left",
+        priceFormat: { type: "custom", formatter: (v: number) => `$${v.toFixed(2)}` },
       });
-      compareSeries.setData(toIndexed(compareWith.data));
+      compareSeries.setData(toSeries(compareWith.data));
     } else {
       const series = chart.addSeries(LineSeries, {
         color: primaryColor,
@@ -116,11 +113,11 @@ export function PriceChart({
         <div className="mb-1.5 flex items-center gap-4 text-xs text-app-fg-muted">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-0.5 w-3 bg-emerald-400" />
-            Acción (% vs. inicio del período)
+            Acción (eje derecho)
           </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-0.5 w-3" style={{ backgroundColor: compareWith.color }} />
-            {compareWith.label} (% vs. inicio del período)
+            {compareWith.label} (eje izquierdo)
           </span>
         </div>
       )}
