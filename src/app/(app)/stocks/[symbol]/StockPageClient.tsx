@@ -14,6 +14,7 @@ import { AnalystConsensusCard } from "@/components/stock/AnalystConsensusCard";
 import { NewsFilingsTabs } from "@/components/stock/NewsFilingsTabs";
 import { SimilarCompaniesGrid } from "@/components/stock/SimilarCompaniesGrid";
 import { FairValueModels } from "@/components/cards/FairValueModels";
+import { ScoresPanel } from "@/components/stock/ScoresPanel";
 
 interface ValuationModelsResponse {
   possibleValueTrap: boolean;
@@ -35,6 +36,8 @@ export function StockPageClient({ symbol }: { symbol: string }) {
       <StockHeader symbol={symbol} />
 
       <ValuationSummaryCards symbol={symbol} />
+
+      <ScoresPanel symbol={symbol} />
 
       {valuation?.possibleValueTrap && (
         <div className="rounded-md border border-amber-700/50 bg-amber-900/20 p-3 text-sm text-amber-300">
