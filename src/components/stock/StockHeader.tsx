@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Star, Lock } from "lucide-react";
+import { Star } from "lucide-react";
 import { MarketStatusBadge } from "@/components/layout/MarketStatusBadge";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
@@ -40,21 +40,20 @@ interface FundamentalsData {
 interface TabDef {
   key: string;
   label: string;
-  pro: boolean;
   target: string; // "top" o id del widget al que hace scroll
 }
 
 const TABS: TabDef[] = [
-  { key: "resumen", label: "Resumen", pro: false, target: "top" },
-  { key: "fair_value", label: "Valor justo", pro: true, target: "widget-scores" },
-  { key: "analyst_target", label: "Objetivo analistas", pro: true, target: "widget-analyst_consensus" },
-  { key: "simulator", label: "Simulador", pro: true, target: "widget-dcf_simulator" },
-  { key: "finanzas", label: "Finanzas", pro: false, target: "widget-fundamentals" },
-  { key: "earnings", label: "Earnings", pro: true, target: "widget-earnings_history" },
-  { key: "previsiones", label: "Previsiones", pro: true, target: "widget-forecasts" },
-  { key: "dividendos", label: "Dividendos", pro: true, target: "widget-dividends" },
-  { key: "accionistas", label: "Accionistas", pro: true, target: "widget-shareholders" },
-  { key: "reportes_sec", label: "Reportes SEC", pro: true, target: "widget-news_filings" },
+  { key: "resumen", label: "Resumen", target: "top" },
+  { key: "fair_value", label: "Valor justo", target: "widget-scores" },
+  { key: "analyst_target", label: "Objetivo analistas", target: "widget-analyst_consensus" },
+  { key: "simulator", label: "Simulador", target: "widget-dcf_simulator" },
+  { key: "finanzas", label: "Finanzas", target: "widget-fundamentals" },
+  { key: "earnings", label: "Earnings", target: "widget-earnings_history" },
+  { key: "previsiones", label: "Previsiones", target: "widget-forecasts" },
+  { key: "dividendos", label: "Dividendos", target: "widget-dividends" },
+  { key: "accionistas", label: "Accionistas", target: "widget-shareholders" },
+  { key: "reportes_sec", label: "Reportes SEC", target: "widget-news_filings" },
 ];
 
 export function StockHeader({ symbol }: { symbol: string }) {
@@ -243,7 +242,6 @@ export function StockHeader({ symbol }: { symbol: string }) {
             }`}
           >
             {tab.label}
-            {tab.pro && <Lock size={11} strokeWidth={2.5} className="text-app-fg-faint" />}
           </button>
         ))}
       </div>
