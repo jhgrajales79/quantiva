@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
+import { GRID_COLS } from "@/lib/widget-list";
 
 export interface WidgetDef {
   id: string;
@@ -9,12 +10,15 @@ export interface WidgetDef {
   description: string;
 }
 
+export type WidthChoice = "half" | "full";
+
 export function WidgetCustomizePanel({
   title,
   description,
   defs,
   current,
   defaultIds,
+  layout,
   onClose,
   onSave,
 }: {
@@ -23,10 +27,21 @@ export function WidgetCustomizePanel({
   defs: WidgetDef[];
   current: string[];
   defaultIds: string[];
+  layout: { i: string; w: number }[];
   onClose: () => void;
-  onSave: (widgets: string[]) => void;
+  onSave: (widgets: string[], widthChoices: Record<string, WidthChoice>) => void;
 }) {
   const [draft, setDraft] = useState<string[]>(current);
+  // Ancho actual de cada widget (a partir de la cuadrícula real), para que
+  // los botones "Mitad"/"Completo" reflejen su estado y el usuario pueda
+  // cambiarlo sin tener que arrastrar el borde del widget.
+  const [widthChoices, setWidthChoices] = useState<Record<string, WidthChoice>>(() => {
+    const initial: Record<string, WidthChoice> = {};
+    for (const item of layout) {
+      initial[item.i] = item.w >= GRID_COLS ? "full" : "half";
+    }
+    return initial;
+  });
 
   const enabledSet = new Set(draft);
   const ordered = [...draft, ...defs.map((w) => w.id).filter((id) => !enabledSet.has(id))];
@@ -45,6 +60,10 @@ export function WidgetCustomizePanel({
       [next[idx], next[swapWith]] = [next[swapWith], next[idx]];
       return next;
     });
+  }
+
+  function setWidth(id: string, choice: WidthChoice) {
+    setWidthChoices((prev) => ({ ...prev, [id]: choice }));
   }
 
   return (
@@ -67,43 +86,71 @@ export function WidgetCustomizePanel({
             if (!def) return null;
             const enabled = enabledSet.has(id);
             const enabledIdx = draft.indexOf(id);
+            const width = widthChoices[id] ?? "half";
             return (
               <li
                 key={id}
-                className={`flex items-center gap-2 rounded-md border px-3 py-2 ${
+                className={`rounded-md border px-3 py-2 ${
                   enabled ? "border-app-border bg-app-surface-2" : "border-app-border/50 opacity-60"
                 }`}
               >
-                <GripVertical size={15} strokeWidth={2} className="shrink-0 text-app-fg-faint" />
-                <label className="flex flex-1 cursor-pointer items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={enabled}
-                    onChange={() => toggle(id)}
-                    className="h-4 w-4 rounded border-app-border"
-                  />
-                  <span>
-                    <span className="block text-sm font-medium text-app-fg">{def.label}</span>
-                    <span className="block text-xs text-app-fg-muted">{def.description}</span>
-                  </span>
-                </label>
+                <div className="flex items-center gap-2">
+                  <GripVertical size={15} strokeWidth={2} className="shrink-0 text-app-fg-faint" />
+                  <label className="flex flex-1 cursor-pointer items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={enabled}
+                      onChange={() => toggle(id)}
+                      className="h-4 w-4 rounded border-app-border"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-app-fg">{def.label}</span>
+                      <span className="block text-xs text-app-fg-muted">{def.description}</span>
+                    </span>
+                  </label>
+                  {enabled && (
+                    <div className="flex shrink-0 flex-col">
+                      <button
+                        onClick={() => move(id, -1)}
+                        disabled={enabledIdx === 0}
+                        className="rounded p-0.5 text-app-fg-muted hover:bg-app-surface disabled:opacity-30"
+                        aria-label="Subir"
+                      >
+                        <ChevronUp size={14} strokeWidth={2} />
+                      </button>
+                      <button
+                        onClick={() => move(id, 1)}
+                        disabled={enabledIdx === draft.length - 1}
+                        className="rounded p-0.5 text-app-fg-muted hover:bg-app-surface disabled:opacity-30"
+                        aria-label="Bajar"
+                      >
+                        <ChevronDown size={14} strokeWidth={2} />
+                      </button>
+                    </div>
+                  )}
+                </div>
                 {enabled && (
-                  <div className="flex shrink-0 flex-col">
+                  <div className="ml-6 mt-2 flex items-center gap-1.5">
+                    <span className="text-xs text-app-fg-faint">Ancho:</span>
                     <button
-                      onClick={() => move(id, -1)}
-                      disabled={enabledIdx === 0}
-                      className="rounded p-0.5 text-app-fg-muted hover:bg-app-surface disabled:opacity-30"
-                      aria-label="Subir"
+                      onClick={() => setWidth(id, "half")}
+                      className={`rounded px-2 py-0.5 text-xs font-medium ${
+                        width === "half"
+                          ? "bg-emerald-600 text-white"
+                          : "border border-app-border text-app-fg-muted hover:bg-app-surface"
+                      }`}
                     >
-                      <ChevronUp size={14} strokeWidth={2} />
+                      Mitad
                     </button>
                     <button
-                      onClick={() => move(id, 1)}
-                      disabled={enabledIdx === draft.length - 1}
-                      className="rounded p-0.5 text-app-fg-muted hover:bg-app-surface disabled:opacity-30"
-                      aria-label="Bajar"
+                      onClick={() => setWidth(id, "full")}
+                      className={`rounded px-2 py-0.5 text-xs font-medium ${
+                        width === "full"
+                          ? "bg-emerald-600 text-white"
+                          : "border border-app-border text-app-fg-muted hover:bg-app-surface"
+                      }`}
                     >
-                      <ChevronDown size={14} strokeWidth={2} />
+                      Completo
                     </button>
                   </div>
                 )}
@@ -127,7 +174,7 @@ export function WidgetCustomizePanel({
               Cancelar
             </button>
             <button
-              onClick={() => onSave(draft)}
+              onClick={() => onSave(draft, widthChoices)}
               className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500"
             >
               Guardar

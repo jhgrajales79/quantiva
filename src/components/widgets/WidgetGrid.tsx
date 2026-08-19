@@ -6,8 +6,14 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { LayoutGrid, GripVertical, StretchHorizontal } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
-import { WidgetCustomizePanel, type WidgetDef } from "@/components/widgets/WidgetCustomizePanel";
+import { WidgetCustomizePanel, type WidgetDef, type WidthChoice } from "@/components/widgets/WidgetCustomizePanel";
 import { generateDefaultLayout, GRID_COLS, type GridLayoutItem } from "@/lib/widget-list";
+
+function applyWidthChoice(item: GridLayoutItem, choice: WidthChoice): GridLayoutItem {
+  if (choice === "full") return { ...item, x: 0, w: GRID_COLS };
+  const half = GRID_COLS / 2;
+  return { ...item, w: half, x: Math.min(item.x, GRID_COLS - half) };
+}
 
 interface WidgetGridDef extends WidgetDef {
   span: "half" | "full";
@@ -85,11 +91,16 @@ export function WidgetGrid({
     }
   }
 
-  async function handleSave(next: string[]) {
-    const keptLayout = layout.filter((item) => next.includes(item.i));
+  async function handleSave(next: string[], widthChoices: Record<string, WidthChoice>) {
+    const keptLayout = layout
+      .filter((item) => next.includes(item.i))
+      .map((item) => (widthChoices[item.i] ? applyWidthChoice(item, widthChoices[item.i]) : item));
     const newIds = next.filter((id) => !keptLayout.some((item) => item.i === id));
     const stackY = keptLayout.reduce((max, item) => Math.max(max, item.y + item.h), 0);
-    const newItems = generateDefaultLayout(defs, newIds).map((item) => ({ ...item, y: item.y + stackY }));
+    const newItems = generateDefaultLayout(defs, newIds).map((item) => {
+      const stacked = { ...item, y: item.y + stackY };
+      return widthChoices[item.i] ? applyWidthChoice(stacked, widthChoices[item.i]) : stacked;
+    });
     const nextLayout = [...keptLayout, ...newItems];
     setWidgets(next);
     setLayout(nextLayout);
@@ -179,6 +190,7 @@ export function WidgetGrid({
           defs={defs}
           current={widgets ?? defaultIds}
           defaultIds={defaultIds}
+          layout={layout}
           onClose={() => setPanelOpen(false)}
           onSave={handleSave}
         />
