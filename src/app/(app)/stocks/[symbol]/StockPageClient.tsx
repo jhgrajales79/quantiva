@@ -19,7 +19,9 @@ export function StockPageClient({ symbol }: { symbol: string }) {
     <div className="space-y-6">
       <StockHeader symbol={symbol} />
 
-      <ValuationSummaryCards symbol={symbol} />
+      <div id="widget-valuation-summary">
+        <ValuationSummaryCards symbol={symbol} />
+      </div>
 
       {possibleValueTrap && (
         <div className="rounded-md border border-amber-700/50 bg-amber-900/20 p-3 text-sm text-amber-300">

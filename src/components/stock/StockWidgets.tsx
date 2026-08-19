@@ -91,7 +91,11 @@ export function StockWidgets({ symbol }: { symbol: string }) {
             const Component = WIDGET_COMPONENTS[id];
             if (!Component) return null;
             return (
-              <div key={id} className={WIDGET_SPAN[id] === "full" ? "lg:col-span-2" : ""}>
+              <div
+                key={id}
+                id={`widget-${id}`}
+                className={WIDGET_SPAN[id] === "full" ? "lg:col-span-2" : ""}
+              >
                 <Component symbol={symbol} />
               </div>
             );
