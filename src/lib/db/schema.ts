@@ -286,6 +286,26 @@ export const valuationConsensus = pgTable("valuation_consensus", {
   calculatedAt: timestamp("calculated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+// Historial de puntajes (append-only, un snapshot diario como máximo por
+// activo) para poder mostrar la tendencia real de los gauges en vez de solo
+// el valor actual. Se alimenta desde /api/valuation al recalcular.
+export const valuationHistory = pgTable(
+  "valuation_history",
+  {
+    id: text("id").primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assets.id, { onDelete: "cascade" }),
+    valueScore: doublePrecision("value_score"),
+    qualityScore: doublePrecision("quality_score"),
+    growthScore: doublePrecision("growth_score"),
+    momentumScore: doublePrecision("momentum_score"),
+    investmentScore: doublePrecision("investment_score"),
+    calculatedAt: timestamp("calculated_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [index("valuation_history_asset_idx").on(table.assetId, table.calculatedAt)],
+);
+
 // ---------------------------------------------------------------------------
 // User layer: watchlists & portfolios
 // ---------------------------------------------------------------------------

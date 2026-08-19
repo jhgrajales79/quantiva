@@ -92,7 +92,10 @@ export function PriceChartSection({ symbol }: { symbol: string }) {
       {stockPrices === null ? (
         <Spinner />
       ) : (
-        <PriceChart data={filteredStock} />
+        <PriceChart
+          data={filteredStock}
+          compareWith={{ label: "S&P 500 (SPY)", color: "#f59e0b", data: filteredSpy }}
+        />
       )}
     </Card>
   );

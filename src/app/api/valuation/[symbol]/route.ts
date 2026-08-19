@@ -7,8 +7,10 @@ import {
   pricesIntradayCache,
   ratios,
   valuationConsensus,
+  valuationHistory,
   valuations,
 } from "@/lib/db/schema";
+import { isStale, TTL } from "@/lib/cache";
 import { getOrCreateAsset } from "@/lib/assets";
 import { evaluateAsset } from "@/lib/valuation/evaluate";
 import { computePerformance } from "@/lib/performance";
@@ -157,6 +159,42 @@ export async function GET(
 
   const calculatedAt = new Date();
 
+  // Un snapshot diario como máximo por activo, para poder mostrar la
+  // tendencia real de los puntajes sin acumular ruido en cada visita.
+  const [lastSnapshot] = await db
+    .select({ calculatedAt: valuationHistory.calculatedAt })
+    .from(valuationHistory)
+    .where(eq(valuationHistory.assetId, asset.id))
+    .orderBy(desc(valuationHistory.calculatedAt))
+    .limit(1);
+
+  if (isStale(lastSnapshot?.calculatedAt, 20 * 60 * 60_000)) {
+    await db.insert(valuationHistory).values({
+      id: newId("valhist"),
+      assetId: asset.id,
+      valueScore: result.valueScore,
+      qualityScore: result.qualityScore,
+      growthScore: result.growthScore,
+      momentumScore: result.momentumScore,
+      investmentScore: result.investmentScore,
+      calculatedAt,
+    });
+  }
+
+  const historySnapshots = await db
+    .select({
+      valueScore: valuationHistory.valueScore,
+      qualityScore: valuationHistory.qualityScore,
+      growthScore: valuationHistory.growthScore,
+      momentumScore: valuationHistory.momentumScore,
+      investmentScore: valuationHistory.investmentScore,
+      calculatedAt: valuationHistory.calculatedAt,
+    })
+    .from(valuationHistory)
+    .where(eq(valuationHistory.assetId, asset.id))
+    .orderBy(desc(valuationHistory.calculatedAt))
+    .limit(10);
+
   for (const model of result.models) {
     await db
       .insert(valuations)
@@ -223,6 +261,46 @@ export async function GET(
       momentum: result.momentumScore,
       investment: result.investmentScore,
     },
+    scoreInputs: {
+      value: {
+        upsidePct: result.upsidePct,
+        fcfYield: latestRatio?.fcfYield ?? null,
+        dividendYield: latestRatio?.dividendYield ?? null,
+      },
+      quality: {
+        roe: latestRatio?.roe ?? null,
+        roic: latestRatio?.roic ?? null,
+        grossMargin: latestRatio?.grossMargin ?? null,
+        operatingMargin: latestRatio?.operatingMargin ?? null,
+        debtToEbitda: latestRatio?.debtToEbitda ?? null,
+      },
+      growth: {
+        revenueGrowth: latestRatio?.revenueGrowth ?? null,
+        epsGrowth: latestRatio?.epsGrowth ?? null,
+      },
+      momentum: {
+        perf1m: performance.perf1m,
+        perf3m: performance.perf3m,
+        perf6m: performance.perf6m,
+        perf12m: performance.perf12m,
+        priceVsMa50Pct: performance.priceVsMa50Pct,
+        priceVsMa200Pct: performance.priceVsMa200Pct,
+      },
+      investment: {
+        value: result.valueScore,
+        quality: result.qualityScore,
+        growth: result.growthScore,
+        momentum: result.momentumScore,
+      },
+    },
+    scoreHistory: historySnapshots.reverse().map((h) => ({
+      calculatedAt: h.calculatedAt.toISOString(),
+      value: h.valueScore,
+      quality: h.qualityScore,
+      growth: h.growthScore,
+      momentum: h.momentumScore,
+      investment: h.investmentScore,
+    })),
     possibleValueTrap: result.possibleValueTrap,
     historicalComparisons,
     models: result.models.map((m) => ({

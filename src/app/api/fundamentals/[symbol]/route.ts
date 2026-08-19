@@ -4,6 +4,7 @@ import { db } from "@/lib/db/client";
 import { fundamentals, ratios } from "@/lib/db/schema";
 import { getOrCreateAsset } from "@/lib/assets";
 import { getMarketDataProvider } from "@/lib/providers/registry";
+import { getAnnualFinancialsHistory } from "@/lib/providers/yahoo-financials-history";
 import { isStale, TTL } from "@/lib/cache";
 import { newId } from "@/lib/id";
 
@@ -69,6 +70,47 @@ export async function GET(
               fetchedAt: new Date(),
             },
           });
+      }
+
+      // Historia anual real (~4 años) vía Yahoo fundamentals-timeseries —
+      // complementa el único snapshot TTM de arriba, para que las tendencias
+      // (CAGR, gráficos históricos) no dependan de que la app acumule su
+      // propio historial visita a visita.
+      try {
+        const annualHistory = await getAnnualFinancialsHistory(symbol);
+        for (const point of annualHistory) {
+          if (point.revenue === null && point.netIncome === null && point.eps === null && point.fcf === null) {
+            continue;
+          }
+          await db
+            .insert(fundamentals)
+            .values({
+              id: newId("fund"),
+              assetId: asset.id,
+              period: "annual",
+              fiscalDate: point.fiscalDate,
+              revenue: point.revenue,
+              netIncome: point.netIncome,
+              eps: point.eps,
+              fcf: point.fcf,
+              source: "Yahoo Finance (fundamentals-timeseries)",
+              fetchedAt: new Date(),
+            })
+            .onConflictDoUpdate({
+              target: [fundamentals.assetId, fundamentals.period, fundamentals.fiscalDate],
+              set: {
+                // Solo se completan estos 4 campos; no se pisan ebitda/ebit/deuda/etc.
+                // si ya existían de otra fuente para la misma fecha.
+                revenue: point.revenue,
+                netIncome: point.netIncome,
+                eps: point.eps,
+                fcf: point.fcf,
+                fetchedAt: new Date(),
+              },
+            });
+        }
+      } catch {
+        // best-effort: si falla, se sigue mostrando el único snapshot TTM
       }
 
       for (const r of ratiosHistory) {

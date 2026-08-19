@@ -25,6 +25,39 @@ const METRICS = [
   { key: "fcf" as const, label: "FCF", format: formatCompact },
 ];
 
+function fiscalYear(fiscalDate: string): string {
+  return fiscalDate.slice(0, 4);
+}
+
+function TrendBars({ points }: { points: { fiscalDate: string; value: number | null }[] }) {
+  const withValue = points.filter((p) => p.value !== null);
+  if (withValue.length < 2) {
+    return <p className="mt-2 text-xs text-app-fg-faint">Historial insuficiente para tendencia</p>;
+  }
+
+  const maxAbs = Math.max(1, ...withValue.map((p) => Math.abs(p.value as number)));
+
+  return (
+    <div className="mt-3 flex h-12 items-end gap-1">
+      {withValue.map((p) => {
+        const value = p.value as number;
+        const isNegative = value < 0;
+        return (
+          <div key={p.fiscalDate} className="group relative flex-1">
+            <div
+              className={`w-full rounded-sm ${isNegative ? "bg-red-500/70" : "bg-emerald-500/70"} group-hover:opacity-100`}
+              style={{ height: `${Math.max(6, (Math.abs(value) / maxAbs) * 48)}px` }}
+            />
+            <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-app-surface-2 px-1.5 py-0.5 text-[10px] text-app-fg opacity-0 shadow group-hover:opacity-100">
+              {fiscalYear(p.fiscalDate)}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function FundamentalsMiniCards({ symbol }: { symbol: string }) {
   const [data, setData] = useState<FundamentalsResponse | null>(null);
 
@@ -56,6 +89,7 @@ export function FundamentalsMiniCards({ symbol }: { symbol: string }) {
                   ? "Historial insuficiente para CAGR"
                   : "Dato no disponible"}
             </p>
+            <TrendBars points={history} />
           </Card>
         );
       })}
