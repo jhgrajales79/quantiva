@@ -5,7 +5,7 @@ import {
   DASHBOARD_WIDGET_DEFS,
   DEFAULT_DASHBOARD_WIDGETS,
   sanitizeWidgetList,
-  sanitizeDashboardWidgetSizes,
+  sanitizeDashboardWidgetLayout,
 } from "@/lib/dashboard-widgets";
 import { WatchlistSummaryCard } from "./WatchlistSummaryCard";
 import { PortfolioSummaryCard } from "./PortfolioSummaryCard";
@@ -38,9 +38,7 @@ export function DashboardWidgets() {
       defs={DASHBOARD_WIDGET_DEFS}
       defaultIds={DEFAULT_DASHBOARD_WIDGETS}
       sanitizeList={sanitizeWidgetList}
-      sanitizeSizes={sanitizeDashboardWidgetSizes}
-      gridClassName="md:grid-cols-2"
-      fullSpanClassName="md:col-span-2"
+      sanitizeLayout={sanitizeDashboardWidgetLayout}
       renderWidget={(id) => {
         const Component = WIDGET_COMPONENTS[id];
         if (!Component) return null;

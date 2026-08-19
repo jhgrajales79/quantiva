@@ -1,14 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LayoutGrid, Maximize2, Minimize2 } from "lucide-react";
+import ReactGridLayout, { useContainerWidth, type Layout } from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import { LayoutGrid, GripVertical } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
 import { WidgetCustomizePanel, type WidgetDef } from "@/components/widgets/WidgetCustomizePanel";
-import type { WidgetSize } from "@/lib/widget-list";
+import { generateDefaultLayout, type GridLayoutItem } from "@/lib/widget-list";
 
 interface WidgetGridDef extends WidgetDef {
-  span: WidgetSize;
+  span: "half" | "full";
+  defaultH: number;
 }
+
+const GRID_COLS = 12;
+const ROW_HEIGHT = 32;
+const MARGIN: [number, number] = [16, 16];
 
 export function WidgetGrid({
   apiPath,
@@ -19,9 +27,7 @@ export function WidgetGrid({
   defs,
   defaultIds,
   sanitizeList,
-  sanitizeSizes,
-  gridClassName,
-  fullSpanClassName,
+  sanitizeLayout,
   renderWidget,
 }: {
   apiPath: string;
@@ -32,13 +38,12 @@ export function WidgetGrid({
   defs: WidgetGridDef[];
   defaultIds: string[];
   sanitizeList: (input: unknown) => string[];
-  sanitizeSizes: (input: unknown) => Record<string, WidgetSize>;
-  gridClassName: string;
-  fullSpanClassName: string;
+  sanitizeLayout: (input: unknown) => GridLayoutItem[];
   renderWidget: (id: string) => React.ReactNode;
 }) {
+  const { width, containerRef, mounted } = useContainerWidth();
   const [widgets, setWidgets] = useState<string[] | null>(null);
-  const [sizes, setSizes] = useState<Record<string, WidgetSize>>({});
+  const [layout, setLayout] = useState<GridLayoutItem[]>([]);
   const [panelOpen, setPanelOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -46,21 +51,28 @@ export function WidgetGrid({
     fetch(apiPath)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        setWidgets(sanitizeList(data?.widgets));
-        setSizes(sanitizeSizes(data?.sizes));
+        const nextWidgets = sanitizeList(data?.widgets);
+        const savedLayout = sanitizeLayout(data?.layout).filter((item) => nextWidgets.includes(item.i));
+        const missingIds = nextWidgets.filter((id) => !savedLayout.some((item) => item.i === id));
+        const filledLayout =
+          missingIds.length > 0
+            ? [...savedLayout, ...generateDefaultLayout(defs, missingIds)]
+            : savedLayout;
+        setWidgets(nextWidgets);
+        setLayout(filledLayout.length > 0 ? filledLayout : generateDefaultLayout(defs, nextWidgets));
       })
       .catch(() => setWidgets(defaultIds));
     // defs/defaultIds/sanitize* son estables por página, no cambian en runtime
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiPath]);
 
-  async function persist(nextWidgets: string[], nextSizes: Record<string, WidgetSize>) {
+  async function persist(nextWidgets: string[], nextLayout: GridLayoutItem[]) {
     setSaving(true);
     try {
       await fetch(apiPath, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ widgets: nextWidgets, sizes: nextSizes }),
+        body: JSON.stringify({ widgets: nextWidgets, layout: nextLayout }),
       });
     } finally {
       setSaving(false);
@@ -68,17 +80,25 @@ export function WidgetGrid({
   }
 
   async function handleSave(next: string[]) {
+    const keptLayout = layout.filter((item) => next.includes(item.i));
+    const newIds = next.filter((id) => !keptLayout.some((item) => item.i === id));
+    const stackY = keptLayout.reduce((max, item) => Math.max(max, item.y + item.h), 0);
+    const newItems = generateDefaultLayout(defs, newIds).map((item) => ({ ...item, y: item.y + stackY }));
+    const nextLayout = [...keptLayout, ...newItems];
     setWidgets(next);
+    setLayout(nextLayout);
     setPanelOpen(false);
-    await persist(next, sizes);
+    await persist(next, nextLayout);
   }
 
-  function toggleSize(id: string, defaultSpan: WidgetSize) {
-    const current = sizes[id] ?? defaultSpan;
-    const next: WidgetSize = current === "full" ? "half" : "full";
-    const nextSizes = { ...sizes, [id]: next };
-    setSizes(nextSizes);
-    persist(widgets ?? defaultIds, nextSizes);
+  function handleLayoutChange(next: Layout) {
+    setLayout(next as GridLayoutItem[]);
+  }
+
+  function handleInteractionStop(next: Layout) {
+    const nextLayout = next as GridLayoutItem[];
+    setLayout(nextLayout);
+    persist(widgets ?? defaultIds, nextLayout);
   }
 
   return (
@@ -101,33 +121,30 @@ export function WidgetGrid({
           {emptyMessage}
         </p>
       ) : (
-        <div className={`grid gap-4 ${gridClassName}`}>
-          {widgets.map((id) => {
-            const def = defs.find((d) => d.id === id);
-            if (!def) return null;
-            const size = sizes[id] ?? def.span;
-            return (
-              <div
-                key={id}
-                id={`widget-${id}`}
-                className={`group relative ${size === "full" ? fullSpanClassName : ""}`}
-              >
-                <button
-                  onClick={() => toggleSize(id, def.span)}
-                  aria-label={size === "full" ? "Reducir widget" : "Ampliar widget"}
-                  title={size === "full" ? "Reducir" : "Ampliar"}
-                  className="absolute right-2 top-2 z-10 rounded-md bg-app-surface/80 p-1 text-app-fg-faint opacity-0 transition group-hover:opacity-100 hover:bg-app-surface-2 hover:text-app-fg"
-                >
-                  {size === "full" ? (
-                    <Minimize2 size={14} strokeWidth={2} />
-                  ) : (
-                    <Maximize2 size={14} strokeWidth={2} />
-                  )}
-                </button>
-                {renderWidget(id)}
-              </div>
-            );
-          })}
+        <div ref={containerRef}>
+          {mounted && layout.length === widgets.length && (
+            <ReactGridLayout
+              layout={layout}
+              width={width}
+              gridConfig={{ cols: GRID_COLS, rowHeight: ROW_HEIGHT, margin: MARGIN }}
+              dragConfig={{ handle: ".widget-drag-handle" }}
+              onLayoutChange={handleLayoutChange}
+              onDragStop={handleInteractionStop}
+              onResizeStop={handleInteractionStop}
+            >
+              {widgets.map((id) => (
+                <div key={id} id={`widget-${id}`} className="group relative h-full">
+                  <div
+                    className="widget-drag-handle absolute left-2 top-2 z-10 cursor-move rounded-md bg-app-surface/80 p-1 text-app-fg-faint opacity-0 transition group-hover:opacity-100 hover:bg-app-surface-2 hover:text-app-fg"
+                    title="Arrastrar para mover"
+                  >
+                    <GripVertical size={14} strokeWidth={2} />
+                  </div>
+                  <div className="h-full overflow-auto">{renderWidget(id)}</div>
+                </div>
+              ))}
+            </ReactGridLayout>
+          )}
         </div>
       )}
 

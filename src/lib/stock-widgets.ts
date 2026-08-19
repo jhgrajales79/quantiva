@@ -1,31 +1,36 @@
-import { sanitizeWidgetList as sanitize, sanitizeWidgetSizes, type WidgetSize } from "@/lib/widget-list";
+import {
+  sanitizeWidgetList as sanitize,
+  sanitizeWidgetLayout,
+  type GridLayoutItem,
+} from "@/lib/widget-list";
 
 export interface StockWidgetDef {
   id: string;
   label: string;
   description: string;
   span: "half" | "full";
+  defaultH: number;
 }
 
 export const STOCK_WIDGET_DEFS: StockWidgetDef[] = [
-  { id: "scores", label: "Puntajes de inversión", description: "Investment/Valor/Calidad/Crecimiento/Momentum.", span: "full" },
-  { id: "price_vs_fair_value", label: "Precio vs. valor razonable", description: "Comparativo visual del precio actual contra el valor justo (DCF).", span: "full" },
-  { id: "price_chart", label: "Precio de la acción", description: "Con comparativo indexado vs. S&P 500 (SPY).", span: "full" },
-  { id: "fundamentals", label: "Ingresos, utilidad, EPS y FCF", description: "Con tendencia de los últimos años.", span: "full" },
-  { id: "earnings_revenue", label: "Beneficios e ingresos", description: "Desglose Ingresos → Beneficio bruto → Beneficios.", span: "full" },
-  { id: "valuation_vs_history", label: "Valoración vs. histórico propio", description: "P/E, EV/EBITDA, P/S, P/Book vs. tu propio promedio.", span: "half" },
-  { id: "profitability_vs_history", label: "Rentabilidad vs. histórico propio", description: "ROE, ROIC, márgenes vs. tu propio promedio.", span: "half" },
-  { id: "financial_health", label: "Salud financiera", description: "Deuda, caja y liquidez.", span: "half" },
-  { id: "dividends", label: "Dividendos", description: "DPS, yield y CAGR de dividendos.", span: "half" },
-  { id: "fair_value_models", label: "Modelos de Fair Value", description: "DCF, P/E relativo, EV/EBITDA, P/S, Graham.", span: "full" },
-  { id: "company_profile", label: "Perfil de la empresa", description: "Sector, industria, empleados, descripción.", span: "full" },
-  { id: "analyst_consensus", label: "Consenso de analistas", description: "Recomendaciones y precio objetivo.", span: "half" },
-  { id: "news_filings", label: "Noticias y reportes SEC", description: "Noticias recientes y filings.", span: "half" },
-  { id: "similar_companies", label: "Empresas similares", description: "Comparables del mismo sector.", span: "full" },
-  { id: "earnings_history", label: "Earnings (histórico)", description: "BPA real vs. estimado, últimos trimestres.", span: "half" },
-  { id: "forecasts", label: "Previsiones", description: "Estimados de consenso para próximos períodos.", span: "half" },
-  { id: "shareholders", label: "Accionistas", description: "Institucionales, insiders y principales tenedores.", span: "half" },
-  { id: "dcf_simulator", label: "Simulador de valor justo", description: "Ajusta los supuestos del modelo DCF y ve el resultado.", span: "full" },
+  { id: "scores", label: "Puntajes de inversión", description: "Investment/Valor/Calidad/Crecimiento/Momentum.", span: "full", defaultH: 7 },
+  { id: "price_vs_fair_value", label: "Precio vs. valor razonable", description: "Comparativo visual del precio actual contra el valor justo (DCF).", span: "full", defaultH: 6 },
+  { id: "price_chart", label: "Precio de la acción", description: "Con comparativo indexado vs. S&P 500 (SPY).", span: "full", defaultH: 9 },
+  { id: "fundamentals", label: "Ingresos, utilidad, EPS y FCF", description: "Con tendencia de los últimos años.", span: "full", defaultH: 5 },
+  { id: "earnings_revenue", label: "Beneficios e ingresos", description: "Desglose Ingresos → Beneficio bruto → Beneficios.", span: "full", defaultH: 10 },
+  { id: "valuation_vs_history", label: "Valoración vs. histórico propio", description: "P/E, EV/EBITDA, P/S, P/Book vs. tu propio promedio.", span: "half", defaultH: 7 },
+  { id: "profitability_vs_history", label: "Rentabilidad vs. histórico propio", description: "ROE, ROIC, márgenes vs. tu propio promedio.", span: "half", defaultH: 7 },
+  { id: "financial_health", label: "Salud financiera", description: "Deuda, caja y liquidez.", span: "half", defaultH: 5 },
+  { id: "dividends", label: "Dividendos", description: "DPS, yield y CAGR de dividendos.", span: "half", defaultH: 5 },
+  { id: "fair_value_models", label: "Modelos de Fair Value", description: "DCF, P/E relativo, EV/EBITDA, P/S, Graham.", span: "full", defaultH: 7 },
+  { id: "company_profile", label: "Perfil de la empresa", description: "Sector, industria, empleados, descripción.", span: "full", defaultH: 6 },
+  { id: "analyst_consensus", label: "Consenso de analistas", description: "Recomendaciones y precio objetivo.", span: "half", defaultH: 6 },
+  { id: "news_filings", label: "Noticias y reportes SEC", description: "Noticias recientes y filings.", span: "half", defaultH: 8 },
+  { id: "similar_companies", label: "Empresas similares", description: "Comparables del mismo sector.", span: "full", defaultH: 6 },
+  { id: "earnings_history", label: "Earnings (histórico)", description: "BPA real vs. estimado, últimos trimestres.", span: "half", defaultH: 6 },
+  { id: "forecasts", label: "Previsiones", description: "Estimados de consenso para próximos períodos.", span: "half", defaultH: 6 },
+  { id: "shareholders", label: "Accionistas", description: "Institucionales, insiders y principales tenedores.", span: "half", defaultH: 8 },
+  { id: "dcf_simulator", label: "Simulador de valor justo", description: "Ajusta los supuestos del modelo DCF y ve el resultado.", span: "full", defaultH: 7 },
 ];
 
 export const STOCK_WIDGET_IDS = STOCK_WIDGET_DEFS.map((w) => w.id);
@@ -36,6 +41,6 @@ export function sanitizeStockWidgetList(input: unknown): string[] {
   return sanitize(input, STOCK_WIDGET_IDS, DEFAULT_STOCK_WIDGETS);
 }
 
-export function sanitizeStockWidgetSizes(input: unknown): Record<string, WidgetSize> {
-  return sanitizeWidgetSizes(input, STOCK_WIDGET_IDS);
+export function sanitizeStockWidgetLayout(input: unknown): GridLayoutItem[] {
+  return sanitizeWidgetLayout(input, STOCK_WIDGET_IDS);
 }

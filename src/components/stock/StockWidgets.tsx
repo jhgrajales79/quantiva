@@ -5,7 +5,7 @@ import {
   STOCK_WIDGET_DEFS,
   DEFAULT_STOCK_WIDGETS,
   sanitizeStockWidgetList,
-  sanitizeStockWidgetSizes,
+  sanitizeStockWidgetLayout,
 } from "@/lib/stock-widgets";
 import { ScoresPanel } from "./ScoresPanel";
 import { PriceChartSection } from "./PriceChartSection";
@@ -58,9 +58,7 @@ export function StockWidgets({ symbol }: { symbol: string }) {
       defs={STOCK_WIDGET_DEFS}
       defaultIds={DEFAULT_STOCK_WIDGETS}
       sanitizeList={sanitizeStockWidgetList}
-      sanitizeSizes={sanitizeStockWidgetSizes}
-      gridClassName="lg:grid-cols-2"
-      fullSpanClassName="lg:col-span-2"
+      sanitizeLayout={sanitizeStockWidgetLayout}
       renderWidget={(id) => {
         const Component = WIDGET_COMPONENTS[id];
         if (!Component) return null;
