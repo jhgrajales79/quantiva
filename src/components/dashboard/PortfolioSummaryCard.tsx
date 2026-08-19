@@ -6,6 +6,8 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
+import { Briefcase } from "lucide-react";
 
 interface PortfolioSummary {
   totalPortfolios: number;
@@ -32,9 +34,10 @@ export function PortfolioSummaryCard() {
         action={<Badge variant="success">P&amp;L en vivo</Badge>}
       />
       {!summary ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : count === 0 ? (
         <EmptyState
+          icon={Briefcase}
           message="Aún no registras ninguna cartera. Crea una cartera y registra tus compras para seguir aquí tu patrimonio, tu ganancia y el peso de cada activo."
           ctaLabel="Ver mis portafolios"
           ctaHref="/portfolio"

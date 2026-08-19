@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LineChart } from "lucide-react";
 import { MarketStatusBadge } from "./MarketStatusBadge";
 import { SearchBox } from "./SearchBox";
 import { NotificationsBell } from "./NotificationsBell";
@@ -12,7 +13,8 @@ import { UserAvatarMenu } from "./UserAvatarMenu";
 export function Header() {
   return (
     <header className="flex items-center gap-4 border-b border-app-border bg-app-bg px-4 py-3">
-      <Link href="/dashboard" className="text-lg font-semibold text-app-fg">
+      <Link href="/dashboard" className="flex items-center gap-1.5 text-lg font-semibold text-app-fg">
+        <LineChart size={20} strokeWidth={2.25} className="text-emerald-500" />
         Quantiva
       </Link>
       <SearchBox />

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatCompact } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface FundamentalsResponse {
   fundamentals: { totalDebt: number | null; cash: number | null; ebitda: number | null };
@@ -28,7 +29,7 @@ export function FinancialHealthCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Salud financiera" />
       {!data ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <dl className="grid grid-cols-2 gap-2 text-sm">
           <dt className="text-app-fg-muted">Efectivo y equivalentes</dt>

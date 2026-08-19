@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { ChevronDown, LogOut } from "lucide-react";
+import clsx from "clsx";
 
 function getInitials(nameOrEmail: string): string {
   const parts = nameOrEmail.trim().split(/\s+/);
@@ -28,6 +30,11 @@ export function UserAvatarMenu() {
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-xs font-semibold text-white">
           {initials}
         </span>
+        <ChevronDown
+          size={14}
+          strokeWidth={2}
+          className={clsx("text-app-fg-muted transition-transform", open && "rotate-180")}
+        />
       </button>
       {open && (
         <>
@@ -35,8 +42,9 @@ export function UserAvatarMenu() {
           <div className="absolute right-0 z-20 mt-2 w-44 rounded-lg border border-app-border bg-app-surface p-1 shadow-lg">
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
-              className="block w-full rounded-md px-3 py-2 text-left text-sm text-app-fg-muted hover:bg-app-surface-2 hover:text-app-fg"
+              className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-app-fg-muted hover:bg-app-surface-2 hover:text-app-fg"
             >
+              <LogOut size={15} strokeWidth={2} />
               Cerrar sesión
             </button>
           </div>

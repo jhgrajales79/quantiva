@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface CompanyProfile {
   sector: string | null;
@@ -28,7 +29,7 @@ export function CompanyProfileCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Perfil de la empresa" />
       {!profile ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <>
           {profile.businessSummary ? (

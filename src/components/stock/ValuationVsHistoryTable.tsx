@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { HistoricalComparisonRow, type ComparisonData } from "./HistoricalComparisonRow";
 import { formatPercent } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface HistoricalComparisons {
   pe: ComparisonData;
@@ -27,7 +28,7 @@ export function ValuationVsHistoryTable({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Valoración vs. promedio histórico propio" />
       {!data ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <div className="divide-y divide-app-border">
           <HistoricalComparisonRow label="P/E" data={data.pe} formatValue={(v) => v.toFixed(1) + "x"} />

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { PriceChart } from "@/components/charts/PriceChart";
 import { formatPercent } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 type Range = "1M" | "3M" | "6M" | "1A" | "3A" | "5A" | "10A";
 
@@ -89,7 +90,7 @@ export function PriceChartSection({ symbol }: { symbol: string }) {
         el mismo período: {spyReturn !== null ? formatPercent(spyReturn) : "Dato no disponible"}
       </p>
       {stockPrices === null ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <PriceChart data={filteredStock} />
       )}

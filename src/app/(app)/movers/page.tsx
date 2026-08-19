@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { MoversTable } from "@/components/market/MoversTable";
+import { Spinner } from "@/components/ui/Spinner";
+import { TrendingUp } from "lucide-react";
 
 interface MoversResponse {
   gainers: { symbol: string; name: string; changePct: number | null; volume: number | null }[];
@@ -28,9 +30,12 @@ export default function MoversPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-app-fg">Market Movers</h1>
+      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+        <TrendingUp size={20} strokeWidth={2} />
+        Market Movers
+      </h1>
       {error && <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>}
-      {!data && !error && <p className="text-sm text-app-fg-muted">Cargando...</p>}
+      {!data && !error && <Spinner />}
       {data && (
         <div className="grid gap-4 md:grid-cols-3">
           <MoversTable title="Top Gainers" rows={data.gainers} />

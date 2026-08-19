@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface FearGreedData {
   score: number;
@@ -39,7 +40,7 @@ export function FearGreedWidget() {
       {error ? (
         <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>
       ) : !data ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <>
           <p className="mb-1 text-3xl font-semibold text-app-fg">{Math.round(data.score)}/100</p>

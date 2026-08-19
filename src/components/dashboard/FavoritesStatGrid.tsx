@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { QuoteStatGrid } from "./QuoteStatGrid";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { MarketSymbol } from "@/lib/market-symbols";
+import { Spinner } from "@/components/ui/Spinner";
+import { Star } from "lucide-react";
 
 export function FavoritesStatGrid() {
   const [symbols, setSymbols] = useState<MarketSymbol[] | null>(null);
@@ -22,10 +24,11 @@ export function FavoritesStatGrid() {
       .catch(() => setSymbols([]));
   }, []);
 
-  if (symbols === null) return <p className="text-sm text-app-fg-muted">Cargando...</p>;
+  if (symbols === null) return <Spinner />;
   if (symbols.length === 0) {
     return (
       <EmptyState
+        icon={Star}
         message="Agrega acciones a tu watchlist para verlas aquí como favoritos."
         ctaLabel="Ir a mi watchlist"
         ctaHref="/watchlist"

@@ -3,6 +3,8 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Spinner } from "@/components/ui/Spinner";
+import { Search } from "lucide-react";
 
 interface SymbolMatch {
   symbol: string;
@@ -13,7 +15,7 @@ interface SymbolMatch {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-app-fg-muted">Cargando...</p>}>
+    <Suspense fallback={<Spinner />}>
       <SearchResults />
     </Suspense>
   );
@@ -42,7 +44,10 @@ function SearchResults() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-app-fg">Buscar</h1>
+      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+        <Search size={20} strokeWidth={2} />
+        Buscar
+      </h1>
       {!q && <p className="text-sm text-app-fg-muted">Escribe un ticker o nombre en el buscador.</p>}
       {error && <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>}
       {results && results.length === 0 && q && (

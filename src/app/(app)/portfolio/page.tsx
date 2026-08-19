@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Spinner } from "@/components/ui/Spinner";
+import { Briefcase } from "lucide-react";
 
 interface Portfolio {
   id: string;
@@ -37,7 +39,10 @@ export default function PortfolioListPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-app-fg">Mis Portafolios</h1>
+      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+        <Briefcase size={20} strokeWidth={2} />
+        Mis Portafolios
+      </h1>
 
       <form onSubmit={handleCreate} className="flex gap-2">
         <input
@@ -55,7 +60,7 @@ export default function PortfolioListPage() {
       </form>
 
       {!portfolios ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : portfolios.length === 0 ? (
         <p className="text-sm text-app-fg-muted">Aún no tienes portafolios. Crea el primero arriba.</p>
       ) : (

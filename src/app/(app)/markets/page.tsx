@@ -4,6 +4,7 @@ import { useState } from "react";
 import { QuotesTable } from "@/components/market/QuotesTable";
 import { CryptoTable } from "@/components/market/CryptoTable";
 import { US_SYMBOLS, GLOBAL_SYMBOLS, COMMODITY_SYMBOLS, FX_PAIRS } from "@/lib/market-symbols";
+import { Globe } from "lucide-react";
 
 const TABS = [
   { key: "us", label: "Estados Unidos" },
@@ -20,7 +21,10 @@ export default function MarketsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-app-fg">Mercados</h1>
+      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+        <Globe size={20} strokeWidth={2} />
+        Mercados
+      </h1>
 
       <div className="flex gap-1 border-b border-app-border">
         {TABS.map((t) => (

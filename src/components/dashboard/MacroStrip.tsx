@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { MiniSparkline } from "./MiniSparkline";
 import { computeYoyChange } from "@/lib/macro-yoy";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface MacroIndicator {
   code: string;
@@ -43,7 +44,7 @@ export function MacroStrip() {
         ? Object.values(STRIP_CODES).map((cfg) => (
             <Card key={cfg.label}>
               <p className="text-xs text-app-fg-muted">{cfg.label}</p>
-              <p className="mt-1 text-sm text-app-fg-muted">Cargando...</p>
+              <Spinner className="mt-1" />
             </Card>
           ))
         : strip.map((ind) => {

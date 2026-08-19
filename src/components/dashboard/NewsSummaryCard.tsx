@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDateTime } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
+import { Newspaper } from "lucide-react";
 
 interface NewsItem {
   id: string;
@@ -27,9 +29,9 @@ export function NewsSummaryCard() {
     <Card>
       <CardHeader title="Noticias de tus acciones" />
       {items === null ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : items.length === 0 ? (
-        <EmptyState message="Todavía no hay noticias de las acciones que sigues." />
+        <EmptyState icon={Newspaper} message="Todavía no hay noticias de las acciones que sigues." />
       ) : (
         <ul className="space-y-2">
           {items.slice(0, 5).map((item) => (

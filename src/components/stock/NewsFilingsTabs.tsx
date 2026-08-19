@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatDateTime } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface NewsItem {
   id: string;
@@ -59,7 +60,7 @@ export function NewsFilingsTabs({ symbol }: { symbol: string }) {
 
       {tab === "news" &&
         (news === null ? (
-          <p className="text-sm text-app-fg-muted">Cargando...</p>
+          <Spinner />
         ) : news.length === 0 ? (
           <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
         ) : (
@@ -79,7 +80,7 @@ export function NewsFilingsTabs({ symbol }: { symbol: string }) {
 
       {tab === "filings" &&
         (filings === null ? (
-          <p className="text-sm text-app-fg-muted">Cargando...</p>
+          <Spinner />
         ) : filings.length === 0 ? (
           <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
         ) : (

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { StatCard } from "@/components/ui/StatCard";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import type { CryptoQuote } from "@/lib/providers/types";
+import { Spinner } from "@/components/ui/Spinner";
 
 export function CryptoStatGrid() {
   const [coins, setCoins] = useState<CryptoQuote[] | null>(null);
@@ -23,7 +24,7 @@ export function CryptoStatGrid() {
   }, []);
 
   if (error) return <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>;
-  if (!coins) return <p className="text-sm text-app-fg-muted">Cargando...</p>;
+  if (!coins) return <Spinner />;
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">

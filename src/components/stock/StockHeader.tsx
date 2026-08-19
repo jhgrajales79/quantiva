@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { MarketStatusBadge } from "@/components/layout/MarketStatusBadge";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface QuoteData {
   companyName: string | null;
@@ -105,7 +106,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
             </span>
           </p>
         ) : (
-          <p className="mt-1 text-sm text-app-fg-muted">Cargando...</p>
+          <Spinner className="mt-1" />
         )}
       </div>
 

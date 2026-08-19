@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatPercent } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface BreadthData {
   advancing: number;
@@ -37,7 +38,7 @@ export function MarketBreadthWidget() {
       {error ? (
         <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>
       ) : !data ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <>
           <div className="mb-1 flex items-center justify-between text-sm">

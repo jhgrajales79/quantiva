@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatCurrency, formatPercent } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface Peer {
   symbol: string;
@@ -25,7 +26,7 @@ export function SimilarCompaniesGrid({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Empresas similares" />
       {peers === null ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : peers.length === 0 ? (
         <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
       ) : (

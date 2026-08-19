@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
+import { SlidersHorizontal } from "lucide-react";
 
 interface ScreenerResult {
   symbol: string;
@@ -75,7 +77,10 @@ export default function ScreenerPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-app-fg">Screener</h1>
+        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+          <SlidersHorizontal size={20} strokeWidth={2} />
+          Screener
+        </h1>
         <p className="text-sm text-app-fg-muted">
           Universo: S&amp;P 500 ({meta.universeSize ?? "…"} activos) · datos del{" "}
           {meta.date ?? "…"}. Los filtros de calidad (ROE) y Fair Value solo aplican a los
@@ -169,7 +174,7 @@ export default function ScreenerPage() {
 
       <Card padded={false}>
         {results === null ? (
-          <p className="p-4 text-sm text-app-fg-muted">Cargando...</p>
+          <Spinner className="p-4" />
         ) : results.length === 0 ? (
           <p className="p-4 text-sm text-app-fg-muted">Sin resultados para estos filtros.</p>
         ) : (

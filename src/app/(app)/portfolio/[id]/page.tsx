@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { formatCurrency, formatPercent } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface Holding {
   symbol: string;
@@ -111,7 +112,7 @@ export default function PortfolioDetailPage() {
           Posiciones
         </h3>
         {!holdings ? (
-          <p className="p-4 text-sm text-app-fg-muted">Cargando...</p>
+          <Spinner className="p-4" />
         ) : holdings.length === 0 ? (
           <p className="p-4 text-sm text-app-fg-muted">
             Sin posiciones todavía. Registra tu primera transacción abajo.

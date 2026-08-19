@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { countryName } from "@/lib/country-names";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface EconomicEvent {
   event: string;
@@ -338,7 +339,7 @@ export function EconomicCalendar() {
             {note && <p className="text-xs text-app-fg-faint">{note}</p>}
           </div>
           {events === null ? (
-            <p className="p-4 text-sm text-app-fg-muted">Cargando...</p>
+            <Spinner className="p-4" />
           ) : grouped.length === 0 ? (
             <p className="p-4 text-sm text-app-fg-muted">Sin eventos para estos filtros.</p>
           ) : (

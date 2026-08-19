@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import { applyTheme, getStoredTheme, type ThemeMode } from "@/lib/theme";
 
 function resolveEffectiveMode(mode: ThemeMode): "light" | "dark" {
@@ -32,7 +33,7 @@ export function ThemeToggle() {
       title={effective === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro"}
       className="rounded-md p-1.5 text-app-fg-muted transition hover:bg-app-surface-2 hover:text-app-fg"
     >
-      {effective === "dark" ? "☾" : "☀"}
+      {effective === "dark" ? <Moon size={17} strokeWidth={2} /> : <Sun size={17} strokeWidth={2} />}
     </button>
   );
 }

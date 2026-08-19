@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
+import { Landmark } from "lucide-react";
 
 interface MacroIndicator {
   code: string;
@@ -26,14 +28,17 @@ export default function MacroPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-app-fg">Macro Dashboard</h1>
+      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+        <Landmark size={20} strokeWidth={2} />
+        Macro Dashboard
+      </h1>
       <p className="text-sm text-app-fg-muted">
         Fuente: Federal Reserve Economic Data (FRED). Se muestra la fecha de publicación oficial
         de cada indicador, no un timestamp de refresco artificial.
       </p>
 
       {!indicators ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {indicators.map((ind) => {

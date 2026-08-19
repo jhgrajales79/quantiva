@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
+import { Newspaper } from "lucide-react";
 
 interface NewsItem {
   id: string;
@@ -28,7 +30,10 @@ export default function NewsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-app-fg">Noticias</h1>
+        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+          <Newspaper size={20} strokeWidth={2} />
+          Noticias
+        </h1>
         <form
           onSubmit={(e) => e.preventDefault()}
           className="flex gap-2"
@@ -43,7 +48,7 @@ export default function NewsPage() {
       </div>
 
       {!items ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : items.length === 0 ? (
         <p className="text-sm text-app-fg-muted">
           {symbol

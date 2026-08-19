@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { valuationBadge } from "@/lib/valuation/consensus";
 import { ValuationBadgePill } from "@/components/cards/ValuationBadgePill";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface WatchlistRow {
   symbol: string;
@@ -114,7 +115,7 @@ export function WatchlistTable() {
       {error && <p className="p-3 text-sm text-red-400">{error}</p>}
 
       {!rows ? (
-        <p className="p-4 text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner className="p-4" />
       ) : rows.length === 0 ? (
         <p className="p-4 text-sm text-app-fg-muted">
           Tu watchlist está vacía. Agrega un ticker arriba.

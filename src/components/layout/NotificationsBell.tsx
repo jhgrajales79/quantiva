@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Bell } from "lucide-react";
 
 export function NotificationsBell() {
   const [open, setOpen] = useState(false);
@@ -13,7 +14,7 @@ export function NotificationsBell() {
         title="Notificaciones"
         className="rounded-md p-1.5 text-app-fg-muted transition hover:bg-app-surface-2 hover:text-app-fg"
       >
-        🔔
+        <Bell size={18} strokeWidth={2} />
       </button>
       {open && (
         <>

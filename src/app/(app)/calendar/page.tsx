@@ -6,6 +6,8 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCompact, formatCurrency } from "@/lib/format";
 import { EconomicCalendar } from "@/components/calendar/EconomicCalendar";
+import { Building2, CalendarDays } from "lucide-react";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface EarningsEvent {
   symbol: string;
@@ -31,10 +33,11 @@ function EarningsCalendar() {
         <CardHeader title="Próximos earnings" subtitle="de tu watchlist y tus portafolios" />
       </div>
       {events === null ? (
-        <p className="p-4 text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner className="p-4" />
       ) : events.length === 0 ? (
         <div className="p-4">
           <EmptyState
+            icon={Building2}
             message="No hay earnings próximos para tus activos seguidos. Agrega tickers a tu watchlist o portafolio para verlos aquí."
             ctaLabel="Ir a mi watchlist"
             ctaHref="/watchlist"
@@ -80,7 +83,10 @@ export default function CalendarPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-app-fg">Calendario</h1>
+        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+          <CalendarDays size={20} strokeWidth={2} />
+          Calendario
+        </h1>
         <p className="text-sm text-app-fg-muted">
           Calendario económico real (EE.UU. e internacional) vía Yahoo Finance, más los próximos
           earnings de tu watchlist y portafolios. La fuente del calendario económico no expone

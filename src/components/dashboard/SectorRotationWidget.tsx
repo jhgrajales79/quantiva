@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatPercent } from "@/lib/format";
 import { assignLabelRows } from "@/lib/label-layout";
+import { Spinner } from "@/components/ui/Spinner";
 
 type Period = "1d" | "1w" | "1m" | "ytd";
 
@@ -59,7 +60,7 @@ export function SectorRotationWidget() {
       </p>
 
       {!sectors ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <SectorAxis sectors={sectors} period={period} />
       )}

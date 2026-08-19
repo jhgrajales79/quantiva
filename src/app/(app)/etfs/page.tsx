@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { PieChart } from "lucide-react";
 
 interface SearchResult {
   symbol: string;
@@ -38,7 +39,10 @@ export default function EtfsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-app-fg">ETFs</h1>
+        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+          <PieChart size={20} strokeWidth={2} />
+          ETFs
+        </h1>
         <p className="text-sm text-app-fg-muted">
           Busca un ETF por símbolo o nombre para ver su composición, sectores y ficha técnica.
         </p>

@@ -4,6 +4,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { useQuotes } from "@/lib/useQuotes";
 import type { MarketSymbol } from "@/lib/market-symbols";
+import { Spinner } from "@/components/ui/Spinner";
 
 export function QuoteStatGrid({ symbols }: { symbols: MarketSymbol[] }) {
   const rows = useQuotes(symbols);
@@ -12,7 +13,7 @@ export function QuoteStatGrid({ symbols }: { symbols: MarketSymbol[] }) {
     return <p className="text-sm text-app-fg-muted">Sin instrumentos configurados.</p>;
   }
   if (!rows) {
-    return <p className="text-sm text-app-fg-muted">Cargando...</p>;
+    return <Spinner />;
   }
 
   return (

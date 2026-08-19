@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
+import { GitCompareArrows } from "lucide-react";
 
 interface CompareEntry {
   symbol: string;
@@ -110,7 +112,10 @@ function CompareInner() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-app-fg">Comparar</h1>
+        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
+          <GitCompareArrows size={20} strokeWidth={2} />
+          Comparar
+        </h1>
         <p className="text-sm text-app-fg-muted">
           Compara hasta 5 activos por valoración, crecimiento, calidad, rentabilidad, dividendos y Fair Value.
         </p>
@@ -194,7 +199,7 @@ function CompareInner() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={<p className="text-sm text-app-fg-muted">Cargando...</p>}>
+    <Suspense fallback={<Spinner />}>
       <CompareInner />
     </Suspense>
   );

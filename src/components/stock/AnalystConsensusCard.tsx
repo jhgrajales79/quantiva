@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatCurrency, formatDateTime } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface AnalystData {
   distribution: { strongBuy: number; buy: number; hold: number; sell: number; strongSell: number } | null;
@@ -46,7 +47,7 @@ export function AnalystConsensusCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title={`Consenso de analistas${data?.numberOfAnalysts ? ` · ${data.numberOfAnalysts}` : ""}`} />
       {!data ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : (
         <>
           {data.distribution && total > 0 ? (

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Spinner } from "@/components/ui/Spinner";
+import { Eye } from "lucide-react";
 
 interface WatchlistItem {
   symbol: string;
@@ -26,9 +28,10 @@ export function WatchlistSummaryCard() {
     <Card>
       <CardHeader title={`Watchlist${items !== null ? ` · ${count} acciones` : ""}`} />
       {items === null ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : count === 0 ? (
         <EmptyState
+          icon={Eye}
           message="Aún no sigues ninguna acción. Busca una empresa y agrégala a tu watchlist para verla aquí con su precio, su valor justo y su potencial."
           ctaLabel="Ver todo mi watchlist"
           ctaHref="/watchlist"

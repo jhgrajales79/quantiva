@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Coins } from "lucide-react";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface DividendsResponse {
   dpsTtm: number | null;
@@ -35,9 +37,9 @@ export function DividendsCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Dividendos" />
       {!data ? (
-        <p className="text-sm text-app-fg-muted">Cargando...</p>
+        <Spinner />
       ) : data.history.length === 0 ? (
-        <EmptyState message="Esta empresa no reparte dividendos, o no hay historial disponible." />
+        <EmptyState icon={Coins} message="Esta empresa no reparte dividendos, o no hay historial disponible." />
       ) : (
         <dl className="grid grid-cols-2 gap-2 text-sm">
           <dt className="text-app-fg-muted">DPS TTM</dt>
