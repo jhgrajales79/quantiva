@@ -12,19 +12,21 @@ import { UserAvatarMenu } from "./UserAvatarMenu";
 
 export function Header() {
   return (
-    <header className="flex items-center gap-4 border-b border-app-border bg-app-bg px-4 py-3">
-      <Link href="/dashboard" className="flex items-center gap-1.5 text-lg font-semibold text-app-fg">
-        <LineChart size={20} strokeWidth={2.25} className="text-emerald-500" />
-        Quantiva
-      </Link>
-      <SearchBox />
-      <div className="ml-auto flex items-center gap-2">
-        <MarketStatusBadge />
-        <NotificationsBell />
-        <UpgradeProButton />
-        <FontSizeToggle />
-        <ThemeToggle />
-        <UserAvatarMenu />
+    <header className="border-b border-app-border bg-app-bg">
+      <div className="mx-auto flex w-full max-w-[1600px] items-center gap-4 px-4 py-3">
+        <Link href="/dashboard" className="flex items-center gap-1.5 text-lg font-semibold text-app-fg">
+          <LineChart size={20} strokeWidth={2.25} className="text-emerald-500" />
+          Quantiva
+        </Link>
+        <SearchBox />
+        <div className="ml-auto flex items-center gap-2">
+          <MarketStatusBadge />
+          <NotificationsBell />
+          <UpgradeProButton />
+          <FontSizeToggle />
+          <ThemeToggle />
+          <UserAvatarMenu />
+        </div>
       </div>
     </header>
   );

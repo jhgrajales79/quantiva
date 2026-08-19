@@ -16,7 +16,8 @@ export function TopNav() {
   }
 
   return (
-    <nav className="flex items-center gap-1 border-b border-app-border bg-app-bg px-4 py-1.5 overflow-x-auto">
+    <nav className="border-b border-app-border bg-app-bg overflow-x-auto">
+    <div className="mx-auto flex w-full max-w-[1600px] items-center gap-1 px-4 py-1.5">
       {PRIMARY_NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         return (
@@ -86,6 +87,7 @@ export function TopNav() {
           </>
         )}
       </div>
+    </div>
     </nav>
   );
 }
