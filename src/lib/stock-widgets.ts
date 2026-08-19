@@ -9,6 +9,7 @@ export interface StockWidgetDef {
 
 export const STOCK_WIDGET_DEFS: StockWidgetDef[] = [
   { id: "scores", label: "Puntajes de inversión", description: "Investment/Valor/Calidad/Crecimiento/Momentum.", span: "full" },
+  { id: "price_vs_fair_value", label: "Precio vs. valor razonable", description: "Comparativo visual del precio actual contra el valor justo (DCF).", span: "full" },
   { id: "price_chart", label: "Precio de la acción", description: "Con comparativo indexado vs. S&P 500 (SPY).", span: "full" },
   { id: "fundamentals", label: "Ingresos, utilidad, EPS y FCF", description: "Con tendencia de los últimos años.", span: "full" },
   { id: "earnings_revenue", label: "Beneficios e ingresos", description: "Desglose Ingresos → Beneficio bruto → Beneficios.", span: "full" },

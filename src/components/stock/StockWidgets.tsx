@@ -22,9 +22,11 @@ import { EarningsHistoryCard } from "./EarningsHistoryCard";
 import { ForecastsCard } from "./ForecastsCard";
 import { ShareholdersCard } from "./ShareholdersCard";
 import { DcfSimulatorCard } from "./DcfSimulatorCard";
+import { PriceVsFairValueCard } from "./PriceVsFairValueCard";
 
 const WIDGET_COMPONENTS: Record<string, React.ComponentType<{ symbol: string }>> = {
   scores: ScoresPanel,
+  price_vs_fair_value: PriceVsFairValueCard,
   price_chart: PriceChartSection,
   fundamentals: FundamentalsMiniCards,
   earnings_revenue: EarningsRevenueCard,
