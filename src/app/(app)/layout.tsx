@@ -8,7 +8,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Header />
       <TopNav />
       <main className="flex-1 overflow-x-hidden">
-        <div className="mx-auto w-full max-w-[1600px] p-4 md:p-6">{children}</div>
+        <div className="mx-auto w-full max-w-[1440px] p-4 md:p-6">{children}</div>
       </main>
       <Disclaimer />
     </div>

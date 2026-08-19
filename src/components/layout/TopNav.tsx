@@ -16,29 +16,33 @@ export function TopNav() {
   }
 
   return (
-    <nav className="border-b border-app-border bg-app-bg overflow-x-auto">
-    <div className="mx-auto flex w-full max-w-[1600px] items-center gap-1 px-4 py-1.5">
-      {PRIMARY_NAV_ITEMS.map((item) => {
-        const Icon = item.icon;
-        return (
-          <Link
-            key={item.label}
-            href={item.href}
-            className={clsx(
-              "flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium transition",
-              isActive(item.href)
-                ? "bg-app-surface-2 text-app-fg"
-                : "text-app-fg-muted hover:bg-app-surface-2 hover:text-app-fg",
-            )}
-          >
-            <Icon size={16} strokeWidth={2} />
-            {item.label}
-            {item.pro && <Lock size={12} strokeWidth={2.5} className="text-app-fg-faint" aria-label="Función PRO" />}
-          </Link>
-        );
-      })}
+    <nav className="border-b border-app-border bg-app-bg">
+    <div className="mx-auto flex w-full max-w-[1440px] items-center gap-1 px-4 py-1.5">
+      {/* overflow-x-auto vive en este contenedor interno (no en <nav>) para
+          que no fuerce overflow-y:auto y recorte el menú "Más" de abajo. */}
+      <div className="flex min-w-0 items-center gap-1 overflow-x-auto">
+        {PRIMARY_NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={clsx(
+                "flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium transition",
+                isActive(item.href)
+                  ? "bg-app-surface-2 text-app-fg"
+                  : "text-app-fg-muted hover:bg-app-surface-2 hover:text-app-fg",
+              )}
+            >
+              <Icon size={16} strokeWidth={2} />
+              {item.label}
+              {item.pro && <Lock size={12} strokeWidth={2.5} className="text-app-fg-faint" aria-label="Función PRO" />}
+            </Link>
+          );
+        })}
+      </div>
 
-      <div className="relative">
+      <div className="relative shrink-0">
         <button
           onClick={() => setMoreOpen((v) => !v)}
           className="flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium text-app-fg-muted transition hover:bg-app-surface-2 hover:text-app-fg"
