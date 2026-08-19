@@ -33,8 +33,19 @@ export async function GET() {
     { totalCurrentValue: 0, totalUnrealizedPnl: 0 },
   );
 
+  // Composición por activo (símbolo + peso%), para mostrar de un vistazo
+  // cómo está distribuido cada portafolio en la lista, sin tener que entrar
+  // al detalle de cada uno.
+  const portfoliosWithAllocation = items.map((p, i) => ({
+    ...p,
+    allocation: holdingsPerPortfolio[i]
+      .filter((h) => h.weightPct !== null && h.currentValue !== null && h.currentValue > 0)
+      .sort((a, b) => (b.weightPct ?? 0) - (a.weightPct ?? 0))
+      .map((h) => ({ symbol: h.symbol, weightPct: h.weightPct })),
+  }));
+
   return NextResponse.json({
-    portfolios: items,
+    portfolios: portfoliosWithAllocation,
     summary: {
       totalPortfolios: items.length,
       ...summary,

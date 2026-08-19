@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/Spinner";
 import { Briefcase } from "lucide-react";
+import { AllocationBar } from "@/components/portfolio/AllocationBar";
 
 interface Portfolio {
   id: string;
   name: string;
   baseCurrency: string;
+  allocation: { symbol: string; weightPct: number | null }[];
 }
 
 export default function PortfolioListPage() {
@@ -67,9 +69,14 @@ export default function PortfolioListPage() {
         <ul className="divide-y divide-app-border rounded-lg border border-app-border bg-app-surface">
           {portfolios.map((p) => (
             <li key={p.id}>
-              <Link href={`/portfolio/${p.id}`} className="flex items-center justify-between p-3 hover:bg-app-surface-2/50">
-                <span className="text-sm font-medium text-app-fg">{p.name}</span>
-                <span className="text-xs text-app-fg-muted">{p.baseCurrency}</span>
+              <Link href={`/portfolio/${p.id}`} className="block p-3 hover:bg-app-surface-2/50">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-app-fg">{p.name}</span>
+                  <span className="text-xs text-app-fg-muted">{p.baseCurrency}</span>
+                </div>
+                <div className="mt-2">
+                  <AllocationBar allocation={p.allocation} />
+                </div>
               </Link>
             </li>
           ))}

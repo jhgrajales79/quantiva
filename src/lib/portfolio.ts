@@ -1,6 +1,15 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { assets, portfolioTransactions, pricesIntradayCache } from "@/lib/db/schema";
+import { assets, portfolios, portfolioTransactions, pricesIntradayCache } from "@/lib/db/schema";
+
+export async function assertPortfolioOwnership(portfolioId: string, userId: string) {
+  const [portfolio] = await db
+    .select()
+    .from(portfolios)
+    .where(and(eq(portfolios.id, portfolioId), eq(portfolios.userId, userId)))
+    .limit(1);
+  return portfolio;
+}
 
 export interface HoldingSummary {
   symbol: string;
@@ -127,4 +136,40 @@ export async function computeHoldings(portfolioId: string): Promise<HoldingSumma
   }
 
   return holdings;
+}
+
+export interface PortfolioTransactionRow {
+  id: string;
+  assetId: string;
+  symbol: string;
+  name: string;
+  type: "buy" | "sell" | "dividend";
+  quantity: number;
+  price: number;
+  fees: number;
+  executedAt: string;
+}
+
+// Historial crudo de transacciones (a diferencia de computeHoldings, que las
+// agrega por activo) — necesario para poder editar/eliminar una transacción
+// puntual en vez de solo la posición consolidada.
+export async function listTransactions(portfolioId: string): Promise<PortfolioTransactionRow[]> {
+  const rows = await db
+    .select({
+      id: portfolioTransactions.id,
+      assetId: portfolioTransactions.assetId,
+      symbol: assets.symbol,
+      name: assets.name,
+      type: portfolioTransactions.type,
+      quantity: portfolioTransactions.quantity,
+      price: portfolioTransactions.price,
+      fees: portfolioTransactions.fees,
+      executedAt: portfolioTransactions.executedAt,
+    })
+    .from(portfolioTransactions)
+    .innerJoin(assets, eq(assets.id, portfolioTransactions.assetId))
+    .where(eq(portfolioTransactions.portfolioId, portfolioId))
+    .orderBy(desc(portfolioTransactions.executedAt));
+
+  return rows.map((r) => ({ ...r, executedAt: r.executedAt.toISOString() }));
 }

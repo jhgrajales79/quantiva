@@ -1,21 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/client";
-import { portfolios, portfolioTransactions } from "@/lib/db/schema";
+import { portfolioTransactions } from "@/lib/db/schema";
 import { getOrCreateAsset } from "@/lib/assets";
-import { computeHoldings } from "@/lib/portfolio";
+import { assertPortfolioOwnership as assertOwnership, computeHoldings, listTransactions } from "@/lib/portfolio";
 import { newId } from "@/lib/id";
-
-async function assertOwnership(portfolioId: string, userId: string) {
-  const [portfolio] = await db
-    .select()
-    .from(portfolios)
-    .where(and(eq(portfolios.id, portfolioId), eq(portfolios.userId, userId)))
-    .limit(1);
-  return portfolio;
-}
 
 export async function GET(
   _request: Request,
@@ -32,7 +22,10 @@ export async function GET(
     return NextResponse.json({ error: "Portafolio no encontrado" }, { status: 404 });
   }
 
-  const holdings = await computeHoldings(id);
+  const [holdings, transactions] = await Promise.all([
+    computeHoldings(id),
+    listTransactions(id),
+  ]);
 
   const totalCapitalInvested = holdings.reduce((sum, h) => sum + h.capitalInvested, 0);
   const totalCurrentValue = holdings.reduce((sum, h) => sum + (h.currentValue ?? 0), 0);
@@ -47,6 +40,7 @@ export async function GET(
   return NextResponse.json({
     portfolio,
     holdings,
+    transactions,
     summary: {
       totalCapitalInvested,
       totalCurrentValue,
@@ -58,7 +52,7 @@ export async function GET(
   });
 }
 
-const txSchema = z.object({
+export const txSchema = z.object({
   symbol: z.string().min(1),
   type: z.enum(["buy", "sell", "dividend"]),
   quantity: z.number().positive(),
