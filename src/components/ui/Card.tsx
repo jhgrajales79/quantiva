@@ -24,16 +24,21 @@ export function Card({
 
 export function CardHeader({
   title,
+  subtitle,
   action,
   className,
 }: {
   title: React.ReactNode;
+  subtitle?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
 }) {
   return (
     <div className={clsx("mb-3 flex items-center justify-between", className)}>
-      <h3 className="text-sm font-semibold text-app-fg">{title}</h3>
+      <div>
+        <h3 className="text-sm font-semibold text-app-fg">{title}</h3>
+        {subtitle && <p className="text-xs text-app-fg-muted">{subtitle}</p>}
+      </div>
       {action}
     </div>
   );
