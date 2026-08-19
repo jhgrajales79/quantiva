@@ -54,7 +54,7 @@ export function PriceChart({
       height: 320,
       timeScale: { borderColor: border },
       rightPriceScale: { borderColor: border },
-      leftPriceScale: showComparison ? { visible: true, borderColor: border } : { visible: false },
+      leftPriceScale: { visible: false },
     });
     chartRef.current = chart;
 
@@ -72,7 +72,7 @@ export function PriceChart({
         color: compareWith.color,
         lineWidth: 2,
         title: compareWith.label,
-        priceScaleId: "left",
+        priceScaleId: "right",
         priceFormat: { type: "custom", formatter: (v: number) => `$${v.toFixed(2)}` },
       });
       compareSeries.setData(toSeries(compareWith.data));
@@ -113,11 +113,11 @@ export function PriceChart({
         <div className="mb-1.5 flex items-center gap-4 text-xs text-app-fg-muted">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-0.5 w-3 bg-emerald-400" />
-            Acción (eje derecho)
+            Acción
           </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-0.5 w-3" style={{ backgroundColor: compareWith.color }} />
-            {compareWith.label} (eje izquierdo)
+            {compareWith.label}
           </span>
         </div>
       )}
