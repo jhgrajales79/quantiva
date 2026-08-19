@@ -75,7 +75,7 @@ export function PriceChartSection({ symbol }: { symbol: string }) {
                 key={r}
                 onClick={() => setRange(r)}
                 className={`rounded-md px-2 py-1 text-xs font-medium ${
-                  range === r ? "bg-neutral-800 text-neutral-50" : "text-neutral-500 hover:text-neutral-300"
+                  range === r ? "bg-app-surface-2 text-app-fg" : "text-app-fg-muted hover:text-app-fg-muted"
                 }`}
               >
                 {r}
@@ -84,12 +84,12 @@ export function PriceChartSection({ symbol }: { symbol: string }) {
           </div>
         }
       />
-      <p className="mb-3 text-xs text-neutral-500">
+      <p className="mb-3 text-xs text-app-fg-muted">
         {symbol} en el período: {stockReturn !== null ? formatPercent(stockReturn) : "Dato no disponible"} · SPY en
         el mismo período: {spyReturn !== null ? formatPercent(spyReturn) : "Dato no disponible"}
       </p>
       {stockPrices === null ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
         <PriceChart data={filteredStock} />
       )}

@@ -20,7 +20,7 @@ export function SearchBox() {
         onChange={(e) => setQuery(e.target.value)}
         type="search"
         placeholder="Buscar ticker, empresa..."
-        className="w-full rounded-md border border-neutral-800 bg-neutral-900 px-3 py-1.5 text-sm text-neutral-100 outline-none placeholder:text-neutral-500 focus:border-emerald-500"
+        className="w-full rounded-md border border-app-border bg-app-surface px-3 py-1.5 text-sm text-app-fg outline-none placeholder:text-app-fg-muted focus:border-emerald-500"
       />
     </form>
   );

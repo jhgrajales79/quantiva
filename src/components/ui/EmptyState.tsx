@@ -11,7 +11,7 @@ export function EmptyState({
 }) {
   return (
     <div className="py-2">
-      <p className="text-sm text-neutral-500">{message}</p>
+      <p className="text-sm text-app-fg-muted">{message}</p>
       {ctaLabel && ctaHref && (
         <Link
           href={ctaHref}

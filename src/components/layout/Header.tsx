@@ -1,32 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
 import { MarketStatusBadge } from "./MarketStatusBadge";
 import { SearchBox } from "./SearchBox";
+import { NotificationsBell } from "./NotificationsBell";
+import { UpgradeProButton } from "./UpgradeProButton";
+import { ThemeToggle } from "./ThemeToggle";
+import { FontSizeToggle } from "./FontSizeToggle";
+import { UserAvatarMenu } from "./UserAvatarMenu";
 
 export function Header() {
-  const { data: session } = useSession();
-
   return (
-    <header className="flex items-center gap-4 border-b border-neutral-800 bg-neutral-950 px-4 py-3">
-      <Link href="/dashboard" className="text-lg font-semibold text-neutral-50">
+    <header className="flex items-center gap-4 border-b border-app-border bg-app-bg px-4 py-3">
+      <Link href="/dashboard" className="text-lg font-semibold text-app-fg">
         Quantiva
       </Link>
       <SearchBox />
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2">
         <MarketStatusBadge />
-        {session?.user && (
-          <span className="hidden text-sm text-neutral-400 sm:inline">
-            {session.user.name ?? session.user.email}
-          </span>
-        )}
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="rounded-md border border-neutral-700 px-2.5 py-1 text-xs text-neutral-300 transition hover:bg-neutral-800"
-        >
-          Salir
-        </button>
+        <NotificationsBell />
+        <UpgradeProButton />
+        <FontSizeToggle />
+        <ThemeToggle />
+        <UserAvatarMenu />
       </div>
     </header>
   );

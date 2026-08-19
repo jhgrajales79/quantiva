@@ -22,17 +22,17 @@ export function FairValueModels({ models }: { models: ModelResult[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
-    <div className="rounded-lg border border-neutral-800 bg-neutral-900">
-      <h3 className="border-b border-neutral-800 p-3 text-sm font-semibold text-neutral-200">
+    <div className="rounded-lg border border-app-border bg-app-surface">
+      <h3 className="border-b border-app-border p-3 text-sm font-semibold text-app-fg">
         Modelos de valoración
       </h3>
-      <ul className="divide-y divide-neutral-800">
+      <ul className="divide-y divide-app-border">
         {models.map((m) => (
           <li key={m.model} className="p-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-neutral-300">{MODEL_LABELS[m.model] ?? m.model}</span>
+              <span className="text-sm text-app-fg-muted">{MODEL_LABELS[m.model] ?? m.model}</span>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-neutral-100">
+                <span className="text-sm font-medium text-app-fg">
                   {m.fairValue !== null ? formatCurrency(m.fairValue) : "Dato no disponible"}
                 </span>
                 <button
@@ -44,7 +44,7 @@ export function FairValueModels({ models }: { models: ModelResult[] }) {
               </div>
             </div>
             {expanded === m.model && (
-              <div className="mt-2 rounded-md bg-neutral-950 p-3 text-xs text-neutral-400">
+              <div className="mt-2 rounded-md bg-app-bg p-3 text-xs text-app-fg-muted">
                 {m.unavailableReason ? (
                   <p>{m.unavailableReason}</p>
                 ) : (

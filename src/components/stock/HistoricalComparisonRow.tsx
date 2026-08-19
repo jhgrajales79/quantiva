@@ -23,8 +23,8 @@ export function HistoricalComparisonRow({
   if (!data || data.unavailable || data.current === null) {
     return (
       <div className="flex items-center justify-between py-2 text-sm">
-        <span className="text-neutral-400">{label}</span>
-        <span className="text-xs text-neutral-500">{data?.reason ?? "Dato no disponible"}</span>
+        <span className="text-app-fg-muted">{label}</span>
+        <span className="text-xs text-app-fg-muted">{data?.reason ?? "Dato no disponible"}</span>
       </div>
     );
   }
@@ -34,19 +34,19 @@ export function HistoricalComparisonRow({
 
   return (
     <div className="flex items-center justify-between py-2 text-sm">
-      <span className="text-neutral-400">{label}</span>
+      <span className="text-app-fg-muted">{label}</span>
       <div className="flex items-center gap-3">
-        <span className="font-medium text-neutral-100">{formatValue(data.current)}</span>
+        <span className="font-medium text-app-fg">{formatValue(data.current)}</span>
         {data.average !== null ? (
           <span
             className={
-              isGood === null ? "text-xs text-neutral-500" : isGood ? "text-xs text-emerald-400" : "text-xs text-red-400"
+              isGood === null ? "text-xs text-app-fg-muted" : isGood ? "text-xs text-emerald-400" : "text-xs text-red-400"
             }
           >
             vs. promedio propio {formatValue(data.average)} ({formatPercent(data.vsAveragePct)}, {data.sampleCount} muestras)
           </span>
         ) : (
-          <span className="text-xs text-neutral-500">Historial insuficiente</span>
+          <span className="text-xs text-app-fg-muted">Historial insuficiente</span>
         )}
       </div>
     </div>

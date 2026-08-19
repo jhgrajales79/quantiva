@@ -92,15 +92,15 @@ export function WatchlistTable() {
     : [];
 
   return (
-    <div className="rounded-lg border border-neutral-800 bg-neutral-900">
-      <div className="flex items-center justify-between border-b border-neutral-800 p-3">
-        <h2 className="text-sm font-semibold text-neutral-200">Watchlist</h2>
+    <div className="rounded-lg border border-app-border bg-app-surface">
+      <div className="flex items-center justify-between border-b border-app-border p-3">
+        <h2 className="text-sm font-semibold text-app-fg">Watchlist</h2>
         <form onSubmit={handleAdd} className="flex gap-2">
           <input
             value={newSymbol}
             onChange={(e) => setNewSymbol(e.target.value)}
             placeholder="AAPL"
-            className="w-28 rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs text-neutral-100 outline-none focus:border-emerald-500"
+            className="w-28 rounded-md border border-app-border bg-app-bg px-2 py-1 text-xs text-app-fg outline-none focus:border-emerald-500"
           />
           <button
             type="submit"
@@ -114,16 +114,16 @@ export function WatchlistTable() {
       {error && <p className="p-3 text-sm text-red-400">{error}</p>}
 
       {!rows ? (
-        <p className="p-4 text-sm text-neutral-500">Cargando...</p>
+        <p className="p-4 text-sm text-app-fg-muted">Cargando...</p>
       ) : rows.length === 0 ? (
-        <p className="p-4 text-sm text-neutral-500">
+        <p className="p-4 text-sm text-app-fg-muted">
           Tu watchlist está vacía. Agrega un ticker arriba.
         </p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 text-left text-xs text-neutral-500">
+              <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
                 {[
                   { key: "symbol", label: "Ticker" },
                   { key: "price", label: "Precio" },
@@ -133,7 +133,7 @@ export function WatchlistTable() {
                 ].map((col) => (
                   <th
                     key={col.key}
-                    className="cursor-pointer px-3 py-2 hover:text-neutral-300"
+                    className="cursor-pointer px-3 py-2 hover:text-app-fg-muted"
                     onClick={() => setSortKey(col.key as SortKey)}
                   >
                     {col.label}
@@ -144,18 +144,18 @@ export function WatchlistTable() {
             </thead>
             <tbody>
               {sortedRows.map((row) => (
-                <tr key={row.symbol} className="border-b border-neutral-900 hover:bg-neutral-800/50">
+                <tr key={row.symbol} className="border-b border-app-border hover:bg-app-surface-2/50">
                   <td className="px-3 py-2">
-                    <Link href={`/stocks/${row.symbol}`} className="font-medium text-neutral-100 hover:underline">
+                    <Link href={`/stocks/${row.symbol}`} className="font-medium text-app-fg hover:underline">
                       {row.symbol}
                     </Link>
-                    <div className="text-xs text-neutral-500">{row.name}</div>
+                    <div className="text-xs text-app-fg-muted">{row.name}</div>
                   </td>
                   <td className="px-3 py-2">{formatCurrency(row.price)}</td>
                   <td
                     className={`px-3 py-2 ${
                       row.changePct === null
-                        ? "text-neutral-500"
+                        ? "text-app-fg-muted"
                         : row.changePct >= 0
                           ? "text-emerald-400"
                           : "text-red-400"
@@ -165,7 +165,7 @@ export function WatchlistTable() {
                   </td>
                   <td className="px-3 py-2">
                     {row.fairValueConsensus === null ? (
-                      <span className="text-xs text-neutral-500">
+                      <span className="text-xs text-app-fg-muted">
                         Sin cálculo — abre la ficha del activo
                       </span>
                     ) : (
@@ -181,7 +181,7 @@ export function WatchlistTable() {
                   <td className="px-3 py-2 text-right">
                     <button
                       onClick={() => handleRemove(row.symbol)}
-                      className="text-xs text-neutral-500 hover:text-red-400"
+                      className="text-xs text-app-fg-muted hover:text-red-400"
                     >
                       Quitar
                     </button>

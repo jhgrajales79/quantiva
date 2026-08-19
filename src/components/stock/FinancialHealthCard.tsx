@@ -28,15 +28,15 @@ export function FinancialHealthCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Salud financiera" />
       {!data ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
         <dl className="grid grid-cols-2 gap-2 text-sm">
-          <dt className="text-neutral-500">Efectivo y equivalentes</dt>
-          <dd className="text-right text-neutral-100">{formatCompact(cash)}</dd>
-          <dt className="text-neutral-500">Deuda neta</dt>
-          <dd className="text-right text-neutral-100">{formatCompact(netDebt)}</dd>
-          <dt className="text-neutral-500">Deuda neta / EBITDA</dt>
-          <dd className="text-right text-neutral-100">
+          <dt className="text-app-fg-muted">Efectivo y equivalentes</dt>
+          <dd className="text-right text-app-fg">{formatCompact(cash)}</dd>
+          <dt className="text-app-fg-muted">Deuda neta</dt>
+          <dd className="text-right text-app-fg">{formatCompact(netDebt)}</dd>
+          <dt className="text-app-fg-muted">Deuda neta / EBITDA</dt>
+          <dd className="text-right text-app-fg">
             {netDebtToEbitda !== null ? `${netDebtToEbitda.toFixed(2)}x` : "Dato no disponible"}
           </dd>
         </dl>

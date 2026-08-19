@@ -44,8 +44,8 @@ export function SectorRotationWidget() {
                 onClick={() => setPeriod(p.key)}
                 className={`rounded-md px-2 py-1 text-xs font-medium ${
                   period === p.key
-                    ? "bg-neutral-800 text-neutral-50"
-                    : "text-neutral-500 hover:text-neutral-300"
+                    ? "bg-app-surface-2 text-app-fg"
+                    : "text-app-fg-muted hover:text-app-fg-muted"
                 }`}
               >
                 {p.label}
@@ -54,17 +54,17 @@ export function SectorRotationWidget() {
           </div>
         }
       />
-      <p className="mb-4 text-xs text-neutral-500">
+      <p className="mb-4 text-xs text-app-fg-muted">
         Dónde entra y sale el dinero. Cada punto es un sector.
       </p>
 
       {!sectors ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
         <SectorAxis sectors={sectors} period={period} />
       )}
 
-      <div className="mt-2 flex justify-between text-xs text-neutral-500">
+      <div className="mt-2 flex justify-between text-xs text-app-fg-muted">
         <span>← Más débil</span>
         <span>Más fuerte →</span>
       </div>
@@ -79,7 +79,7 @@ function SectorAxis({ sectors, period }: { sectors: SectorResult[]; period: Peri
     .sort((a, b) => a.value - b.value);
 
   if (withValues.length === 0) {
-    return <p className="text-sm text-neutral-500">Dato no disponible.</p>;
+    return <p className="text-sm text-app-fg-muted">Dato no disponible.</p>;
   }
 
   const min = Math.min(...withValues.map((s) => s.value));
@@ -104,12 +104,12 @@ function SectorAxis({ sectors, period }: { sectors: SectorResult[]; period: Peri
           <div
             className={`absolute left-1/2 w-max -translate-x-1/2 text-center ${ROW_OFFSETS[rowIndexes[i]]}`}
           >
-            <p className="text-[11px] font-medium text-neutral-300">{s.label}</p>
+            <p className="text-[11px] font-medium text-app-fg-muted">{s.label}</p>
             <p className={s.value >= 0 ? "text-[11px] text-emerald-400" : "text-[11px] text-red-400"}>
               {formatPercent(s.value)}
             </p>
           </div>
-          <div className="h-2.5 w-2.5 rounded-full border-2 border-neutral-950 bg-neutral-100" />
+          <div className="h-2.5 w-2.5 rounded-full border-2 border-app-border bg-neutral-100" />
         </div>
       ))}
     </div>

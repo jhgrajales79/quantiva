@@ -25,17 +25,17 @@ export function MarketMonitorWidget() {
     <Card>
       <CardHeader
         title="Mercado"
-        action={<span className="text-xs text-neutral-500">clic en una tarjeta para cambiar el activo · actualizado recién</span>}
+        action={<span className="text-xs text-app-fg-muted">clic en una tarjeta para cambiar el activo · actualizado recién</span>}
       />
-      <div className="mb-3 flex flex-wrap gap-1 border-b border-neutral-800 pb-2">
+      <div className="mb-3 flex flex-wrap gap-1 border-b border-app-border pb-2">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
               tab === t.key
-                ? "bg-neutral-800 text-neutral-50"
-                : "text-neutral-500 hover:text-neutral-300"
+                ? "bg-app-surface-2 text-app-fg"
+                : "text-app-fg-muted hover:text-app-fg-muted"
             }`}
           >
             {t.label}

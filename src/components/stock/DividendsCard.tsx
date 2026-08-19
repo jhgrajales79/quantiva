@@ -35,21 +35,21 @@ export function DividendsCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Dividendos" />
       {!data ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : data.history.length === 0 ? (
         <EmptyState message="Esta empresa no reparte dividendos, o no hay historial disponible." />
       ) : (
         <dl className="grid grid-cols-2 gap-2 text-sm">
-          <dt className="text-neutral-500">DPS TTM</dt>
-          <dd className="text-right text-neutral-100">{formatCurrency(data.dpsTtm)}</dd>
-          <dt className="text-neutral-500">Rendimiento (yield)</dt>
-          <dd className="text-right text-neutral-100">{formatPercent(ratios?.ratios?.dividendYield ?? null)}</dd>
-          <dt className="text-neutral-500">DPS CAGR 5A</dt>
-          <dd className="text-right text-neutral-100">
+          <dt className="text-app-fg-muted">DPS TTM</dt>
+          <dd className="text-right text-app-fg">{formatCurrency(data.dpsTtm)}</dd>
+          <dt className="text-app-fg-muted">Rendimiento (yield)</dt>
+          <dd className="text-right text-app-fg">{formatPercent(ratios?.ratios?.dividendYield ?? null)}</dd>
+          <dt className="text-app-fg-muted">DPS CAGR 5A</dt>
+          <dd className="text-right text-app-fg">
             {data.cagr5y !== null ? formatPercent(data.cagr5y) : "Historial insuficiente"}
           </dd>
-          <dt className="text-neutral-500">DPS CAGR 10A</dt>
-          <dd className="text-right text-neutral-100">
+          <dt className="text-app-fg-muted">DPS CAGR 10A</dt>
+          <dd className="text-right text-app-fg">
             {data.cagr10y !== null ? formatPercent(data.cagr10y) : "Historial insuficiente"}
           </dd>
         </dl>

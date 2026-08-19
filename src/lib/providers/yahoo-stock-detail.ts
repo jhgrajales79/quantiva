@@ -93,6 +93,92 @@ export async function getStockOverview(symbol: string, currentPrice: number): Pr
   };
 }
 
+// ---------------------------------------------------------------------------
+// ETFs (topHoldings + fundProfile)
+// ---------------------------------------------------------------------------
+
+const etfProfileSchema = z.object({
+  topHoldings: z
+    .object({
+      holdings: z
+        .array(
+          z.object({
+            symbol: z.string(),
+            holdingName: z.string().optional(),
+            holdingPercent: rawNum,
+          }),
+        )
+        .optional(),
+      sectorWeightings: z
+        .array(z.record(z.string(), rawNum))
+        .optional(),
+      stockPosition: rawNum,
+      bondPosition: rawNum,
+      cashPosition: rawNum,
+    })
+    .optional(),
+  fundProfile: z
+    .object({
+      family: z.string().nullable().optional(),
+      categoryName: z.string().nullable().optional(),
+      legalType: z.string().nullable().optional(),
+      feesExpensesInvestment: z
+        .object({
+          annualReportExpenseRatio: rawNum,
+          totalNetAssets: rawNum,
+        })
+        .partial()
+        .optional(),
+    })
+    .optional(),
+});
+
+export interface EtfProfile {
+  holdings: { symbol: string; name: string; weightPct: number }[];
+  sectorWeightings: { sector: string; weightPct: number }[];
+  stockPositionPct: number | null;
+  bondPositionPct: number | null;
+  cashPositionPct: number | null;
+  family: string | null;
+  category: string | null;
+  legalType: string | null;
+  expenseRatio: number | null;
+  totalNetAssets: number | null; // en millones USD, según Yahoo
+}
+
+export async function getEtfProfile(symbol: string): Promise<EtfProfile | null> {
+  const result = await yahooFetchWithCrumb(
+    (crumb) =>
+      `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=topHoldings,fundProfile&crumb=${encodeURIComponent(crumb)}`,
+    quoteSummarySchema(etfProfileSchema),
+  );
+  const r = result.quoteSummary.result?.[0];
+  if (!r?.topHoldings) return null;
+
+  const sectorWeightings = (r.topHoldings.sectorWeightings ?? []).flatMap((entry) =>
+    Object.entries(entry)
+      .filter(([, v]) => v !== null)
+      .map(([sector, weight]) => ({ sector, weightPct: (weight as number) * 100 })),
+  );
+
+  return {
+    holdings: (r.topHoldings.holdings ?? []).map((h) => ({
+      symbol: h.symbol,
+      name: h.holdingName ?? h.symbol,
+      weightPct: (h.holdingPercent ?? 0) * 100,
+    })),
+    sectorWeightings,
+    stockPositionPct: r.topHoldings.stockPosition !== null ? r.topHoldings.stockPosition * 100 : null,
+    bondPositionPct: r.topHoldings.bondPosition !== null ? r.topHoldings.bondPosition * 100 : null,
+    cashPositionPct: r.topHoldings.cashPosition !== null ? r.topHoldings.cashPosition * 100 : null,
+    family: r.fundProfile?.family ?? null,
+    category: r.fundProfile?.categoryName ?? null,
+    legalType: r.fundProfile?.legalType ?? null,
+    expenseRatio: r.fundProfile?.feesExpensesInvestment?.annualReportExpenseRatio ?? null,
+    totalNetAssets: r.fundProfile?.feesExpensesInvestment?.totalNetAssets ?? null,
+  };
+}
+
 export interface CompanyProfile {
   sector: string | null;
   industry: string | null;

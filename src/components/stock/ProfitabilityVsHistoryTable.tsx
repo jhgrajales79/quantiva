@@ -26,9 +26,9 @@ export function ProfitabilityVsHistoryTable({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Rentabilidad vs. promedio histórico propio" />
       {!data ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
-        <div className="divide-y divide-neutral-800">
+        <div className="divide-y divide-app-border">
           <HistoricalComparisonRow label="ROE" data={data.roe} formatValue={(v) => formatPercent(v)} higherIsBetter />
           <HistoricalComparisonRow label="ROIC" data={data.roic} formatValue={(v) => formatPercent(v)} higherIsBetter />
           <HistoricalComparisonRow

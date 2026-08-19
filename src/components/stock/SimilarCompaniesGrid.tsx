@@ -25,19 +25,19 @@ export function SimilarCompaniesGrid({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Empresas similares" />
       {peers === null ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : peers.length === 0 ? (
-        <p className="text-sm text-neutral-500">Dato no disponible.</p>
+        <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {peers.map((p) => (
             <Link
               key={p.symbol}
               href={`/stocks/${p.symbol}`}
-              className="rounded-md border border-neutral-800 p-3 transition hover:border-neutral-700"
+              className="rounded-md border border-app-border p-3 transition hover:border-app-border"
             >
-              <p className="text-sm font-medium text-neutral-100">{p.symbol}</p>
-              <p className="text-sm text-neutral-300">{formatCurrency(p.price)}</p>
+              <p className="text-sm font-medium text-app-fg">{p.symbol}</p>
+              <p className="text-sm text-app-fg-muted">{formatCurrency(p.price)}</p>
               <p className={p.changePct !== null && p.changePct >= 0 ? "text-xs text-emerald-400" : "text-xs text-red-400"}>
                 {formatPercent(p.changePct === null ? null : p.changePct / 100)}
               </p>

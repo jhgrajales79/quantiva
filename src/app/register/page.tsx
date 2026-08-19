@@ -48,28 +48,28 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
-      <div className="w-full max-w-sm rounded-xl border border-neutral-800 bg-neutral-900 p-8">
-        <h1 className="mb-1 text-xl font-semibold text-neutral-50">
+    <div className="flex min-h-screen items-center justify-center bg-app-bg px-4">
+      <div className="w-full max-w-sm rounded-xl border border-app-border bg-app-surface p-8">
+        <h1 className="mb-1 text-xl font-semibold text-app-fg">
           Crear cuenta
         </h1>
-        <p className="mb-6 text-sm text-neutral-400">
+        <p className="mb-6 text-sm text-app-fg-muted">
           Empieza a monitorear mercados y valorar tus inversiones.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-400">
+            <label className="mb-1 block text-xs font-medium text-app-fg-muted">
               Nombre
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-md border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-emerald-500"
+              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none focus:border-emerald-500"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-400">
+            <label className="mb-1 block text-xs font-medium text-app-fg-muted">
               Correo
             </label>
             <input
@@ -77,11 +77,11 @@ export default function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-emerald-500"
+              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none focus:border-emerald-500"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-400">
+            <label className="mb-1 block text-xs font-medium text-app-fg-muted">
               Contraseña (mínimo 8 caracteres)
             </label>
             <input
@@ -90,7 +90,7 @@ export default function RegisterPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-emerald-500"
+              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none focus:border-emerald-500"
             />
           </div>
           {error && <p className="text-sm text-red-400">{error}</p>}
@@ -102,7 +102,7 @@ export default function RegisterPage() {
             {loading ? "Creando..." : "Crear cuenta"}
           </button>
         </form>
-        <p className="mt-6 text-center text-sm text-neutral-500">
+        <p className="mt-6 text-center text-sm text-app-fg-muted">
           ¿Ya tienes cuenta?{" "}
           <Link href="/login" className="text-emerald-400 hover:underline">
             Inicia sesión

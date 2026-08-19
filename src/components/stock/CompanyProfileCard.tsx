@@ -28,18 +28,18 @@ export function CompanyProfileCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Perfil de la empresa" />
       {!profile ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
         <>
           {profile.businessSummary ? (
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-app-fg-muted">
               {expanded ? profile.businessSummary : profile.businessSummary.slice(0, 280) + "…"}{" "}
               <button onClick={() => setExpanded(!expanded)} className="text-emerald-400 hover:underline">
                 {expanded ? "Ver menos" : "Ver más"}
               </button>
             </p>
           ) : (
-            <p className="text-sm text-neutral-500">Dato no disponible.</p>
+            <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
           )}
 
           <dl className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
@@ -63,8 +63,8 @@ export function CompanyProfileCard({ symbol }: { symbol: string }) {
 function Field({ label, value, href }: { label: string; value: string | null; href?: string }) {
   return (
     <div>
-      <dt className="text-xs text-neutral-500">{label}</dt>
-      <dd className="text-neutral-200">
+      <dt className="text-xs text-app-fg-muted">{label}</dt>
+      <dd className="text-app-fg">
         {value === null ? (
           "Dato no disponible"
         ) : href ? (

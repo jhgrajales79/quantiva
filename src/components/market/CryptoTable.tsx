@@ -22,17 +22,17 @@ export function CryptoTable() {
   }, []);
 
   if (error) {
-    return <p className="text-sm text-neutral-500">Dato no disponible: {error}</p>;
+    return <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>;
   }
   if (!coins) {
-    return <p className="text-sm text-neutral-500">Cargando criptomonedas...</p>;
+    return <p className="text-sm text-app-fg-muted">Cargando criptomonedas...</p>;
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-neutral-800 bg-neutral-900">
+    <div className="overflow-x-auto rounded-lg border border-app-border bg-app-surface">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-neutral-800 text-left text-xs text-neutral-500">
+          <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
             <th className="px-3 py-2">Activo</th>
             <th className="px-3 py-2">Precio</th>
             <th className="px-3 py-2">24h</th>
@@ -42,15 +42,15 @@ export function CryptoTable() {
         </thead>
         <tbody>
           {coins.map((coin) => (
-            <tr key={coin.symbol} className="border-b border-neutral-900 hover:bg-neutral-800/40">
+            <tr key={coin.symbol} className="border-b border-app-border hover:bg-app-surface-2/40">
               <td className="px-3 py-2 font-medium">
-                {coin.name} <span className="text-xs text-neutral-500">{coin.symbol}</span>
+                {coin.name} <span className="text-xs text-app-fg-muted">{coin.symbol}</span>
               </td>
               <td className="px-3 py-2">{formatCurrency(coin.price)}</td>
               <td
                 className={`px-3 py-2 ${
                   coin.change24hPct === null
-                    ? "text-neutral-500"
+                    ? "text-app-fg-muted"
                     : coin.change24hPct >= 0
                       ? "text-emerald-400"
                       : "text-red-400"

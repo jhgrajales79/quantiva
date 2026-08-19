@@ -27,17 +27,17 @@ export function NewsSummaryCard() {
     <Card>
       <CardHeader title="Noticias de tus acciones" />
       {items === null ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : items.length === 0 ? (
         <EmptyState message="Todavía no hay noticias de las acciones que sigues." />
       ) : (
         <ul className="space-y-2">
           {items.slice(0, 5).map((item) => (
             <li key={item.id} className="text-sm">
-              <a href={item.url} target="_blank" rel="noreferrer" className="text-neutral-200 hover:underline">
+              <a href={item.url} target="_blank" rel="noreferrer" className="text-app-fg hover:underline">
                 {item.title}
               </a>
-              <span className="ml-2 text-xs text-neutral-500">
+              <span className="ml-2 text-xs text-app-fg-muted">
                 {item.source} · {formatDateTime(item.publishedAt)}
               </span>
             </li>

@@ -42,8 +42,8 @@ export function MacroStrip() {
       {!indicators
         ? Object.values(STRIP_CODES).map((cfg) => (
             <Card key={cfg.label}>
-              <p className="text-xs text-neutral-500">{cfg.label}</p>
-              <p className="mt-1 text-sm text-neutral-500">Cargando...</p>
+              <p className="text-xs text-app-fg-muted">{cfg.label}</p>
+              <p className="mt-1 text-sm text-app-fg-muted">Cargando...</p>
             </Card>
           ))
         : strip.map((ind) => {
@@ -67,9 +67,9 @@ export function MacroStrip() {
 
             return (
               <Card key={ind.code}>
-                <p className="text-xs text-neutral-500">{config.label}</p>
+                <p className="text-xs text-app-fg-muted">{config.label}</p>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <p className="text-lg font-semibold text-neutral-50">
+                  <p className="text-lg font-semibold text-app-fg">
                     {displayValue === null ? "—" : `${(displayValue * 100).toFixed(1)}%`}
                   </p>
                   {deltaPp !== null && (
@@ -83,7 +83,7 @@ export function MacroStrip() {
                   data={ind.history}
                   positive={deltaPp === null ? null : deltaPp >= 0}
                 />
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-app-fg-muted">
                   Último dato: {ind.date ?? "Dato no disponible"}
                 </p>
               </Card>

@@ -10,7 +10,7 @@ const BADGE_CONFIG: Record<ValuationBadge, { label: string; className: string }>
 
 export function ValuationBadgePill({ badge }: { badge: ValuationBadge | null }) {
   if (!badge) {
-    return <span className="text-xs text-neutral-500">Dato no disponible</span>;
+    return <span className="text-xs text-app-fg-muted">Dato no disponible</span>;
   }
   const config = BADGE_CONFIG[badge];
   return (

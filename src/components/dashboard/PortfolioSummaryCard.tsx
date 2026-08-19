@@ -32,7 +32,7 @@ export function PortfolioSummaryCard() {
         action={<Badge variant="success">P&amp;L en vivo</Badge>}
       />
       {!summary ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : count === 0 ? (
         <EmptyState
           message="Aún no registras ninguna cartera. Crea una cartera y registra tus compras para seguir aquí tu patrimonio, tu ganancia y el peso de cada activo."
@@ -41,7 +41,7 @@ export function PortfolioSummaryCard() {
         />
       ) : (
         <div className="space-y-1">
-          <p className="text-lg font-semibold text-neutral-50">
+          <p className="text-lg font-semibold text-app-fg">
             {formatCurrency(summary.totalCurrentValue)}
           </p>
           <p className={summary.totalUnrealizedPnl >= 0 ? "text-sm text-emerald-400" : "text-sm text-red-400"}>

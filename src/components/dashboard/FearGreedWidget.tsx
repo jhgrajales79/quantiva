@@ -37,24 +37,24 @@ export function FearGreedWidget() {
         action={data && <Badge variant={badgeVariant(data.score)}>{data.rating}</Badge>}
       />
       {error ? (
-        <p className="text-sm text-neutral-500">Dato no disponible: {error}</p>
+        <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>
       ) : !data ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
         <>
-          <p className="mb-1 text-3xl font-semibold text-neutral-50">{Math.round(data.score)}/100</p>
+          <p className="mb-1 text-3xl font-semibold text-app-fg">{Math.round(data.score)}/100</p>
           <div className="relative h-2 w-full rounded-full bg-gradient-to-r from-red-500 via-amber-400 to-emerald-500">
             <div
-              className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-neutral-950 bg-neutral-100"
+              className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-app-border bg-neutral-100"
               style={{ left: `${data.score}%` }}
             />
           </div>
-          <div className="mt-1 flex justify-between text-xs text-neutral-500">
+          <div className="mt-1 flex justify-between text-xs text-app-fg-muted">
             <span>Miedo extremo</span>
             <span>Neutral</span>
             <span>Codicia extrema</span>
           </div>
-          <p className="mt-3 text-xs text-neutral-500">
+          <p className="mt-3 text-xs text-app-fg-muted">
             hace 1 sem: {Math.round(data.previousWeek)} · cierre ant.: {Math.round(data.previousClose)} · fuente: {data.source}
           </p>
         </>

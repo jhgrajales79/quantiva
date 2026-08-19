@@ -22,7 +22,7 @@ export function FavoritesStatGrid() {
       .catch(() => setSymbols([]));
   }, []);
 
-  if (symbols === null) return <p className="text-sm text-neutral-500">Cargando...</p>;
+  if (symbols === null) return <p className="text-sm text-app-fg-muted">Cargando...</p>;
   if (symbols.length === 0) {
     return (
       <EmptyState

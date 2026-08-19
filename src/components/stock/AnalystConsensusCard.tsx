@@ -46,7 +46,7 @@ export function AnalystConsensusCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title={`Consenso de analistas${data?.numberOfAnalysts ? ` · ${data.numberOfAnalysts}` : ""}`} />
       {!data ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
         <>
           {data.distribution && total > 0 ? (
@@ -60,32 +60,32 @@ export function AnalystConsensusCard({ symbol }: { symbol: string }) {
               ))}
             </div>
           ) : (
-            <p className="mb-3 text-sm text-neutral-500">Dato no disponible.</p>
+            <p className="mb-3 text-sm text-app-fg-muted">Dato no disponible.</p>
           )}
 
-          <p className="mb-4 text-sm text-neutral-400">
+          <p className="mb-4 text-sm text-app-fg-muted">
             Precio objetivo promedio: {formatCurrency(data.targetMeanPrice)} (rango{" "}
             {formatCurrency(data.targetLowPrice)} – {formatCurrency(data.targetHighPrice)})
           </p>
 
-          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-app-fg-muted">
             Cambios recientes
           </h4>
           {data.recentChanges.length === 0 ? (
-            <p className="text-sm text-neutral-500">Dato no disponible.</p>
+            <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
           ) : (
             <ul className="space-y-2">
               {data.recentChanges.slice(0, 5).map((c, i) => (
                 <li key={i} className="text-sm">
-                  <span className="text-neutral-200">{c.firm}</span>{" "}
-                  <span className="text-neutral-500">
+                  <span className="text-app-fg">{c.firm}</span>{" "}
+                  <span className="text-app-fg-muted">
                     {c.fromGrade && c.fromGrade !== c.toGrade ? `${c.fromGrade} → ` : ""}
                     {c.toGrade}
                   </span>
                   {c.priceTarget !== null && (
-                    <span className="text-neutral-500"> · PT {formatCurrency(c.priceTarget)}</span>
+                    <span className="text-app-fg-muted"> · PT {formatCurrency(c.priceTarget)}</span>
                   )}
-                  <span className="ml-2 text-xs text-neutral-600">{formatDateTime(c.date)}</span>
+                  <span className="ml-2 text-xs text-app-fg-faint">{formatDateTime(c.date)}</span>
                 </li>
               ))}
             </ul>

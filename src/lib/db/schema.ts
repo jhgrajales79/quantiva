@@ -414,6 +414,35 @@ export const marketBreadthSnapshots = pgTable("market_breadth_snapshots", {
   fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+export const screenerSnapshots = pgTable(
+  "screener_snapshots",
+  {
+    date: text("date").notNull(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assets.id, { onDelete: "cascade" }),
+    sector: text("sector"),
+    price: doublePrecision("price"),
+    changePct: doublePrecision("change_pct"),
+    marketCap: doublePrecision("market_cap"),
+    pe: doublePrecision("pe"),
+    forwardPe: doublePrecision("forward_pe"),
+    pb: doublePrecision("pb"),
+    dividendYield: doublePrecision("dividend_yield"),
+    ma50: doublePrecision("ma50"),
+    ma200: doublePrecision("ma200"),
+    fiftyTwoWeekLow: doublePrecision("fifty_two_week_low"),
+    fiftyTwoWeekHigh: doublePrecision("fifty_two_week_high"),
+    avgVolume10d: doublePrecision("avg_volume_10d"),
+    avgVolume3m: doublePrecision("avg_volume_3m"),
+    fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.date, table.assetId] }),
+    index("screener_date_idx").on(table.date),
+  ],
+);
+
 export const marketMoversCache = pgTable(
   "market_movers_cache",
   {

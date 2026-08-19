@@ -50,11 +50,11 @@ export function PriceChart({ data }: { data: PricePoint[] }) {
 
   if (data.length === 0) {
     return (
-      <div className="flex h-80 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-sm text-neutral-500">
+      <div className="flex h-80 items-center justify-center rounded-lg border border-app-border bg-app-surface text-sm text-app-fg-muted">
         Dato no disponible: sin histórico de precios todavía.
       </div>
     );
   }
 
-  return <div ref={containerRef} className="rounded-lg border border-neutral-800 bg-neutral-900 p-2" />;
+  return <div ref={containerRef} className="rounded-lg border border-app-border bg-app-surface p-2" />;
 }

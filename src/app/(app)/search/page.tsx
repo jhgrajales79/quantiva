@@ -13,7 +13,7 @@ interface SymbolMatch {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-neutral-500">Cargando...</p>}>
+    <Suspense fallback={<p className="text-sm text-app-fg-muted">Cargando...</p>}>
       <SearchResults />
     </Suspense>
   );
@@ -42,25 +42,25 @@ function SearchResults() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-neutral-50">Buscar</h1>
-      {!q && <p className="text-sm text-neutral-500">Escribe un ticker o nombre en el buscador.</p>}
-      {error && <p className="text-sm text-neutral-500">Dato no disponible: {error}</p>}
+      <h1 className="text-xl font-semibold text-app-fg">Buscar</h1>
+      {!q && <p className="text-sm text-app-fg-muted">Escribe un ticker o nombre en el buscador.</p>}
+      {error && <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>}
       {results && results.length === 0 && q && (
-        <p className="text-sm text-neutral-500">Sin resultados para &quot;{q}&quot;.</p>
+        <p className="text-sm text-app-fg-muted">Sin resultados para &quot;{q}&quot;.</p>
       )}
       {results && results.length > 0 && (
-        <ul className="divide-y divide-neutral-800 rounded-lg border border-neutral-800 bg-neutral-900">
+        <ul className="divide-y divide-app-border rounded-lg border border-app-border bg-app-surface">
           {results.map((r) => (
             <li key={r.symbol}>
               <Link
                 href={`/stocks/${r.symbol}`}
-                className="flex items-center justify-between p-3 hover:bg-neutral-800/50"
+                className="flex items-center justify-between p-3 hover:bg-app-surface-2/50"
               >
                 <span>
-                  <span className="font-medium text-neutral-100">{r.symbol}</span>
-                  <span className="ml-2 text-sm text-neutral-500">{r.name}</span>
+                  <span className="font-medium text-app-fg">{r.symbol}</span>
+                  <span className="ml-2 text-sm text-app-fg-muted">{r.name}</span>
                 </span>
-                <span className="text-xs text-neutral-500">{r.exchange}</span>
+                <span className="text-xs text-app-fg-muted">{r.exchange}</span>
               </Link>
             </li>
           ))}

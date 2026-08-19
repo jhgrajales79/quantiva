@@ -86,7 +86,7 @@ export default function PortfolioDetailPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-neutral-50">{portfolioName || "Portafolio"}</h1>
+      <h1 className="text-xl font-semibold text-app-fg">{portfolioName || "Portafolio"}</h1>
 
       {summary && (
         <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -106,21 +106,21 @@ export default function PortfolioDetailPage() {
         </div>
       )}
 
-      <div className="rounded-lg border border-neutral-800 bg-neutral-900">
-        <h3 className="border-b border-neutral-800 p-3 text-sm font-semibold text-neutral-200">
+      <div className="rounded-lg border border-app-border bg-app-surface">
+        <h3 className="border-b border-app-border p-3 text-sm font-semibold text-app-fg">
           Posiciones
         </h3>
         {!holdings ? (
-          <p className="p-4 text-sm text-neutral-500">Cargando...</p>
+          <p className="p-4 text-sm text-app-fg-muted">Cargando...</p>
         ) : holdings.length === 0 ? (
-          <p className="p-4 text-sm text-neutral-500">
+          <p className="p-4 text-sm text-app-fg-muted">
             Sin posiciones todavía. Registra tu primera transacción abajo.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-800 text-left text-xs text-neutral-500">
+                <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
                   <th className="px-3 py-2">Ticker</th>
                   <th className="px-3 py-2">Cantidad</th>
                   <th className="px-3 py-2">Costo prom.</th>
@@ -132,7 +132,7 @@ export default function PortfolioDetailPage() {
               </thead>
               <tbody>
                 {holdings.map((h) => (
-                  <tr key={h.symbol} className="border-b border-neutral-900 hover:bg-neutral-800/40">
+                  <tr key={h.symbol} className="border-b border-app-border hover:bg-app-surface-2/40">
                     <td className="px-3 py-2 font-medium">{h.symbol}</td>
                     <td className="px-3 py-2">{h.quantity}</td>
                     <td className="px-3 py-2">{formatCurrency(h.averageCost)}</td>
@@ -141,7 +141,7 @@ export default function PortfolioDetailPage() {
                     <td
                       className={`px-3 py-2 ${
                         h.unrealizedPnl === null
-                          ? "text-neutral-500"
+                          ? "text-app-fg-muted"
                           : h.unrealizedPnl >= 0
                             ? "text-emerald-400"
                             : "text-red-400"
@@ -158,20 +158,20 @@ export default function PortfolioDetailPage() {
         )}
       </div>
 
-      <div className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
-        <h3 className="mb-3 text-sm font-semibold text-neutral-200">Registrar transacción</h3>
+      <div className="rounded-lg border border-app-border bg-app-surface p-4">
+        <h3 className="mb-3 text-sm font-semibold text-app-fg">Registrar transacción</h3>
         <form onSubmit={handleSubmit} className="grid gap-2 sm:grid-cols-5">
           <input
             required
             placeholder="Ticker"
             value={form.symbol}
             onChange={(e) => setForm({ ...form, symbol: e.target.value })}
-            className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
           />
           <select
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value as typeof form.type })}
-            className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
           >
             <option value="buy">Compra</option>
             <option value="sell">Venta</option>
@@ -184,7 +184,7 @@ export default function PortfolioDetailPage() {
             placeholder="Cantidad"
             value={form.quantity}
             onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-            className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
           />
           <input
             required
@@ -193,13 +193,13 @@ export default function PortfolioDetailPage() {
             placeholder="Precio"
             value={form.price}
             onChange={(e) => setForm({ ...form, price: e.target.value })}
-            className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
           />
           <input
             type="date"
             value={form.executedAt}
             onChange={(e) => setForm({ ...form, executedAt: e.target.value })}
-            className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
           />
           <button
             type="submit"
@@ -224,11 +224,11 @@ function SummaryCard({
   positive?: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-neutral-800 bg-neutral-900 p-3">
-      <p className="text-xs text-neutral-500">{label}</p>
+    <div className="rounded-lg border border-app-border bg-app-surface p-3">
+      <p className="text-xs text-app-fg-muted">{label}</p>
       <p
         className={`text-lg font-semibold ${
-          positive === undefined ? "text-neutral-100" : positive ? "text-emerald-400" : "text-red-400"
+          positive === undefined ? "text-app-fg" : positive ? "text-emerald-400" : "text-red-400"
         }`}
       >
         {value}

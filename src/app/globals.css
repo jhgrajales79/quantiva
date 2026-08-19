@@ -1,6 +1,52 @@
 @import "tailwindcss";
 
+:root {
+  /* Tema claro (default) */
+  --color-app-bg: #ffffff;
+  --color-app-surface: #f8fafc;
+  --color-app-surface-2: #f1f5f9;
+  --color-app-border: #e2e8f0;
+  --color-app-fg: #0f172a;
+  --color-app-fg-muted: #475569;
+  --color-app-fg-faint: #94a3b8;
+
+  --app-font-scale: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-app-bg: #0a0a0a;
+    --color-app-surface: #171717;
+    --color-app-surface-2: #262626;
+    --color-app-border: #262626;
+    --color-app-fg: #fafafa;
+    --color-app-fg-muted: #a3a3a3;
+    --color-app-fg-faint: #525252;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-app-bg: #0a0a0a;
+  --color-app-surface: #171717;
+  --color-app-surface-2: #262626;
+  --color-app-border: #262626;
+  --color-app-fg: #fafafa;
+  --color-app-fg-muted: #a3a3a3;
+  --color-app-fg-faint: #525252;
+}
+
+html {
+  font-size: calc(16px * var(--app-font-scale));
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-app-bg: var(--color-app-bg);
+  --color-app-surface: var(--color-app-surface);
+  --color-app-surface-2: var(--color-app-surface-2);
+  --color-app-border: var(--color-app-border);
+  --color-app-fg: var(--color-app-fg);
+  --color-app-fg-muted: var(--color-app-fg-muted);
+  --color-app-fg-faint: var(--color-app-fg-faint);
 }

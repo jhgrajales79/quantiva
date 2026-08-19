@@ -28,7 +28,7 @@ export default function NewsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-neutral-50">Noticias</h1>
+        <h1 className="text-xl font-semibold text-app-fg">Noticias</h1>
         <form
           onSubmit={(e) => e.preventDefault()}
           className="flex gap-2"
@@ -37,15 +37,15 @@ export default function NewsPage() {
             value={symbol}
             onChange={(e) => setSymbol(e.target.value.toUpperCase())}
             placeholder="Filtrar por ticker (ej. AAPL)"
-            className="rounded-md border border-neutral-700 bg-neutral-900 px-2 py-1 text-xs text-neutral-100 outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-surface px-2 py-1 text-xs text-app-fg outline-none focus:border-emerald-500"
           />
         </form>
       </div>
 
       {!items ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : items.length === 0 ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-app-fg-muted">
           {symbol
             ? `Dato no disponible: sin noticias recientes para ${symbol}.`
             : "Sin noticias todavía. Busca un ticker para poblar el feed."}
@@ -53,19 +53,19 @@ export default function NewsPage() {
       ) : (
         <ul className="space-y-3">
           {items.map((item) => (
-            <li key={item.id} className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+            <li key={item.id} className="rounded-lg border border-app-border bg-app-surface p-4">
               <a
                 href={item.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-sm font-medium text-neutral-100 hover:underline"
+                className="text-sm font-medium text-app-fg hover:underline"
               >
                 {item.title}
               </a>
               {item.summary && (
-                <p className="mt-1 line-clamp-2 text-sm text-neutral-400">{item.summary}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-app-fg-muted">{item.summary}</p>
               )}
-              <p className="mt-2 text-xs text-neutral-500">
+              <p className="mt-2 text-xs text-app-fg-muted">
                 {item.source} · {formatDateTime(item.publishedAt)} · {item.relatedSymbols.join(", ")}
               </p>
             </li>

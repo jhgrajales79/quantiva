@@ -22,8 +22,8 @@ export function CryptoStatGrid() {
       .catch((err) => setError(err.message));
   }, []);
 
-  if (error) return <p className="text-sm text-neutral-500">Dato no disponible: {error}</p>;
-  if (!coins) return <p className="text-sm text-neutral-500">Cargando...</p>;
+  if (error) return <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>;
+  if (!coins) return <p className="text-sm text-app-fg-muted">Cargando...</p>;
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">

@@ -35,16 +35,16 @@ export function MarketBreadthWidget() {
     <Card>
       <CardHeader title={`Amplitud del mercado · S&P 500${data ? ` (${data.universeSize})` : ""}`} />
       {error ? (
-        <p className="text-sm text-neutral-500">Dato no disponible: {error}</p>
+        <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>
       ) : !data ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
         <>
           <div className="mb-1 flex items-center justify-between text-sm">
             <span className="font-semibold text-emerald-400">{data.advancing} suben</span>
             <span className="font-semibold text-red-400">{data.declining} bajan</span>
           </div>
-          <div className="flex h-2 w-full overflow-hidden rounded-full bg-neutral-800">
+          <div className="flex h-2 w-full overflow-hidden rounded-full bg-app-surface-2">
             <div
               className="bg-emerald-500"
               style={{ width: `${(data.advancing / (data.advancing + data.declining || 1)) * 100}%` }}
@@ -73,7 +73,7 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: "suc
       <p className={tone === "success" ? "text-lg font-semibold text-emerald-400" : "text-lg font-semibold text-red-400"}>
         {value}
       </p>
-      <p className="text-xs text-neutral-500">{label}</p>
+      <p className="text-xs text-app-fg-muted">{label}</p>
     </div>
   );
 }

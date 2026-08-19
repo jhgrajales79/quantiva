@@ -43,13 +43,13 @@ export function NewsFilingsTabs({ symbol }: { symbol: string }) {
           <div className="flex gap-1">
             <button
               onClick={() => setTab("news")}
-              className={`rounded-md px-2 py-1 text-xs font-medium ${tab === "news" ? "bg-neutral-800 text-neutral-50" : "text-neutral-500"}`}
+              className={`rounded-md px-2 py-1 text-xs font-medium ${tab === "news" ? "bg-app-surface-2 text-app-fg" : "text-app-fg-muted"}`}
             >
               Noticias
             </button>
             <button
               onClick={() => setTab("filings")}
-              className={`rounded-md px-2 py-1 text-xs font-medium ${tab === "filings" ? "bg-neutral-800 text-neutral-50" : "text-neutral-500"}`}
+              className={`rounded-md px-2 py-1 text-xs font-medium ${tab === "filings" ? "bg-app-surface-2 text-app-fg" : "text-app-fg-muted"}`}
             >
               Reportes SEC
             </button>
@@ -59,17 +59,17 @@ export function NewsFilingsTabs({ symbol }: { symbol: string }) {
 
       {tab === "news" &&
         (news === null ? (
-          <p className="text-sm text-neutral-500">Cargando...</p>
+          <p className="text-sm text-app-fg-muted">Cargando...</p>
         ) : news.length === 0 ? (
-          <p className="text-sm text-neutral-500">Dato no disponible.</p>
+          <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
         ) : (
           <ul className="space-y-2">
             {news.map((n) => (
               <li key={n.id} className="text-sm">
-                <a href={n.url} target="_blank" rel="noreferrer" className="text-neutral-200 hover:underline">
+                <a href={n.url} target="_blank" rel="noreferrer" className="text-app-fg hover:underline">
                   {n.title}
                 </a>
-                <span className="ml-2 text-xs text-neutral-500">
+                <span className="ml-2 text-xs text-app-fg-muted">
                   {n.source} · {formatDateTime(n.publishedAt)}
                 </span>
               </li>
@@ -79,22 +79,22 @@ export function NewsFilingsTabs({ symbol }: { symbol: string }) {
 
       {tab === "filings" &&
         (filings === null ? (
-          <p className="text-sm text-neutral-500">Cargando...</p>
+          <p className="text-sm text-app-fg-muted">Cargando...</p>
         ) : filings.length === 0 ? (
-          <p className="text-sm text-neutral-500">Dato no disponible.</p>
+          <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
         ) : (
           <ul className="space-y-2">
             {filings.map((f, i) => (
               <li key={i} className="text-sm">
-                <a href={f.edgarUrl} target="_blank" rel="noreferrer" className="text-neutral-200 hover:underline">
+                <a href={f.edgarUrl} target="_blank" rel="noreferrer" className="text-app-fg hover:underline">
                   {f.type} — {f.title}
                 </a>
-                <span className="ml-2 text-xs text-neutral-500">{f.date}</span>
+                <span className="ml-2 text-xs text-app-fg-muted">{f.date}</span>
               </li>
             ))}
           </ul>
         ))}
-      <p className="mt-3 text-xs text-neutral-600">Fuente: SEC EDGAR (vía Yahoo Finance).</p>
+      <p className="mt-3 text-xs text-app-fg-faint">Fuente: SEC EDGAR (vía Yahoo Finance).</p>
     </Card>
   );
 }

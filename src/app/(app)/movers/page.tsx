@@ -28,9 +28,9 @@ export default function MoversPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-neutral-50">Market Movers</h1>
-      {error && <p className="text-sm text-neutral-500">Dato no disponible: {error}</p>}
-      {!data && !error && <p className="text-sm text-neutral-500">Cargando...</p>}
+      <h1 className="text-xl font-semibold text-app-fg">Market Movers</h1>
+      {error && <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>}
+      {!data && !error && <p className="text-sm text-app-fg-muted">Cargando...</p>}
       {data && (
         <div className="grid gap-4 md:grid-cols-3">
           <MoversTable title="Top Gainers" rows={data.gainers} />

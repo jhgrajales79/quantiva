@@ -9,10 +9,10 @@ export function QuoteStatGrid({ symbols }: { symbols: MarketSymbol[] }) {
   const rows = useQuotes(symbols);
 
   if (symbols.length === 0) {
-    return <p className="text-sm text-neutral-500">Sin instrumentos configurados.</p>;
+    return <p className="text-sm text-app-fg-muted">Sin instrumentos configurados.</p>;
   }
   if (!rows) {
-    return <p className="text-sm text-neutral-500">Cargando...</p>;
+    return <p className="text-sm text-app-fg-muted">Cargando...</p>;
   }
 
   return (

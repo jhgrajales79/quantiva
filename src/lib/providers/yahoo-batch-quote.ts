@@ -11,6 +11,13 @@ const batchQuoteItemSchema = z.object({
   regularMarketPrice: nullableNumber,
   fiftyTwoWeekHigh: nullableNumber,
   fiftyTwoWeekLow: nullableNumber,
+  marketCap: nullableNumber,
+  trailingPE: nullableNumber,
+  forwardPE: nullableNumber,
+  priceToBook: nullableNumber,
+  dividendYield: nullableNumber,
+  averageDailyVolume10Day: nullableNumber,
+  averageDailyVolume3Month: nullableNumber,
 });
 
 const batchQuoteResponseSchema = z.object({

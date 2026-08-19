@@ -12,7 +12,7 @@ export function Card({
   return (
     <div
       className={clsx(
-        "rounded-lg border border-neutral-800 bg-neutral-900",
+        "rounded-lg border border-app-border bg-app-surface",
         padded && "p-4",
         className,
       )}
@@ -33,7 +33,7 @@ export function CardHeader({
 }) {
   return (
     <div className={clsx("mb-3 flex items-center justify-between", className)}>
-      <h3 className="text-sm font-semibold text-neutral-200">{title}</h3>
+      <h3 className="text-sm font-semibold text-app-fg">{title}</h3>
       {action}
     </div>
   );

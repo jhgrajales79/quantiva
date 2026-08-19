@@ -27,9 +27,9 @@ export function ValuationVsHistoryTable({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title="Valoración vs. promedio histórico propio" />
       {!data ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : (
-        <div className="divide-y divide-neutral-800">
+        <div className="divide-y divide-app-border">
           <HistoricalComparisonRow label="P/E" data={data.pe} formatValue={(v) => v.toFixed(1) + "x"} />
           <HistoricalComparisonRow label="EV/EBITDA" data={data.evEbitda} formatValue={(v) => v.toFixed(1) + "x"} />
           <HistoricalComparisonRow label="P/S" data={data.ps} formatValue={(v) => v.toFixed(1) + "x"} />

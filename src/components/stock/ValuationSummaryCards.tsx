@@ -50,45 +50,45 @@ export function ValuationSummaryCards({ symbol }: { symbol: string }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <Card>
-        <p className="text-xs text-neutral-500">Investment Score</p>
-        <p className="mt-1 text-2xl font-semibold text-neutral-50">
+        <p className="text-xs text-app-fg-muted">Investment Score</p>
+        <p className="mt-1 text-2xl font-semibold text-app-fg">
           {valuation?.scores.investment !== null && valuation?.scores.investment !== undefined
             ? valuation.scores.investment.toFixed(0)
             : "—"}
         </p>
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-app-fg-muted">
           Upside vs. Fair Value: {formatPercent(valuation?.upsidePct ?? null)}
         </p>
       </Card>
       <Card>
-        <p className="text-xs text-neutral-500">Estimados</p>
-        <p className="mt-1 text-2xl font-semibold text-neutral-50">
+        <p className="text-xs text-app-fg-muted">Estimados</p>
+        <p className="mt-1 text-2xl font-semibold text-app-fg">
           {overview?.forwardPe !== null && overview?.forwardPe !== undefined
             ? `${overview.forwardPe.toFixed(1)}x`
             : "—"}
         </p>
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-app-fg-muted">
           adelante · {ratios?.ratios?.pe !== null && ratios?.ratios?.pe !== undefined ? `${ratios.ratios.pe.toFixed(1)}x actual` : "actual no disponible"}
         </p>
       </Card>
       <Card>
-        <p className="text-xs text-neutral-500">Crecimiento</p>
-        <p className="mt-1 text-2xl font-semibold text-neutral-50">
+        <p className="text-xs text-app-fg-muted">Crecimiento</p>
+        <p className="mt-1 text-2xl font-semibold text-app-fg">
           {formatPercent(ratios?.ratios?.revenueGrowth ?? null)}
         </p>
-        <p className="text-xs text-neutral-500">ingresos · anual</p>
+        <p className="text-xs text-app-fg-muted">ingresos · anual</p>
       </Card>
       <Card>
-        <p className="text-xs text-neutral-500">Próximo evento</p>
+        <p className="text-xs text-app-fg-muted">Próximo evento</p>
         {earnings ? (
           <>
-            <p className="mt-1 text-lg font-semibold text-neutral-50">Ganancias</p>
-            <p className="text-xs text-neutral-500">
+            <p className="mt-1 text-lg font-semibold text-app-fg">Ganancias</p>
+            <p className="text-xs text-app-fg-muted">
               {earnings.reportDate} · en {earnings.daysUntil} días
             </p>
           </>
         ) : (
-          <p className="mt-1 text-sm text-neutral-500">Dato no disponible</p>
+          <p className="mt-1 text-sm text-app-fg-muted">Dato no disponible</p>
         )}
       </Card>
     </div>

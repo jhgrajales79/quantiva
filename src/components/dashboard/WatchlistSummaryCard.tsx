@@ -26,7 +26,7 @@ export function WatchlistSummaryCard() {
     <Card>
       <CardHeader title={`Watchlist${items !== null ? ` · ${count} acciones` : ""}`} />
       {items === null ? (
-        <p className="text-sm text-neutral-500">Cargando...</p>
+        <p className="text-sm text-app-fg-muted">Cargando...</p>
       ) : count === 0 ? (
         <EmptyState
           message="Aún no sigues ninguna acción. Busca una empresa y agrégala a tu watchlist para verla aquí con su precio, su valor justo y su potencial."
@@ -38,10 +38,10 @@ export function WatchlistSummaryCard() {
           <ul className="space-y-1">
             {items.slice(0, 4).map((item) => (
               <li key={item.symbol} className="flex justify-between text-sm">
-                <Link href={`/stocks/${item.symbol}`} className="font-medium text-neutral-100 hover:underline">
+                <Link href={`/stocks/${item.symbol}`} className="font-medium text-app-fg hover:underline">
                   {item.symbol}
                 </Link>
-                <span className="text-neutral-500">{item.name}</span>
+                <span className="text-app-fg-muted">{item.name}</span>
               </li>
             ))}
           </ul>

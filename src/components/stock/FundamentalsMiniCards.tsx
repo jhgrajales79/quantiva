@@ -47,9 +47,9 @@ export function FundamentalsMiniCards({ symbol }: { symbol: string }) {
 
         return (
           <Card key={metric.key}>
-            <p className="text-xs text-neutral-500">{metric.label}</p>
-            <p className="mt-1 text-xl font-semibold text-neutral-50">{metric.format(current)}</p>
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="text-xs text-app-fg-muted">{metric.label}</p>
+            <p className="mt-1 text-xl font-semibold text-app-fg">{metric.format(current)}</p>
+            <p className="mt-1 text-xs text-app-fg-muted">
               {cagr !== null
                 ? `CAGR ${yearsSpan.toFixed(1)} años: ${formatPercent(cagr)}`
                 : sampleCount < 2

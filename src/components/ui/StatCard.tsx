@@ -16,15 +16,15 @@ export function StatCard({
   href?: string;
 }) {
   const content = (
-    <Card className={clsx(href && "transition hover:border-neutral-700")}>
-      <p className="text-xs text-neutral-500">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-neutral-50">{value}</p>
+    <Card className={clsx(href && "transition hover:border-app-border")}>
+      <p className="text-xs text-app-fg-muted">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-app-fg">{value}</p>
       {deltaLabel !== undefined && (
         <p
           className={clsx(
             "text-sm",
             deltaPositive === null || deltaPositive === undefined
-              ? "text-neutral-500"
+              ? "text-app-fg-muted"
               : deltaPositive
                 ? "text-emerald-400"
                 : "text-red-400",

@@ -41,14 +41,14 @@ export function QuotesTable({ symbols }: { symbols: { symbol: string; label: str
   }, [JSON.stringify(symbols)]);
 
   if (!rows) {
-    return <p className="text-sm text-neutral-500">Cargando cotizaciones...</p>;
+    return <p className="text-sm text-app-fg-muted">Cargando cotizaciones...</p>;
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-neutral-800 bg-neutral-900">
+    <div className="overflow-x-auto rounded-lg border border-app-border bg-app-surface">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-neutral-800 text-left text-xs text-neutral-500">
+          <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
             <th className="px-3 py-2">Instrumento</th>
             <th className="px-3 py-2">Precio</th>
             <th className="px-3 py-2">Var.</th>
@@ -56,16 +56,16 @@ export function QuotesTable({ symbols }: { symbols: { symbol: string; label: str
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.symbol} className="border-b border-neutral-900 hover:bg-neutral-800/40">
+            <tr key={row.symbol} className="border-b border-app-border hover:bg-app-surface-2/40">
               <td className="px-3 py-2">
                 <Link href={`/stocks/${row.symbol}`} className="font-medium hover:underline">
                   {row.label}
                 </Link>
-                <span className="ml-1 text-xs text-neutral-500">{row.symbol}</span>
+                <span className="ml-1 text-xs text-app-fg-muted">{row.symbol}</span>
               </td>
               <td className="px-3 py-2">
                 {row.error ? (
-                  <span className="text-xs text-neutral-500">Dato no disponible</span>
+                  <span className="text-xs text-app-fg-muted">Dato no disponible</span>
                 ) : (
                   formatCurrency(row.price)
                 )}
@@ -73,7 +73,7 @@ export function QuotesTable({ symbols }: { symbols: { symbol: string; label: str
               <td
                 className={`px-3 py-2 ${
                   row.changePct === null
-                    ? "text-neutral-500"
+                    ? "text-app-fg-muted"
                     : row.changePct >= 0
                       ? "text-emerald-400"
                       : "text-red-400"

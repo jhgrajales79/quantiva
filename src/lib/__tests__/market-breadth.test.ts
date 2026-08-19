@@ -11,6 +11,13 @@ function quote(overrides: Partial<BatchQuoteItem>): BatchQuoteItem {
     regularMarketPrice: null,
     fiftyTwoWeekHigh: null,
     fiftyTwoWeekLow: null,
+    marketCap: null,
+    trailingPE: null,
+    forwardPE: null,
+    priceToBook: null,
+    dividendYield: null,
+    averageDailyVolume10Day: null,
+    averageDailyVolume3Month: null,
     ...overrides,
   };
 }

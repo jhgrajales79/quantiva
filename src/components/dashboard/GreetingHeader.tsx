@@ -11,10 +11,10 @@ export async function GreetingHeader() {
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-emerald-500">Tu panel</p>
-        <h1 className="text-2xl font-semibold text-neutral-50">
+        <h1 className="text-2xl font-semibold text-app-fg">
           <GreetingText firstName={firstName} />
         </h1>
-        <p className="text-sm text-neutral-500">Esto cambió en tus acciones mientras no mirabas.</p>
+        <p className="text-sm text-app-fg-muted">Esto cambió en tus acciones mientras no mirabas.</p>
       </div>
       <div className="flex items-center gap-2">
         <MarketStatusBadge />
