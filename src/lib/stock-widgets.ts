@@ -21,6 +21,10 @@ export const STOCK_WIDGET_DEFS: StockWidgetDef[] = [
   { id: "analyst_consensus", label: "Consenso de analistas", description: "Recomendaciones y precio objetivo.", span: "half" },
   { id: "news_filings", label: "Noticias y reportes SEC", description: "Noticias recientes y filings.", span: "half" },
   { id: "similar_companies", label: "Empresas similares", description: "Comparables del mismo sector.", span: "full" },
+  { id: "earnings_history", label: "Earnings (histórico)", description: "BPA real vs. estimado, últimos trimestres.", span: "half" },
+  { id: "forecasts", label: "Previsiones", description: "Estimados de consenso para próximos períodos.", span: "half" },
+  { id: "shareholders", label: "Accionistas", description: "Institucionales, insiders y principales tenedores.", span: "half" },
+  { id: "dcf_simulator", label: "Simulador de valor justo", description: "Ajusta los supuestos del modelo DCF y ve el resultado.", span: "full" },
 ];
 
 export const STOCK_WIDGET_IDS = STOCK_WIDGET_DEFS.map((w) => w.id);

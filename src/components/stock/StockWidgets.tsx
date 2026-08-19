@@ -18,6 +18,10 @@ import { CompanyProfileCard } from "./CompanyProfileCard";
 import { AnalystConsensusCard } from "./AnalystConsensusCard";
 import { NewsFilingsTabs } from "./NewsFilingsTabs";
 import { SimilarCompaniesGrid } from "./SimilarCompaniesGrid";
+import { EarningsHistoryCard } from "./EarningsHistoryCard";
+import { ForecastsCard } from "./ForecastsCard";
+import { ShareholdersCard } from "./ShareholdersCard";
+import { DcfSimulatorCard } from "./DcfSimulatorCard";
 
 const WIDGET_COMPONENTS: Record<string, React.ComponentType<{ symbol: string }>> = {
   scores: ScoresPanel,
@@ -33,6 +37,10 @@ const WIDGET_COMPONENTS: Record<string, React.ComponentType<{ symbol: string }>>
   analyst_consensus: AnalystConsensusCard,
   news_filings: NewsFilingsTabs,
   similar_companies: SimilarCompaniesGrid,
+  earnings_history: EarningsHistoryCard,
+  forecasts: ForecastsCard,
+  shareholders: ShareholdersCard,
+  dcf_simulator: DcfSimulatorCard,
 };
 
 const WIDGET_SPAN: Record<string, "half" | "full"> = Object.fromEntries(

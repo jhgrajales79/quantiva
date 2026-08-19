@@ -9,6 +9,13 @@ const rawNum = z
   .or(z.null())
   .catch(null);
 
+const rawFmt = z
+  .object({ fmt: z.string().nullable().optional() })
+  .partial()
+  .transform((v) => v.fmt ?? null)
+  .or(z.null())
+  .catch(null);
+
 // ---------------------------------------------------------------------------
 // Perfil de empresa (assetProfile)
 // ---------------------------------------------------------------------------
@@ -441,4 +448,172 @@ export async function getForwardEpsEstimate(symbol: string): Promise<number | nu
   const trend = result.quoteSummary.result?.[0]?.earningsTrend?.trend ?? [];
   const nextYear = trend.find((t) => t.period === "+1y");
   return nextYear?.earningsEstimate?.avg ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Previsiones completas (earningsTrend, todos los períodos) — "Previsiones"
+// ---------------------------------------------------------------------------
+
+const fullEarningsTrendSchema = z.object({
+  earningsTrend: z
+    .object({
+      trend: z.array(
+        z.object({
+          period: z.string(),
+          endDate: z.string().nullable().optional(),
+          growth: rawNum,
+          earningsEstimate: z
+            .object({ avg: rawNum, low: rawNum, high: rawNum, numberOfAnalysts: rawNum, growth: rawNum })
+            .partial()
+            .optional(),
+          revenueEstimate: z
+            .object({ avg: rawNum, low: rawNum, high: rawNum, numberOfAnalysts: rawNum, growth: rawNum })
+            .partial()
+            .optional(),
+        }),
+      ),
+    })
+    .optional(),
+});
+
+export interface ForecastPeriod {
+  period: string; // "0q" | "+1q" | "0y" | "+1y"
+  endDate: string | null;
+  epsEstimateAvg: number | null;
+  epsGrowth: number | null;
+  revenueEstimateAvg: number | null;
+  revenueGrowth: number | null;
+  numberOfAnalysts: number | null;
+}
+
+const PERIOD_LABELS: Record<string, string> = {
+  "0q": "Trimestre actual",
+  "+1q": "Próximo trimestre",
+  "0y": "Año fiscal actual",
+  "+1y": "Próximo año fiscal",
+};
+
+export async function getEarningsForecasts(symbol: string): Promise<ForecastPeriod[]> {
+  const result = await yahooFetchWithCrumb(
+    (crumb) =>
+      `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=earningsTrend&crumb=${encodeURIComponent(crumb)}`,
+    quoteSummarySchema(fullEarningsTrendSchema),
+  );
+  const trend = result.quoteSummary.result?.[0]?.earningsTrend?.trend ?? [];
+  return trend
+    .filter((t) => t.period in PERIOD_LABELS)
+    .map((t) => ({
+      period: t.period,
+      endDate: t.endDate ?? null,
+      epsEstimateAvg: t.earningsEstimate?.avg ?? null,
+      epsGrowth: t.earningsEstimate?.growth ?? null,
+      revenueEstimateAvg: t.revenueEstimate?.avg ?? null,
+      revenueGrowth: t.revenueEstimate?.growth ?? null,
+      numberOfAnalysts: t.earningsEstimate?.numberOfAnalysts ?? null,
+    }));
+}
+
+export { PERIOD_LABELS as FORECAST_PERIOD_LABELS };
+
+// ---------------------------------------------------------------------------
+// Historial de earnings (EPS real vs. estimado, últimos trimestres) —
+// "Earnings"
+// ---------------------------------------------------------------------------
+
+const earningsHistorySchema = z.object({
+  earningsHistory: z
+    .object({
+      history: z.array(
+        z.object({
+          quarter: rawFmt,
+          epsActual: rawNum,
+          epsEstimate: rawNum,
+          epsDifference: rawNum,
+          surprisePercent: rawNum,
+        }),
+      ),
+    })
+    .optional(),
+});
+
+export interface EarningsHistoryQuarter {
+  quarterEndDate: string | null;
+  epsActual: number | null;
+  epsEstimate: number | null;
+  epsDifference: number | null;
+  surprisePercent: number | null;
+}
+
+export async function getEarningsHistory(symbol: string): Promise<EarningsHistoryQuarter[]> {
+  const result = await yahooFetchWithCrumb(
+    (crumb) =>
+      `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=earningsHistory&crumb=${encodeURIComponent(crumb)}`,
+    quoteSummarySchema(earningsHistorySchema),
+  );
+  const history = result.quoteSummary.result?.[0]?.earningsHistory?.history ?? [];
+  return history.map((h) => ({
+    quarterEndDate: h.quarter ?? null,
+    epsActual: h.epsActual ?? null,
+    epsEstimate: h.epsEstimate ?? null,
+    epsDifference: h.epsDifference ?? null,
+    surprisePercent: h.surprisePercent ?? null,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Estructura accionaria (majorHoldersBreakdown + institutionOwnership) —
+// "Accionistas"
+// ---------------------------------------------------------------------------
+
+const shareholderSchema = z.object({
+  majorHoldersBreakdown: z
+    .object({
+      insidersPercentHeld: rawNum,
+      institutionsPercentHeld: rawNum,
+      institutionsCount: rawNum,
+    })
+    .partial()
+    .optional(),
+  institutionOwnership: z
+    .object({
+      ownershipList: z
+        .array(
+          z.object({
+            organization: z.string(),
+            pctHeld: rawNum,
+            position: rawNum,
+            value: rawNum,
+            reportDate: rawFmt,
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
+});
+
+export interface ShareholderStructure {
+  insidersPct: number | null;
+  institutionsPct: number | null;
+  institutionsCount: number | null;
+  topHolders: { organization: string; pctHeld: number | null; position: number | null; value: number | null }[];
+}
+
+export async function getShareholderStructure(symbol: string): Promise<ShareholderStructure> {
+  const result = await yahooFetchWithCrumb(
+    (crumb) =>
+      `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=majorHoldersBreakdown,institutionOwnership&crumb=${encodeURIComponent(crumb)}`,
+    quoteSummarySchema(shareholderSchema),
+  );
+  const r = result.quoteSummary.result?.[0];
+  return {
+    insidersPct: r?.majorHoldersBreakdown?.insidersPercentHeld ?? null,
+    institutionsPct: r?.majorHoldersBreakdown?.institutionsPercentHeld ?? null,
+    institutionsCount: r?.majorHoldersBreakdown?.institutionsCount ?? null,
+    topHolders: (r?.institutionOwnership?.ownershipList ?? []).slice(0, 10).map((h) => ({
+      organization: h.organization,
+      pctHeld: h.pctHeld ?? null,
+      position: h.position ?? null,
+      value: h.value ?? null,
+    })),
+  };
 }

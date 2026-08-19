@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Star, Lock } from "lucide-react";
 import { MarketStatusBadge } from "@/components/layout/MarketStatusBadge";
-import { ProComingSoonModal } from "@/components/layout/ProComingSoonModal";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
@@ -42,19 +41,19 @@ interface TabDef {
   key: string;
   label: string;
   pro: boolean;
-  target: string | null; // id del widget al que hace scroll; null = sin destino real (abre modal PRO)
+  target: string; // "top" o id del widget al que hace scroll
 }
 
 const TABS: TabDef[] = [
   { key: "resumen", label: "Resumen", pro: false, target: "top" },
   { key: "fair_value", label: "Valor justo", pro: true, target: "widget-scores" },
   { key: "analyst_target", label: "Objetivo analistas", pro: true, target: "widget-analyst_consensus" },
-  { key: "simulator", label: "Simulador", pro: true, target: null },
+  { key: "simulator", label: "Simulador", pro: true, target: "widget-dcf_simulator" },
   { key: "finanzas", label: "Finanzas", pro: false, target: "widget-fundamentals" },
-  { key: "earnings", label: "Earnings", pro: true, target: "widget-valuation-summary" },
-  { key: "previsiones", label: "Previsiones", pro: true, target: "widget-valuation-summary" },
+  { key: "earnings", label: "Earnings", pro: true, target: "widget-earnings_history" },
+  { key: "previsiones", label: "Previsiones", pro: true, target: "widget-forecasts" },
   { key: "dividendos", label: "Dividendos", pro: true, target: "widget-dividends" },
-  { key: "accionistas", label: "Accionistas", pro: true, target: null },
+  { key: "accionistas", label: "Accionistas", pro: true, target: "widget-shareholders" },
   { key: "reportes_sec", label: "Reportes SEC", pro: true, target: "widget-news_filings" },
 ];
 
@@ -66,7 +65,6 @@ export function StockHeader({ symbol }: { symbol: string }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [watchlistLoaded, setWatchlistLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState("resumen");
-  const [proModalOpen, setProModalOpen] = useState(false);
 
   useEffect(() => {
     fetch(`/api/quotes/${symbol}`)
@@ -117,11 +115,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    if (tab.target) {
-      document.getElementById(tab.target)?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-    setProModalOpen(true);
+    document.getElementById(tab.target)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   const changePositive = quote?.changePct !== null && quote?.changePct !== undefined && quote.changePct >= 0;
@@ -253,13 +247,6 @@ export function StockHeader({ symbol }: { symbol: string }) {
           </button>
         ))}
       </div>
-
-      {proModalOpen && (
-        <ProComingSoonModal
-          onClose={() => setProModalOpen(false)}
-          message="Esta sección (simulador de escenarios, accionistas institucionales) todavía no está construida. Preferimos no mostrarte un número inventado — estará disponible cuando tengamos una fuente de datos real."
-        />
-      )}
     </div>
   );
 }
