@@ -45,6 +45,13 @@ export function WidgetGrid({
   const [layout, setLayout] = useState<GridLayoutItem[]>([]);
   const [panelOpen, setPanelOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  // ReactGridLayout solo lee `layout` como valor inicial al montar — no lo
+  // vuelve a aplicar si cambia por una actualización externa (como el botón
+  // "usar todo el ancho" o agregar/quitar widgets desde "Personalizar"), a
+  // diferencia del arrastre/resize nativo que sí actualiza la grilla en
+  // vivo. Por eso esos cambios programáticos, además de actualizar el
+  // estado, incrementan esta versión para forzar el remount de la grilla.
+  const [layoutVersion, setLayoutVersion] = useState(0);
 
   useEffect(() => {
     fetch(apiPath)
@@ -86,6 +93,7 @@ export function WidgetGrid({
     const nextLayout = [...keptLayout, ...newItems];
     setWidgets(next);
     setLayout(nextLayout);
+    setLayoutVersion((v) => v + 1);
     setPanelOpen(false);
     await persist(next, nextLayout);
   }
@@ -103,6 +111,7 @@ export function WidgetGrid({
   function handleUseFullWidth(id: string) {
     const nextLayout = layout.map((item) => (item.i === id ? { ...item, x: 0, w: GRID_COLS } : item));
     setLayout(nextLayout);
+    setLayoutVersion((v) => v + 1);
     persist(widgets ?? defaultIds, nextLayout);
   }
 
@@ -129,6 +138,7 @@ export function WidgetGrid({
         <div ref={containerRef}>
           {mounted && layout.length === widgets.length && (
             <ReactGridLayout
+              key={layoutVersion}
               layout={layout}
               width={width}
               gridConfig={{ cols: GRID_COLS, rowHeight: ROW_HEIGHT, margin: MARGIN }}

@@ -86,15 +86,17 @@ export function PriceChart({
 
     chart.timeScale().fitContent();
 
-    const handleResize = () => {
-      if (containerRef.current) {
-        chart.applyOptions({ width: containerRef.current.clientWidth });
-      }
-    };
-    window.addEventListener("resize", handleResize);
+    // ResizeObserver (no solo el resize de la ventana) para que el gráfico
+    // se reajuste también cuando el widget cambia de tamaño dentro de la
+    // cuadrícula (arrastrar, redimensionar o "usar todo el ancho").
+    const resizeObserver = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width;
+      if (width) chart.applyOptions({ width });
+    });
+    resizeObserver.observe(containerRef.current);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
       chart.remove();
     };
   }, [data, compareWith]);

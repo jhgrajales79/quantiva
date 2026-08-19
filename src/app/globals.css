@@ -59,6 +59,9 @@ html {
   height: 32px !important;
   padding: 0 8px 8px 0 !important;
   opacity: 0.6 !important;
+  /* z-index alto: algunos widgets (ej. gráficos con canvas interactivo)
+     pueden pintarse encima de la manija de resize si no se fuerza esto. */
+  z-index: 30 !important;
 }
 .quantiva-widget-grid .react-resizable-handle-se:hover {
   opacity: 1 !important;
