@@ -50,3 +50,16 @@ html {
   --color-app-fg-muted: var(--color-app-fg-muted);
   --color-app-fg-faint: var(--color-app-fg-faint);
 }
+
+/* Manija de resize de los widgets (dashboard y ficha de acción) más grande
+   que el tamaño por defecto de react-resizable, para que sea fácil de
+   agarrar con el mouse. */
+.quantiva-widget-grid .react-resizable-handle-se {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 8px 8px 0 !important;
+  opacity: 0.6 !important;
+}
+.quantiva-widget-grid .react-resizable-handle-se:hover {
+  opacity: 1 !important;
+}

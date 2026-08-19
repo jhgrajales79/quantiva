@@ -4,17 +4,16 @@ import { useEffect, useState } from "react";
 import ReactGridLayout, { useContainerWidth, type Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { LayoutGrid, GripVertical } from "lucide-react";
+import { LayoutGrid, GripVertical, StretchHorizontal } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
 import { WidgetCustomizePanel, type WidgetDef } from "@/components/widgets/WidgetCustomizePanel";
-import { generateDefaultLayout, type GridLayoutItem } from "@/lib/widget-list";
+import { generateDefaultLayout, GRID_COLS, type GridLayoutItem } from "@/lib/widget-list";
 
 interface WidgetGridDef extends WidgetDef {
   span: "half" | "full";
   defaultH: number;
 }
 
-const GRID_COLS = 12;
 const ROW_HEIGHT = 32;
 const MARGIN: [number, number] = [16, 16];
 
@@ -101,6 +100,12 @@ export function WidgetGrid({
     persist(widgets ?? defaultIds, nextLayout);
   }
 
+  function handleUseFullWidth(id: string) {
+    const nextLayout = layout.map((item) => (item.i === id ? { ...item, x: 0, w: GRID_COLS } : item));
+    setLayout(nextLayout);
+    persist(widgets ?? defaultIds, nextLayout);
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -128,6 +133,8 @@ export function WidgetGrid({
               width={width}
               gridConfig={{ cols: GRID_COLS, rowHeight: ROW_HEIGHT, margin: MARGIN }}
               dragConfig={{ handle: ".widget-drag-handle" }}
+              resizeConfig={{ handles: ["se"] }}
+              className="quantiva-widget-grid"
               onLayoutChange={handleLayoutChange}
               onDragStop={handleInteractionStop}
               onResizeStop={handleInteractionStop}
@@ -135,11 +142,18 @@ export function WidgetGrid({
               {widgets.map((id) => (
                 <div key={id} id={`widget-${id}`} className="group relative h-full">
                   <div
-                    className="widget-drag-handle absolute left-2 top-2 z-10 cursor-move rounded-md bg-app-surface/80 p-1 text-app-fg-faint opacity-0 transition group-hover:opacity-100 hover:bg-app-surface-2 hover:text-app-fg"
+                    className="widget-drag-handle absolute left-2 top-2 z-10 flex cursor-move items-center gap-1 rounded-md bg-app-surface-2/90 px-2 py-1.5 text-app-fg-muted opacity-60 shadow-sm transition hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100 group-hover:opacity-100"
                     title="Arrastrar para mover"
                   >
-                    <GripVertical size={14} strokeWidth={2} />
+                    <GripVertical size={16} strokeWidth={2} />
                   </div>
+                  <button
+                    onClick={() => handleUseFullWidth(id)}
+                    className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md bg-app-surface-2/90 px-2 py-1.5 text-app-fg-muted opacity-60 shadow-sm transition hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100 group-hover:opacity-100"
+                    title="Usar todo el ancho de la pantalla"
+                  >
+                    <StretchHorizontal size={16} strokeWidth={2} />
+                  </button>
                   <div className="h-full overflow-auto">{renderWidget(id)}</div>
                 </div>
               ))}

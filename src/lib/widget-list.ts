@@ -19,7 +19,10 @@ export interface GridLayoutItem {
   h: number;
 }
 
-const GRID_COLS = 12;
+// 24 en vez de 12 para permitir posiciones/anchos más finos al arrastrar
+// (no solo mitad/completo) y que cada widget pueda usar el ancho que
+// el usuario quiera, no solo dos posiciones fijas.
+export const GRID_COLS = 24;
 
 function isFiniteNonNegative(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
