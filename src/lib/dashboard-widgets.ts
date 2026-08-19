@@ -1,3 +1,5 @@
+import { sanitizeWidgetList as sanitize } from "@/lib/widget-list";
+
 export interface DashboardWidgetDef {
   id: string;
   label: string;
@@ -21,14 +23,5 @@ export const DASHBOARD_WIDGET_IDS = DASHBOARD_WIDGET_DEFS.map((w) => w.id);
 export const DEFAULT_DASHBOARD_WIDGETS = [...DASHBOARD_WIDGET_IDS];
 
 export function sanitizeWidgetList(input: unknown): string[] {
-  if (!Array.isArray(input)) return DEFAULT_DASHBOARD_WIDGETS;
-  const seen = new Set<string>();
-  const result: string[] = [];
-  for (const item of input) {
-    if (typeof item === "string" && DASHBOARD_WIDGET_IDS.includes(item) && !seen.has(item)) {
-      seen.add(item);
-      result.push(item);
-    }
-  }
-  return result;
+  return sanitize(input, DASHBOARD_WIDGET_IDS, DEFAULT_DASHBOARD_WIDGETS);
 }

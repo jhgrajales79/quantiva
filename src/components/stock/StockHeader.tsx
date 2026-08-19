@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { MarketStatusBadge } from "@/components/layout/MarketStatusBadge";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface QuoteData {
   companyName: string | null;
@@ -75,6 +76,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
         <div className="flex items-center gap-2">
+          <CompanyLogo symbol={symbol} />
           <h1 className="text-2xl font-semibold text-app-fg">
             {symbol}
             {quote?.companyName && (

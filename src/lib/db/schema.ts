@@ -498,3 +498,14 @@ export const dashboardPreferences = pgTable("dashboard_preferences", {
   widgets: text("widgets").array().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
+
+// Igual que dashboardPreferences pero para la ficha de cada acción
+// (/stocks/[symbol]) — un solo layout de widgets por usuario, aplicado a
+// cualquier ticker que visite (no hay estado por símbolo).
+export const stockWidgetPreferences = pgTable("stock_widget_preferences", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  widgets: text("widgets").array().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});
