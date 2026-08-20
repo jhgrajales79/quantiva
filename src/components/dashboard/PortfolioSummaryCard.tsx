@@ -28,7 +28,7 @@ export function PortfolioSummaryCard() {
   const count = summary?.totalPortfolios ?? 0;
 
   return (
-    <Card>
+    <Card className="flex h-full flex-col">
       <CardHeader
         title={`Mi portafolio${summary ? ` · ${count} carteras` : ""}`}
         action={<Badge variant="success">P&amp;L en vivo</Badge>}
@@ -43,14 +43,14 @@ export function PortfolioSummaryCard() {
           ctaHref="/portfolio"
         />
       ) : (
-        <div className="space-y-1">
+        <div className="flex flex-1 flex-col space-y-1">
           <p className="text-lg font-semibold text-app-fg">
             {formatCurrency(summary.totalCurrentValue)}
           </p>
           <p className={summary.totalUnrealizedPnl >= 0 ? "text-sm text-positive" : "text-sm text-negative"}>
             {formatCurrency(summary.totalUnrealizedPnl)} no realizado
           </p>
-          <Link href="/portfolio" className="inline-flex text-sm text-brand hover:underline">
+          <Link href="/portfolio" className="mt-auto inline-flex pt-2 text-sm text-brand hover:underline">
             Ver mis portafolios →
           </Link>
         </div>

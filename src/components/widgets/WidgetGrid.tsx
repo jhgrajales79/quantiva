@@ -275,7 +275,13 @@ export function WidgetGrid({
                   >
                     <StretchHorizontal size={16} strokeWidth={2} />
                   </button>
-                  <div className="h-full overflow-auto">{renderWidget(id)}</div>
+                  {/* display:grid con un solo hijo lo estira automáticamente
+                      para llenar el alto/ancho de la celda (comportamiento
+                      "stretch" por defecto de grid) — así la tarjeta del
+                      widget siempre ocupa todo el espacio que el usuario le
+                      asignó al redimensionar, en vez de quedar más corta que
+                      la celda y dejar ver la cuadrícula de fondo debajo. */}
+                  <div className="grid h-full overflow-auto">{renderWidget(id)}</div>
                 </div>
               ))}
             </ReactGridLayout>

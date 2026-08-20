@@ -25,7 +25,7 @@ export function WatchlistSummaryCard() {
   const count = items?.length ?? 0;
 
   return (
-    <Card>
+    <Card className="flex h-full flex-col">
       <CardHeader title={`Watchlist${items !== null ? ` · ${count} acciones` : ""}`} />
       {items === null ? (
         <Spinner />
@@ -37,7 +37,7 @@ export function WatchlistSummaryCard() {
           ctaHref="/watchlist"
         />
       ) : (
-        <div className="space-y-2">
+        <div className="flex flex-1 flex-col">
           <ul className="space-y-1">
             {items.slice(0, 4).map((item) => (
               <li key={item.symbol} className="flex justify-between text-sm">
@@ -48,7 +48,7 @@ export function WatchlistSummaryCard() {
               </li>
             ))}
           </ul>
-          <Link href="/watchlist" className="inline-flex text-sm text-brand hover:underline">
+          <Link href="/watchlist" className="mt-auto inline-flex pt-2 text-sm text-brand hover:underline">
             Ver todo mi watchlist →
           </Link>
         </div>
