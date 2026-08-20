@@ -17,6 +17,7 @@ export interface GridLayoutItem {
   y: number;
   w: number;
   h: number;
+  minW?: number;
 }
 
 // 24 en vez de 12 para permitir posiciones/anchos más finos al arrastrar
@@ -61,7 +62,7 @@ export function sanitizeWidgetLayout(input: unknown, allIds: string[]): GridLayo
 // los widgets de ancho completo) cuando el usuario todavía no personalizó
 // nada — solo un punto de partida razonable, no un tamaño fijo.
 export function generateDefaultLayout(
-  defs: { id: string; span: "half" | "full"; defaultH: number }[],
+  defs: { id: string; span: "half" | "full"; defaultH: number; minW?: number }[],
   ids: string[],
 ): GridLayoutItem[] {
   const half = GRID_COLS / 2;
@@ -74,14 +75,14 @@ export function generateDefaultLayout(
     const h = def.defaultH;
     if (def.span === "full") {
       const y = Math.max(leftY, rightY);
-      items.push({ i: id, x: 0, y, w: GRID_COLS, h });
+      items.push({ i: id, x: 0, y, w: GRID_COLS, h, minW: def.minW });
       leftY = y + h;
       rightY = y + h;
     } else if (leftY <= rightY) {
-      items.push({ i: id, x: 0, y: leftY, w: half, h });
+      items.push({ i: id, x: 0, y: leftY, w: half, h, minW: def.minW });
       leftY += h;
     } else {
-      items.push({ i: id, x: half, y: rightY, w: half, h });
+      items.push({ i: id, x: half, y: rightY, w: half, h, minW: def.minW });
       rightY += h;
     }
   }

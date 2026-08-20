@@ -19,6 +19,7 @@ function applyWidthChoice(item: GridLayoutItem, choice: WidthChoice): GridLayout
 interface WidgetGridDef extends WidgetDef {
   span: "half" | "full";
   defaultH: number;
+  minW?: number;
 }
 
 const ROW_HEIGHT = 32;
@@ -239,7 +240,16 @@ export function WidgetGrid({
           {mounted && layout.length === widgets.length && (
             <ReactGridLayout
               key={layoutVersion}
-              layout={layout}
+              layout={layout.map((item) => {
+                const minW = defs.find((d) => d.id === item.i)?.minW;
+                if (!minW) return item;
+                // El ancho mínimo es una regla del tipo de widget (algunos
+                // necesitan un mínimo de espacio horizontal para no
+                // superponer su contenido), no una preferencia guardada por
+                // el usuario — se aplica siempre, incluso si el layout
+                // persistido quedó con un ancho menor de una sesión previa.
+                return { ...item, minW, w: Math.max(item.w, minW) };
+              })}
               width={width}
               gridConfig={{
                 cols: GRID_COLS,

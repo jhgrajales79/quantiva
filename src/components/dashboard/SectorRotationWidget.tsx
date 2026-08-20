@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatPercent } from "@/lib/format";
 import { assignLabelRows } from "@/lib/label-layout";
@@ -73,7 +73,48 @@ export function SectorRotationWidget() {
   );
 }
 
+// Desplazamiento vertical (en px) de cada fila respecto al punto — con
+// suficiente separación entre filas consecutivas (más que la altura real de
+// una etiqueta de 2 líneas, ~33px) para que dos etiquetas en filas
+// distintas nunca se superpongan verticalmente, sin importar qué tan cerca
+// estén horizontalmente. Antes usaba clases de Tailwind ("-top-14"...) con
+// solo 20px de separación entre algunas filas — menos que la altura real de
+// una etiqueta — lo que las hacía chocar igual aunque el algoritmo de
+// colisión horizontal las hubiera puesto en filas "distintas".
+const ROW_OFFSETS_PX = [-80, -40, 6, 46];
+const LABEL_FONT = "500 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+// Espacio entre el borde de una etiqueta y la de su vecina, además de la
+// mitad de cada ancho — evita que queden pegadas incluso cuando el gap
+// calculado es justo.
+const LABEL_BUFFER_PX = 10;
+
+let measureCtx: CanvasRenderingContext2D | null = null;
+
+// Ancho real del texto renderizado (no una aproximación por cantidad de
+// caracteres) — así "Servicios públicos" y "Salud" reciben el espacio que
+// cada uno de verdad necesita en vez de tratarse como del mismo tamaño.
+function measureTextWidth(text: string): number {
+  if (typeof document === "undefined") return text.length * 6.2;
+  if (!measureCtx) {
+    measureCtx = document.createElement("canvas").getContext("2d");
+  }
+  if (!measureCtx) return text.length * 6.2;
+  measureCtx.font = LABEL_FONT;
+  return measureCtx.measureText(text).width;
+}
+
 function SectorAxis({ sectors, period }: { sectors: SectorResult[]; period: Period }) {
+  const [containerWidth, setContainerWidth] = useState(0);
+  const containerRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    setContainerWidth(node.getBoundingClientRect().width);
+    const observer = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setContainerWidth(w);
+    });
+    observer.observe(node);
+  }, []);
+
   const withValues = sectors
     .map((s) => ({ ...s, value: s.returns[period] }))
     .filter((s): s is SectorResult & { value: number } => s.value !== null)
@@ -88,31 +129,59 @@ function SectorAxis({ sectors, period }: { sectors: SectorResult[]; period: Peri
   const span = max - min || 1;
 
   const leftPcts = withValues.map((s) => ((s.value - min) / span) * 100);
-  // 4 filas alternando arriba/abajo (2 por lado) — con 11 sectores es común
-  // que varios queden con retornos muy cercanos entre sí; una asignación
-  // greedy (no solo par/impar) evita que sus etiquetas se encimen.
-  const ROW_OFFSETS = ["-top-14", "-top-9", "top-4", "top-9"];
-  const rowIndexes = assignLabelRows(leftPcts, ROW_OFFSETS.length, 9);
+
+  // Ancho estimado de cada etiqueta = la línea más ancha entre el nombre del
+  // sector y su porcentaje, medido con canvas (texto real, no una
+  // aproximación) — así las colisiones se calculan en píxeles reales del
+  // contenedor actual, sin importar qué tan angosto lo haya dejado el
+  // usuario al redimensionar el widget.
+  const labelWidths = withValues.map((s) =>
+    Math.max(measureTextWidth(s.label), measureTextWidth(formatPercent(s.value))) +
+    LABEL_BUFFER_PX,
+  );
+
+  const hasWidth = containerWidth > 0;
+  const centersPx = withValues.map((_, i) => {
+    if (!hasWidth) return 0;
+    const half = labelWidths[i] / 2;
+    const ideal = (leftPcts[i] / 100) * containerWidth;
+    // La etiqueta se centra en su punto, pero si eso la haría salirse del
+    // contenedor (típico en los extremos, el sector más débil/más fuerte),
+    // se desliza hacia adentro lo justo para que el texto quede completo.
+    return Math.min(containerWidth - half, Math.max(half, ideal));
+  });
+  const halfWidthsPx = labelWidths.map((w) => w / 2);
+  const rowIndexes = hasWidth
+    ? assignLabelRows(centersPx, ROW_OFFSETS_PX.length, halfWidthsPx)
+    : withValues.map((_, i) => i % ROW_OFFSETS_PX.length);
 
   return (
-    <div className="relative mt-14 mb-14 h-1.5 w-full rounded-full bg-gradient-to-r from-negative via-warning to-positive">
+    <div
+      ref={containerRef}
+      className="relative mt-24 mb-24 h-1.5 w-full rounded-full bg-gradient-to-r from-negative via-warning to-positive"
+    >
       {withValues.map((s, i) => (
         <div
           key={s.symbol}
           className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
           style={{ left: `${leftPcts[i]}%` }}
         >
+          <div className="h-2.5 w-2.5 rounded-pill border-2 border-app-border bg-app-fg" />
+        </div>
+      ))}
+      {hasWidth &&
+        withValues.map((s, i) => (
           <div
-            className={`absolute left-1/2 w-max -translate-x-1/2 text-center ${ROW_OFFSETS[rowIndexes[i]]}`}
+            key={`label-${s.symbol}`}
+            className="absolute w-max -translate-x-1/2 text-center"
+            style={{ left: `${centersPx[i]}px`, top: `${ROW_OFFSETS_PX[rowIndexes[i]]}px` }}
           >
             <p className="text-[11px] font-medium text-app-fg-muted">{s.label}</p>
             <p className={s.value >= 0 ? "text-[11px] text-positive" : "text-[11px] text-negative"}>
               {formatPercent(s.value)}
             </p>
           </div>
-          <div className="h-2.5 w-2.5 rounded-full border-2 border-app-border bg-neutral-100" />
-        </div>
-      ))}
+        ))}
     </div>
   );
 }
