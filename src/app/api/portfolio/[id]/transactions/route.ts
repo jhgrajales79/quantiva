@@ -5,6 +5,7 @@ import { db } from "@/lib/db/client";
 import { portfolioTransactions } from "@/lib/db/schema";
 import { getOrCreateAsset } from "@/lib/assets";
 import { assertPortfolioOwnership as assertOwnership, computeHoldings, listTransactions } from "@/lib/portfolio";
+import { TickerNotFoundError } from "@/lib/assets";
 import { newId } from "@/lib/id";
 
 export async function GET(
@@ -85,7 +86,15 @@ export async function POST(
     );
   }
 
-  const asset = await getOrCreateAsset(parsed.data.symbol.toUpperCase(), "stock");
+  let asset;
+  try {
+    asset = await getOrCreateAsset(parsed.data.symbol.toUpperCase(), "stock");
+  } catch (error) {
+    if (error instanceof TickerNotFoundError) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+    throw error;
+  }
 
   const [created] = await db
     .insert(portfolioTransactions)

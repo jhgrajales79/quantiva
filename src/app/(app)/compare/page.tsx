@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
 import { GitCompareArrows } from "lucide-react";
+import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
 
 interface CompareEntry {
   symbol: string;
@@ -81,6 +82,16 @@ function CompareInner() {
   const [input, setInput] = useState(initial);
   const [entries, setEntries] = useState<CompareEntry[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const currentSegment = input.split(",").pop()?.trim() ?? "";
+  const { results: suggestions } = useTickerSearch(suggestOpen ? currentSegment : "");
+
+  function selectSuggestion(symbol: string) {
+    const parts = input.split(",");
+    parts[parts.length - 1] = ` ${symbol}`;
+    setInput(parts.join(",").replace(/^\s+/, "") + ", ");
+    setSuggestOpen(false);
+  }
 
   const symbolsParam = searchParams.get("symbols");
 
@@ -123,14 +134,24 @@ function CompareInner() {
 
       <Card>
         <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && submit()}
-            placeholder="Ej. AAPL,MSFT,GOOGL"
-            className="flex-1 rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg"
-          />
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value);
+                setSuggestOpen(true);
+              }}
+              onFocus={() => setSuggestOpen(true)}
+              onBlur={() => setSuggestOpen(false)}
+              onKeyDown={(e) => e.key === "Enter" && submit()}
+              placeholder="Ej. AAPL,MSFT,GOOGL"
+              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg"
+            />
+            {suggestOpen && (
+              <TickerSuggestions results={suggestions} onSelect={(m) => selectSuggestion(m.symbol)} />
+            )}
+          </div>
           <button
             onClick={submit}
             className="rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"

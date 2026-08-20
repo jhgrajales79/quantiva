@@ -47,7 +47,12 @@ export async function GET() {
         if (quotes.length === 0) continue;
 
         const resolvedAssets = await Promise.all(
-          quotes.map((quote) => getOrCreateAsset(quote.symbol, "stock")),
+          quotes.map((quote) =>
+            getOrCreateAsset(quote.symbol, "stock", {
+              name: quote.companyName ?? undefined,
+              skipLiveValidation: true,
+            }),
+          ),
         );
 
         await db

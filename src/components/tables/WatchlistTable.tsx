@@ -6,6 +6,7 @@ import { formatCurrency, formatPercent } from "@/lib/format";
 import { valuationBadge } from "@/lib/valuation/consensus";
 import { ValuationBadgePill } from "@/components/cards/ValuationBadgePill";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
 
 interface WatchlistRow {
   symbol: string;
@@ -22,8 +23,10 @@ type SortKey = "symbol" | "price" | "changePct" | "upsidePct" | "investmentScore
 export function WatchlistTable() {
   const [rows, setRows] = useState<WatchlistRow[] | null>(null);
   const [newSymbol, setNewSymbol] = useState("");
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("symbol");
   const [error, setError] = useState<string | null>(null);
+  const { results: suggestions } = useTickerSearch(suggestOpen ? newSymbol : "");
 
   const load = useCallback(async () => {
     const res = await fetch("/api/watchlist");
@@ -62,16 +65,27 @@ export function WatchlistTable() {
     load();
   }, [load]);
 
-  async function handleAdd(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newSymbol.trim()) return;
-    await fetch("/api/watchlist", {
+  async function addSymbol(symbol: string) {
+    if (!symbol.trim()) return;
+    setError(null);
+    setSuggestOpen(false);
+    const res = await fetch("/api/watchlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ symbol: newSymbol.trim().toUpperCase() }),
+      body: JSON.stringify({ symbol: symbol.trim().toUpperCase() }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "No se pudo agregar el ticker.");
+      return;
+    }
     setNewSymbol("");
     load();
+  }
+
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault();
+    addSymbol(newSymbol);
   }
 
   async function handleRemove(symbol: string) {
@@ -97,12 +111,22 @@ export function WatchlistTable() {
       <div className="flex items-center justify-between border-b border-app-border p-3">
         <h2 className="text-sm font-semibold text-app-fg">Watchlist</h2>
         <form onSubmit={handleAdd} className="flex gap-2">
-          <input
-            value={newSymbol}
-            onChange={(e) => setNewSymbol(e.target.value)}
-            placeholder="AAPL"
-            className="w-28 rounded-md border border-app-border bg-app-bg px-2 py-1 text-xs text-app-fg outline-none focus:border-emerald-500"
-          />
+          <div className="relative">
+            <input
+              value={newSymbol}
+              onChange={(e) => {
+                setNewSymbol(e.target.value);
+                setSuggestOpen(true);
+              }}
+              onFocus={() => setSuggestOpen(true)}
+              onBlur={() => setSuggestOpen(false)}
+              placeholder="AAPL"
+              className="w-28 rounded-md border border-app-border bg-app-bg px-2 py-1 text-xs text-app-fg outline-none focus:border-emerald-500"
+            />
+            {suggestOpen && (
+              <TickerSuggestions results={suggestions} onSelect={(m) => addSymbol(m.symbol)} />
+            )}
+          </div>
           <button
             type="submit"
             className="rounded-md bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-500"

@@ -55,7 +55,7 @@ export async function refreshMarketBreadth() {
     });
 
   const assetsBySymbol = await Promise.all(
-    quotes.map((q) => getOrCreateAsset(q.symbol, "stock")),
+    quotes.map((q) => getOrCreateAsset(q.symbol, "stock", { skipLiveValidation: true })),
   );
 
   if (quotes.length > 0) {

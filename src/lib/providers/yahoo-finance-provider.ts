@@ -267,7 +267,15 @@ export class YahooFinanceProvider implements MarketDataProvider {
   readonly name = "Yahoo Finance";
 
   async getQuote(symbol: string): Promise<Quote | null> {
-    const result = await fetchChart(symbol, "5d", "1d");
+    let result;
+    try {
+      result = await fetchChart(symbol, "5d", "1d");
+    } catch {
+      // Yahoo responde 404 en /chart para símbolos inexistentes: tratarlo
+      // como "no encontrado" en vez de propagar la excepción, para que
+      // getOrCreateAsset pueda distinguir un ticker inválido de un error real.
+      return null;
+    }
     if (!result) return null;
     const { meta } = result;
     if (meta.regularMarketPrice === null) return null;

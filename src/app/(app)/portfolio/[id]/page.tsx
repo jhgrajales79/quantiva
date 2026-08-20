@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
 import { Pencil, Trash2 } from "lucide-react";
+import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
 
 interface Holding {
   symbol: string;
@@ -64,6 +65,8 @@ export default function PortfolioDetailPage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const { results: suggestions } = useTickerSearch(suggestOpen ? form.symbol : "");
 
   async function load() {
     const res = await fetch(`/api/portfolio/${params.id}/transactions`);
@@ -283,13 +286,29 @@ export default function PortfolioDetailPage() {
       <div className="rounded-lg border border-app-border bg-app-surface p-4">
         <h3 className="mb-3 text-sm font-semibold text-app-fg">Registrar transacción</h3>
         <form onSubmit={handleSubmit} className="grid gap-2 sm:grid-cols-5">
-          <input
-            required
-            placeholder="Ticker"
-            value={form.symbol}
-            onChange={(e) => setForm({ ...form, symbol: e.target.value })}
-            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
-          />
+          <div className="relative">
+            <input
+              required
+              placeholder="Ticker"
+              value={form.symbol}
+              onChange={(e) => {
+                setForm({ ...form, symbol: e.target.value });
+                setSuggestOpen(true);
+              }}
+              onFocus={() => setSuggestOpen(true)}
+              onBlur={() => setSuggestOpen(false)}
+              className="w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            />
+            {suggestOpen && (
+              <TickerSuggestions
+                results={suggestions}
+                onSelect={(m) => {
+                  setForm({ ...form, symbol: m.symbol });
+                  setSuggestOpen(false);
+                }}
+              />
+            )}
+          </div>
           <select
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value as typeof form.type })}

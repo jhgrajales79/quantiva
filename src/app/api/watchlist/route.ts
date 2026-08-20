@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/client";
 import { assets, watchlistItems } from "@/lib/db/schema";
-import { getOrCreateAsset } from "@/lib/assets";
+import { getOrCreateAsset, TickerNotFoundError } from "@/lib/assets";
 import { getOrCreateDefaultWatchlist } from "@/lib/watchlist";
 
 export async function GET() {
@@ -39,7 +39,15 @@ export async function POST(request: Request) {
   }
 
   const watchlist = await getOrCreateDefaultWatchlist(session.user.id);
-  const asset = await getOrCreateAsset(parsed.data.symbol.toUpperCase(), "stock");
+  let asset;
+  try {
+    asset = await getOrCreateAsset(parsed.data.symbol.toUpperCase(), "stock");
+  } catch (error) {
+    if (error instanceof TickerNotFoundError) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+    throw error;
+  }
 
   await db
     .insert(watchlistItems)
