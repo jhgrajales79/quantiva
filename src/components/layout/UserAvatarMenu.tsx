@@ -31,7 +31,7 @@ export function UserAvatarMenu() {
     >
       <MenuLabel>{displayName}</MenuLabel>
       <MenuSeparator />
-      <MenuItem icon={LogOut} danger onSelect={() => signOut({ callbackUrl: "/login" })}>
+      <MenuItem icon={LogOut} danger onSelect={() => signOut({ callbackUrl: "/" })}>
         Cerrar sesión
       </MenuItem>
     </Menu>
