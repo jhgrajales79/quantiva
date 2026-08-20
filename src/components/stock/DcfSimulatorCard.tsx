@@ -108,7 +108,7 @@ export function DcfSimulatorCard({ symbol }: { symbol: string }) {
             </div>
             <div>
               <p className="text-xs text-app-fg-muted">Upside implícito</p>
-              <p className={`text-lg font-medium ${result.upsidePct !== null && result.upsidePct >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+              <p className={`text-lg font-medium tabular-nums ${result.upsidePct !== null && result.upsidePct >= 0 ? "text-positive" : "text-negative"}`}>
                 {result.upsidePct !== null
                   ? `${result.upsidePct >= 0 ? "+" : ""}${formatPercent(result.upsidePct)}`
                   : "—"}

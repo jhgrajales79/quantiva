@@ -48,7 +48,7 @@ export function ForecastsCard({ symbol }: { symbol: string }) {
                 <span className="font-medium text-app-fg">
                   {formatCurrency(f.epsEstimateAvg)}
                   {f.epsGrowth !== null && (
-                    <span className={f.epsGrowth >= 0 ? "ml-1 text-emerald-400" : "ml-1 text-red-400"}>
+                    <span className={f.epsGrowth >= 0 ? "ml-1 text-positive" : "ml-1 text-negative"}>
                       ({f.epsGrowth >= 0 ? "+" : ""}
                       {formatPercent(f.epsGrowth)})
                     </span>
@@ -60,7 +60,7 @@ export function ForecastsCard({ symbol }: { symbol: string }) {
                 <span className="font-medium text-app-fg">
                   {formatCompact(f.revenueEstimateAvg)}
                   {f.revenueGrowth !== null && (
-                    <span className={f.revenueGrowth >= 0 ? "ml-1 text-emerald-400" : "ml-1 text-red-400"}>
+                    <span className={f.revenueGrowth >= 0 ? "ml-1 text-positive" : "ml-1 text-negative"}>
                       ({f.revenueGrowth >= 0 ? "+" : ""}
                       {formatPercent(f.revenueGrowth)})
                     </span>

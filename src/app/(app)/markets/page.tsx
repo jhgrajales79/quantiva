@@ -4,6 +4,8 @@ import { useState } from "react";
 import { QuotesTable } from "@/components/market/QuotesTable";
 import { CryptoTable } from "@/components/market/CryptoTable";
 import { US_SYMBOLS, GLOBAL_SYMBOLS, COMMODITY_SYMBOLS, FX_PAIRS } from "@/lib/market-symbols";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { Globe } from "lucide-react";
 
 const TABS = [
@@ -21,32 +23,33 @@ export default function MarketsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-        <Globe size={20} strokeWidth={2} />
-        Mercados
-      </h1>
+      <PageHeader title="Mercados" icon={Globe} />
 
-      <div className="flex gap-1 border-b border-app-border">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`px-3 py-2 text-sm ${
-              tab === t.key
-                ? "border-b-2 border-emerald-500 text-app-fg"
-                : "text-app-fg-muted hover:text-app-fg-muted"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <Tabs value={tab} onValueChange={(v) => setTab(v as TabKey)}>
+        <TabsList>
+          {TABS.map((t) => (
+            <TabsTrigger key={t.key} value={t.key}>
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      {tab === "us" && <QuotesTable symbols={US_SYMBOLS} />}
-      {tab === "global" && <QuotesTable symbols={GLOBAL_SYMBOLS} />}
-      {tab === "crypto" && <CryptoTable />}
-      {tab === "commodities" && <QuotesTable symbols={COMMODITY_SYMBOLS} />}
-      {tab === "fx" && <QuotesTable symbols={FX_PAIRS} />}
+        <TabsContent value="us">
+          <QuotesTable symbols={US_SYMBOLS} />
+        </TabsContent>
+        <TabsContent value="global">
+          <QuotesTable symbols={GLOBAL_SYMBOLS} />
+        </TabsContent>
+        <TabsContent value="crypto">
+          <CryptoTable />
+        </TabsContent>
+        <TabsContent value="commodities">
+          <QuotesTable symbols={COMMODITY_SYMBOLS} />
+        </TabsContent>
+        <TabsContent value="fx">
+          <QuotesTable symbols={FX_PAIRS} />
+        </TabsContent>
+      </Tabs>
 
       <p className="text-xs text-app-fg-muted">
         Los índices, referencias globales y commodities se muestran mediante ETFs líquidos que

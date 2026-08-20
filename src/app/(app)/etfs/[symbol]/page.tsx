@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { StatCard } from "@/components/ui/StatCard";
+import { Spinner } from "@/components/ui/Spinner";
 import { MarketStatusBadge } from "@/components/layout/MarketStatusBadge";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 
@@ -61,46 +63,37 @@ export default function EtfDetailPage() {
       </div>
 
       {quote ? (
-        <p className="text-lg text-app-fg-muted">
+        <p className="text-lg tabular-nums text-app-fg-muted">
           {formatCurrency(quote.price)}{" "}
-          <span className={quote.changePct !== null && quote.changePct >= 0 ? "text-emerald-400" : "text-red-400"}>
+          <span className={quote.changePct !== null && quote.changePct >= 0 ? "text-positive" : "text-negative"}>
             {formatPercent(quote.changePct === null ? null : quote.changePct / 100)}
           </span>
         </p>
       ) : (
-        <p className="text-sm text-app-fg-muted">Cargando cotización...</p>
+        <Spinner label="Cargando cotización..." />
       )}
 
       {error ? (
         <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>
       ) : !profile ? (
-        <p className="text-sm text-app-fg-muted">Cargando ficha del ETF...</p>
+        <Spinner label="Cargando ficha del ETF..." />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <p className="text-xs text-app-fg-muted">Categoría</p>
-              <p className="mt-1 text-sm font-medium text-app-fg">{profile.category ?? "Dato no disponible"}</p>
-            </Card>
-            <Card>
-              <p className="text-xs text-app-fg-muted">Familia</p>
-              <p className="mt-1 text-sm font-medium text-app-fg">{profile.family ?? "Dato no disponible"}</p>
-            </Card>
-            <Card>
-              <p className="text-xs text-app-fg-muted">Expense Ratio</p>
-              <p className="mt-1 text-sm font-medium text-app-fg">{formatPercent(profile.expenseRatio)}</p>
-            </Card>
-            <Card>
-              <p className="text-xs text-app-fg-muted">AUM</p>
-              <p className="mt-1 text-sm font-medium text-app-fg">
-                {profile.totalNetAssets !== null ? formatCompact(profile.totalNetAssets * 1_000_000) : "Dato no disponible"}
-              </p>
-            </Card>
+            <StatCard label="Categoría" value={profile.category ?? "Dato no disponible"} />
+            <StatCard label="Familia" value={profile.family ?? "Dato no disponible"} />
+            <StatCard label="Expense Ratio" value={formatPercent(profile.expenseRatio)} />
+            <StatCard
+              label="AUM"
+              value={
+                profile.totalNetAssets !== null ? formatCompact(profile.totalNetAssets * 1_000_000) : "Dato no disponible"
+              }
+            />
           </div>
 
           <Card>
             <CardHeader title="Composición" />
-            <div className="flex gap-4 text-sm">
+            <div className="flex gap-4 text-sm tabular-nums">
               <span>Acciones: {formatPercent(profile.stockPositionPct !== null ? profile.stockPositionPct / 100 : null)}</span>
               <span>Bonos: {formatPercent(profile.bondPositionPct !== null ? profile.bondPositionPct / 100 : null)}</span>
               <span>Efectivo: {formatPercent(profile.cashPositionPct !== null ? profile.cashPositionPct / 100 : null)}</span>
@@ -119,7 +112,7 @@ export default function EtfDetailPage() {
                       <span className="text-app-fg">
                         {h.symbol} <span className="text-app-fg-muted">{h.name}</span>
                       </span>
-                      <span className="text-app-fg-muted">{h.weightPct.toFixed(2)}%</span>
+                      <span className="tabular-nums text-app-fg-muted">{h.weightPct.toFixed(2)}%</span>
                     </li>
                   ))}
                 </ul>
@@ -138,11 +131,11 @@ export default function EtfDetailPage() {
                       <li key={s.sector}>
                         <div className="flex justify-between text-xs text-app-fg-muted">
                           <span className="capitalize">{s.sector.replace(/_/g, " ")}</span>
-                          <span>{s.weightPct.toFixed(1)}%</span>
+                          <span className="tabular-nums">{s.weightPct.toFixed(1)}%</span>
                         </div>
-                        <div className="mt-0.5 h-1.5 rounded-full bg-app-surface-2">
+                        <div className="mt-0.5 h-1.5 rounded-pill bg-app-surface-2">
                           <div
-                            className="h-1.5 rounded-full bg-emerald-500"
+                            className="h-1.5 rounded-pill bg-brand"
                             style={{ width: `${Math.min(100, s.weightPct)}%` }}
                           />
                         </div>

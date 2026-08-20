@@ -44,7 +44,7 @@ export function FearGreedWidget() {
       ) : (
         <>
           <p className="mb-1 text-3xl font-semibold text-app-fg">{Math.round(data.score)}/100</p>
-          <div className="relative h-2 w-full rounded-full bg-gradient-to-r from-red-500 via-amber-400 to-emerald-500">
+          <div className="relative h-2 w-full rounded-full bg-gradient-to-r from-negative via-warning to-positive">
             <div
               className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-app-border bg-neutral-100"
               style={{ left: `${data.score}%` }}

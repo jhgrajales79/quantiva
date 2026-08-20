@@ -10,6 +10,25 @@
   --color-app-fg-muted: #475569;
   --color-app-fg-faint: #94a3b8;
 
+  /* Colores semánticos: mismo significado en toda la app (ganancias,
+     pérdidas, alertas, información, marca). Calibrados para contraste
+     AA sobre --color-app-bg/surface en cada tema. */
+  --color-positive: #059669;
+  --color-negative: #dc2626;
+  --color-warning: #d97706;
+  --color-info: #0284c7;
+  --color-brand: #059669;
+
+  /* Anillo de foco: visible en todo elemento interactivo con teclado. */
+  --color-app-focus: #059669;
+
+  /* Radio y sombra: mismo valor en ambos temas, centralizados para no
+     depender de rounded-lg/rounded-md sueltos por componente. */
+  --radius-card: 0.625rem;
+  --radius-pill: 9999px;
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-popover: 0 8px 24px -4px rgb(0 0 0 / 0.18), 0 2px 8px -2px rgb(0 0 0 / 0.12);
+
   --app-font-scale: 1;
 }
 
@@ -22,6 +41,16 @@
     --color-app-fg: #fafafa;
     --color-app-fg-muted: #a3a3a3;
     --color-app-fg-faint: #525252;
+
+    --color-positive: #34d399;
+    --color-negative: #f87171;
+    --color-warning: #fbbf24;
+    --color-info: #38bdf8;
+    --color-brand: #10b981;
+
+    --color-app-focus: #34d399;
+    --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-popover: 0 8px 24px -4px rgb(0 0 0 / 0.5), 0 2px 8px -2px rgb(0 0 0 / 0.4);
   }
 }
 
@@ -33,6 +62,16 @@
   --color-app-fg: #fafafa;
   --color-app-fg-muted: #a3a3a3;
   --color-app-fg-faint: #525252;
+
+  --color-positive: #34d399;
+  --color-negative: #f87171;
+  --color-warning: #fbbf24;
+  --color-info: #38bdf8;
+  --color-brand: #10b981;
+
+  --color-app-focus: #34d399;
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-popover: 0 8px 24px -4px rgb(0 0 0 / 0.5), 0 2px 8px -2px rgb(0 0 0 / 0.4);
 }
 
 html {
@@ -49,6 +88,27 @@ html {
   --color-app-fg: var(--color-app-fg);
   --color-app-fg-muted: var(--color-app-fg-muted);
   --color-app-fg-faint: var(--color-app-fg-faint);
+
+  --color-positive: var(--color-positive);
+  --color-negative: var(--color-negative);
+  --color-warning: var(--color-warning);
+  --color-info: var(--color-info);
+  --color-brand: var(--color-brand);
+  --color-app-focus: var(--color-app-focus);
+
+  --radius-card: var(--radius-card);
+  --radius-pill: var(--radius-pill);
+  --shadow-card: var(--shadow-card);
+  --shadow-popover: var(--shadow-popover);
+}
+
+/* Foco de teclado consistente en toda la app — reemplaza el outline por
+   defecto del navegador, que es inconsistente entre elementos y a veces
+   invisible sobre fondos oscuros. */
+*:focus-visible {
+  outline: 2px solid var(--color-app-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* Manija de resize de los widgets (dashboard y ficha de acción) más grande
@@ -65,4 +125,57 @@ html {
 }
 .quantiva-widget-grid .react-resizable-handle-se:hover {
   opacity: 1 !important;
+}
+
+/* Animaciones de entrada/salida para popovers/menús/diálogos de Radix,
+   controladas por su atributo data-state (Radix espera a que termine la
+   animación antes de desmontar, sin necesitar forceMount ni JS extra). */
+@keyframes qv-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes qv-pop-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+}
+.qv-pop[data-state="open"] {
+  animation: qv-pop-in 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.qv-pop[data-state="closed"] {
+  animation: qv-pop-out 100ms ease-in;
+}
+
+@keyframes qv-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes qv-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.qv-fade[data-state="open"] {
+  animation: qv-fade-in 150ms ease-out;
+}
+.qv-fade[data-state="closed"] {
+  animation: qv-fade-out 100ms ease-in;
 }

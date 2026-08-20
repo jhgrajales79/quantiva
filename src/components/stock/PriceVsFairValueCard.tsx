@@ -50,8 +50,8 @@ export function PriceVsFairValueCard({ symbol }: { symbol: string }) {
   const overvalued = deviationPct > 0.1;
   const undervalued = deviationPct < -0.1;
   const label = overvalued ? "Sobrevalorada" : undervalued ? "Infravalorada" : "Precio justo";
-  const badgeColor = overvalued ? "text-red-400" : undervalued ? "text-emerald-400" : "text-amber-400";
-  const barColor = overvalued ? "bg-red-500" : "bg-emerald-500";
+  const badgeColor = overvalued ? "text-negative" : undervalued ? "text-positive" : "text-warning";
+  const barColor = overvalued ? "bg-negative" : "bg-positive";
 
   const scaleMax = Math.max(currentPrice, fairValue) * 1.08;
   const fairValuePct = (fairValue / scaleMax) * 100;
@@ -65,7 +65,7 @@ export function PriceVsFairValueCard({ symbol }: { symbol: string }) {
       />
 
       <div className="mb-4">
-        <p className={`text-2xl font-bold ${badgeColor}`}>{formatPercent(Math.abs(deviationPct))}</p>
+        <p className={`text-2xl font-bold tabular-nums ${badgeColor}`}>{formatPercent(Math.abs(deviationPct))}</p>
         <p className={`text-sm font-medium ${badgeColor}`}>{label}</p>
       </div>
 
@@ -78,7 +78,7 @@ export function PriceVsFairValueCard({ symbol }: { symbol: string }) {
             />
           </div>
           <div
-            className="absolute top-0 h-8 w-px bg-amber-400"
+            className="absolute top-0 h-8 w-px bg-warning"
             style={{ left: `${Math.min(100, fairValuePct)}%` }}
           />
           <div className="mt-1 flex items-center justify-between text-sm">
@@ -90,12 +90,12 @@ export function PriceVsFairValueCard({ symbol }: { symbol: string }) {
         <div className="relative">
           <div className="h-8 w-full rounded-sm bg-app-surface-2">
             <div
-              className="h-full rounded-sm bg-emerald-500"
+              className="h-full rounded-sm bg-positive"
               style={{ width: `${Math.min(100, fairValuePct)}%` }}
             />
           </div>
           <div
-            className="absolute top-0 h-8 w-px bg-amber-400"
+            className="absolute top-0 h-8 w-px bg-warning"
             style={{ left: `${Math.min(100, fairValuePct)}%` }}
           />
           <div className="mt-1 flex items-center justify-between text-sm">

@@ -161,7 +161,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
         : null;
 
   return (
-    <div className="rounded-lg border border-app-border bg-app-surface p-4">
+    <div className="rounded-card border border-app-border bg-app-surface p-4 shadow-card">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           <CompanyLogo symbol={symbol} />
@@ -183,7 +183,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
           <button
             onClick={toggleFavorite}
             aria-label={isFavorite ? "Quitar de watchlist" : "Agregar a watchlist"}
-            className={isFavorite ? "text-amber-400" : "text-app-fg-faint hover:text-amber-400"}
+            className={isFavorite ? "text-warning" : "text-app-fg-faint hover:text-warning"}
           >
             <Star size={22} strokeWidth={2} fill={isFavorite ? "currentColor" : "none"} />
           </button>
@@ -194,12 +194,12 @@ export function StockHeader({ symbol }: { symbol: string }) {
         <div>
           {quote ? (
             <>
-              <p className="text-3xl font-semibold text-app-fg">{formatCurrency(quote.price)}</p>
-              <p className={changePositive ? "text-emerald-400" : "text-red-400"}>
+              <p className="text-3xl font-semibold tabular-nums text-app-fg">{formatCurrency(quote.price)}</p>
+              <p className={`tabular-nums ${changePositive ? "text-positive" : "text-negative"}`}>
                 {formatCurrency(quote.changeAbs)} ({formatPercent(quote.changePct === null ? null : quote.changePct / 100)})
               </p>
               {extendedHoursLabel && (
-                <p className="mt-0.5 text-xs text-sky-400">
+                <p className="mt-0.5 text-xs tabular-nums text-info">
                   {extendedHoursLabel.label} {formatCurrency(extendedHoursLabel.price)}{" "}
                   {extendedHoursLabel.change !== null && extendedHoursLabel.change >= 0 ? "+" : ""}
                   {extendedHoursLabel.change !== null ? formatCurrency(extendedHoursLabel.change) : ""}{" "}
@@ -231,7 +231,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
             <>
               <div className="relative mt-1 h-1.5 rounded-full bg-app-surface-2">
                 <div
-                  className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-app-border bg-neutral-100"
+                  className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-pill border-2 border-app-border bg-app-fg"
                   style={{ left: `${Math.min(100, Math.max(0, rangePct))}%` }}
                 />
               </div>
@@ -277,9 +277,11 @@ function SummaryCard({
         <Spinner className="mt-1" />
       ) : content ? (
         <>
-          <span className="mt-0.5 text-sm font-semibold text-app-fg">{content.value}</span>
+          <span className="mt-0.5 text-sm font-semibold tabular-nums text-app-fg">{content.value}</span>
           {content.sublabel && (
-            <span className={`text-xs ${content.sublabelClass ?? "text-app-fg-faint"}`}>{content.sublabel}</span>
+            <span className={`text-xs tabular-nums ${content.sublabelClass ?? "text-app-fg-faint"}`}>
+              {content.sublabel}
+            </span>
           )}
         </>
       ) : (
@@ -300,7 +302,7 @@ function renderSummaryContent(
       return {
         value: formatCurrency(value),
         sublabel: upsidePct !== null ? `${upsidePct >= 0 ? "+" : ""}${formatPercent(upsidePct)} upside` : undefined,
-        sublabelClass: upsidePct !== null ? (upsidePct >= 0 ? "text-emerald-400" : "text-red-400") : undefined,
+        sublabelClass: upsidePct !== null ? (upsidePct >= 0 ? "text-positive" : "text-negative") : undefined,
       };
     }
     case "analyst_target": {
@@ -317,7 +319,7 @@ function renderSummaryContent(
       return {
         value: formatCurrency(fairValue),
         sublabel: upsidePct !== null ? `${upsidePct >= 0 ? "+" : ""}${formatPercent(upsidePct)} upside` : undefined,
-        sublabelClass: upsidePct !== null ? (upsidePct >= 0 ? "text-emerald-400" : "text-red-400") : undefined,
+        sublabelClass: upsidePct !== null ? (upsidePct >= 0 ? "text-positive" : "text-negative") : undefined,
       };
     }
     case "finanzas": {
@@ -337,7 +339,7 @@ function renderSummaryContent(
           surprisePercent !== null
             ? `${surprisePercent >= 0 ? "+" : ""}${formatPercent(surprisePercent)} vs. estimado`
             : quarterEndDate ?? undefined,
-        sublabelClass: surprisePercent !== null ? (surprisePercent >= 0 ? "text-emerald-400" : "text-red-400") : undefined,
+        sublabelClass: surprisePercent !== null ? (surprisePercent >= 0 ? "text-positive" : "text-negative") : undefined,
       };
     }
     case "previsiones": {
@@ -349,7 +351,7 @@ function renderSummaryContent(
           epsGrowth !== null
             ? `${epsGrowth >= 0 ? "+" : ""}${formatPercent(epsGrowth)} · ${label ?? "BPA est."}`
             : label ?? undefined,
-        sublabelClass: epsGrowth !== null ? (epsGrowth >= 0 ? "text-emerald-400" : "text-red-400") : undefined,
+        sublabelClass: epsGrowth !== null ? (epsGrowth >= 0 ? "text-positive" : "text-negative") : undefined,
       };
     }
     case "dividendos": {
@@ -385,8 +387,8 @@ function Stat({ label, value, sublabel }: { label: string; value: string; sublab
   return (
     <div>
       <p className="text-xs text-app-fg-muted">{label}</p>
-      <p className="font-medium text-app-fg">{value}</p>
-      {sublabel && <p className="text-xs text-app-fg-faint">{sublabel}</p>}
+      <p className="font-medium tabular-nums text-app-fg">{value}</p>
+      {sublabel && <p className="text-xs tabular-nums text-app-fg-faint">{sublabel}</p>}
     </div>
   );
 }

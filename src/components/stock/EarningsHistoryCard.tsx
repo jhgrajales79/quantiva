@@ -50,12 +50,12 @@ export function EarningsHistoryCard({ symbol }: { symbol: string }) {
                 <td className="py-1.5 text-right text-app-fg">{formatCurrency(q.epsActual)}</td>
                 <td className="py-1.5 text-right text-app-fg-muted">{formatCurrency(q.epsEstimate)}</td>
                 <td
-                  className={`py-1.5 text-right font-medium ${
+                  className={`py-1.5 text-right font-medium tabular-nums ${
                     q.surprisePercent === null
                       ? "text-app-fg-faint"
                       : q.surprisePercent >= 0
-                        ? "text-emerald-400"
-                        : "text-red-400"
+                        ? "text-positive"
+                        : "text-negative"
                   }`}
                 >
                   {q.surprisePercent !== null

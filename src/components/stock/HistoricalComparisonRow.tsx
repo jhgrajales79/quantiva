@@ -40,7 +40,7 @@ export function HistoricalComparisonRow({
         {data.average !== null ? (
           <span
             className={
-              isGood === null ? "text-xs text-app-fg-muted" : isGood ? "text-xs text-emerald-400" : "text-xs text-red-400"
+              isGood === null ? "text-xs text-app-fg-muted" : isGood ? "text-xs text-positive" : "text-xs text-negative"
             }
           >
             vs. promedio propio {formatValue(data.average)} ({formatPercent(data.vsAveragePct)}, {data.sampleCount} muestras)

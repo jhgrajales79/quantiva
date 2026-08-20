@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatCurrency, formatPercent } from "@/lib/format";
+import { Table, Thead, Th, Tbody, Tr, Td, TableEmpty } from "@/components/ui/Table";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface QuoteRow {
   symbol: string;
@@ -41,50 +43,51 @@ export function QuotesTable({ symbols }: { symbols: { symbol: string; label: str
   }, [JSON.stringify(symbols)]);
 
   if (!rows) {
-    return <p className="text-sm text-app-fg-muted">Cargando cotizaciones...</p>;
+    return <Spinner label="Cargando cotizaciones..." className="p-4" />;
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-app-border bg-app-surface">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-            <th className="px-3 py-2">Instrumento</th>
-            <th className="px-3 py-2">Precio</th>
-            <th className="px-3 py-2">Var.</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.symbol} className="border-b border-app-border hover:bg-app-surface-2/40">
-              <td className="px-3 py-2">
+    <Table>
+      <Thead>
+        <Th>Instrumento</Th>
+        <Th align="right">Precio</Th>
+        <Th align="right">Var.</Th>
+      </Thead>
+      <Tbody>
+        {rows.length === 0 ? (
+          <TableEmpty colSpan={3}>Dato no disponible.</TableEmpty>
+        ) : (
+          rows.map((row) => (
+            <Tr key={row.symbol}>
+              <Td>
                 <Link href={`/stocks/${row.symbol}`} className="font-medium hover:underline">
                   {row.label}
                 </Link>
                 <span className="ml-1 text-xs text-app-fg-muted">{row.symbol}</span>
-              </td>
-              <td className="px-3 py-2">
+              </Td>
+              <Td align="right">
                 {row.error ? (
                   <span className="text-xs text-app-fg-muted">Dato no disponible</span>
                 ) : (
                   formatCurrency(row.price)
                 )}
-              </td>
-              <td
-                className={`px-3 py-2 ${
+              </Td>
+              <Td
+                align="right"
+                className={
                   row.changePct === null
                     ? "text-app-fg-muted"
                     : row.changePct >= 0
-                      ? "text-emerald-400"
-                      : "text-red-400"
-                }`}
+                      ? "text-positive"
+                      : "text-negative"
+                }
               >
                 {formatPercent(row.changePct === null ? null : row.changePct / 100)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+              </Td>
+            </Tr>
+          ))
+        )}
+      </Tbody>
+    </Table>
   );
 }

@@ -19,7 +19,7 @@ export function EmptyState({
       {ctaLabel && ctaHref && (
         <Link
           href={ctaHref}
-          className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-emerald-400 hover:underline"
+          className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
         >
           {ctaLabel}
           <ArrowRight size={14} strokeWidth={2} />

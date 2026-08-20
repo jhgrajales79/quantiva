@@ -39,7 +39,7 @@ export function SimilarCompaniesGrid({ symbol }: { symbol: string }) {
             >
               <p className="text-sm font-medium text-app-fg">{p.symbol}</p>
               <p className="text-sm text-app-fg-muted">{formatCurrency(p.price)}</p>
-              <p className={p.changePct !== null && p.changePct >= 0 ? "text-xs text-emerald-400" : "text-xs text-red-400"}>
+              <p className={p.changePct !== null && p.changePct >= 0 ? "text-xs tabular-nums text-positive" : "text-xs tabular-nums text-negative"}>
                 {formatPercent(p.changePct === null ? null : p.changePct / 100)}
               </p>
             </Link>

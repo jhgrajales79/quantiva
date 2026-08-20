@@ -3,11 +3,11 @@ import clsx from "clsx";
 export type BadgeVariant = "success" | "warning" | "danger" | "neutral" | "info";
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  success: "bg-emerald-500/15 text-emerald-400",
-  warning: "bg-amber-500/15 text-amber-400",
-  danger: "bg-red-500/15 text-red-400",
+  success: "bg-positive/15 text-positive",
+  warning: "bg-warning/15 text-warning",
+  danger: "bg-negative/15 text-negative",
   neutral: "bg-app-surface-2 text-app-fg-muted",
-  info: "bg-sky-500/15 text-sky-400",
+  info: "bg-info/15 text-info",
 };
 
 export function Badge({
@@ -22,7 +22,7 @@ export function Badge({
   return (
     <span
       className={clsx(
-        "rounded-full px-2.5 py-1 text-xs font-medium",
+        "rounded-pill px-2.5 py-1 text-xs font-medium",
         VARIANT_CLASSES[variant],
         className,
       )}

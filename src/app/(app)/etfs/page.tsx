@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Spinner } from "@/components/ui/Spinner";
 import { PieChart } from "lucide-react";
 
 interface SearchResult {
@@ -38,15 +40,11 @@ export default function EtfsPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-          <PieChart size={20} strokeWidth={2} />
-          ETFs
-        </h1>
-        <p className="text-sm text-app-fg-muted">
-          Busca un ETF por símbolo o nombre para ver su composición, sectores y ficha técnica.
-        </p>
-      </div>
+      <PageHeader
+        icon={PieChart}
+        title="ETFs"
+        description="Busca un ETF por símbolo o nombre para ver su composición, sectores y ficha técnica."
+      />
 
       <Card>
         <input
@@ -54,13 +52,13 @@ export default function EtfsPage() {
           value={query}
           onChange={(e) => runSearch(e.target.value)}
           placeholder="Ej. VTI, QQQ, SPY, ARKK..."
-          className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg"
+          className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none focus:border-brand"
         />
       </Card>
 
       <Card padded={false}>
         {loading ? (
-          <p className="p-4 text-sm text-app-fg-muted">Buscando...</p>
+          <Spinner label="Buscando..." className="p-4" />
         ) : results === null ? (
           <p className="p-4 text-sm text-app-fg-muted">Escribe para buscar un ETF.</p>
         ) : results.length === 0 ? (

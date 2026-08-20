@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { EconomicCalendar } from "@/components/calendar/EconomicCalendar";
 import { EarningsCalendar } from "@/components/calendar/EarningsCalendar";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { CalendarDays } from "lucide-react";
 
 export default function CalendarPage() {
@@ -10,40 +12,30 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-          <CalendarDays size={20} strokeWidth={2} />
-          Calendario
-        </h1>
-        <p className="text-sm text-app-fg-muted">
-          Calendario económico y de resultados (EE.UU. e internacional) vía Yahoo Finance. Ninguna
-          de las dos fuentes expone consenso de mercado para ingresos ni un valor "Estimado"
-          oficial — se muestra "Dato no disponible" en vez de inventarlo.
-        </p>
-      </div>
+      <PageHeader
+        icon={CalendarDays}
+        title="Calendario"
+        description={
+          <>
+            Calendario económico y de resultados (EE.UU. e internacional) vía Yahoo Finance. Ninguna
+            de las dos fuentes expone consenso de mercado para ingresos ni un valor &quot;Estimado&quot;
+            oficial — se muestra &quot;Dato no disponible&quot; en vez de inventarlo.
+          </>
+        }
+      />
 
-      <div className="flex gap-1.5 border-b border-app-border pb-px">
-        {(
-          [
-            ["economic", "Calendario económico"],
-            ["earnings", "Calendario de resultados"],
-          ] as [typeof tab, string][]
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            onClick={() => setTab(value)}
-            className={`rounded-t-md px-3 py-2 text-sm font-medium ${
-              tab === value
-                ? "border-b-2 border-orange-500 text-app-fg"
-                : "text-app-fg-muted hover:text-app-fg"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {tab === "economic" ? <EconomicCalendar /> : <EarningsCalendar />}
+      <Tabs value={tab} onValueChange={(v) => setTab(v as "economic" | "earnings")}>
+        <TabsList>
+          <TabsTrigger value="economic">Calendario económico</TabsTrigger>
+          <TabsTrigger value="earnings">Calendario de resultados</TabsTrigger>
+        </TabsList>
+        <TabsContent value="economic">
+          <EconomicCalendar />
+        </TabsContent>
+        <TabsContent value="earnings">
+          <EarningsCalendar />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

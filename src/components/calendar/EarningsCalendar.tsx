@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
+import { Badge } from "@/components/ui/Badge";
+import { Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
 import { formatCompact, formatCurrency } from "@/lib/format";
 import { Sunrise, Sunset, HelpCircle, Lock } from "lucide-react";
 
@@ -56,8 +58,8 @@ function formatDayHeader(bucket: string): string {
 }
 
 function TimingIcon({ timing }: { timing: EarningsEvent["timing"] }) {
-  if (timing === "bmo") return <Sunrise size={14} strokeWidth={2} className="text-amber-400" />;
-  if (timing === "amc") return <Sunset size={14} strokeWidth={2} className="text-sky-400" />;
+  if (timing === "bmo") return <Sunrise size={14} strokeWidth={2} className="text-warning" />;
+  if (timing === "amc") return <Sunset size={14} strokeWidth={2} className="text-info" />;
   return <HelpCircle size={14} strokeWidth={2} className="text-app-fg-faint" />;
 }
 
@@ -190,13 +192,13 @@ export function EarningsCalendar() {
                 )}
               </p>
               <p className="text-xs text-app-fg-muted">{nextKeyReport.companyName}</p>
-              <div className="mt-2 inline-flex rounded-md bg-app-surface-2 px-2 py-1 text-xs text-app-fg">
+              <div className="mt-2 inline-flex rounded-card bg-app-surface-2 px-2 py-1 text-xs text-app-fg">
                 <TimingLabel timing={nextKeyReport.timing} />
               </div>
               <div>
                 <Link
                   href={`/stocks/${nextKeyReport.symbol}`}
-                  className="mt-3 inline-block rounded-md border border-app-border px-3 py-1.5 text-xs font-medium text-app-fg hover:bg-app-surface-2"
+                  className="mt-3 inline-block rounded-card border border-app-border px-3 py-1.5 text-xs font-medium text-app-fg hover:bg-app-surface-2"
                 >
                   Ver ficha de {nextKeyReport.symbol}
                 </Link>
@@ -215,7 +217,7 @@ export function EarningsCalendar() {
                 <Link
                   key={e.symbol}
                   href={`/stocks/${e.symbol}`}
-                  className="rounded-md border border-app-border px-2 py-1 text-center text-xs font-medium text-app-fg hover:bg-app-surface-2"
+                  className="rounded-card border border-app-border px-2 py-1 text-center text-xs font-medium text-app-fg hover:bg-app-surface-2"
                 >
                   {e.symbol}
                 </Link>
@@ -265,9 +267,9 @@ export function EarningsCalendar() {
               <button
                 key={value}
                 onClick={() => setPreset(value)}
-                className={`rounded-md border px-2 py-1.5 text-xs ${
+                className={`rounded-card border px-2 py-1.5 text-xs ${
                   preset === value
-                    ? "border-orange-500 bg-orange-500/10 text-orange-400"
+                    ? "border-brand bg-brand/10 text-brand"
                     : "border-app-border text-app-fg-muted hover:bg-app-surface-2"
                 }`}
               >
@@ -289,9 +291,9 @@ export function EarningsCalendar() {
               <button
                 key={value}
                 onClick={() => setCapFilter(value)}
-                className={`rounded-md border px-2 py-1.5 text-xs ${
+                className={`rounded-card border px-2 py-1.5 text-xs ${
                   capFilter === value
-                    ? "border-orange-500 bg-orange-500/10 text-orange-400"
+                    ? "border-brand bg-brand/10 text-brand"
                     : "border-app-border text-app-fg-muted hover:bg-app-surface-2"
                 }`}
               >
@@ -312,9 +314,9 @@ export function EarningsCalendar() {
               <button
                 key={value}
                 onClick={() => setTimingFilter(value)}
-                className={`rounded-md border px-2 py-1.5 text-xs ${
+                className={`rounded-card border px-2 py-1.5 text-xs ${
                   timingFilter === value
-                    ? "border-orange-500 bg-orange-500/10 text-orange-400"
+                    ? "border-brand bg-brand/10 text-brand"
                     : "border-app-border text-app-fg-muted hover:bg-app-surface-2"
                 }`}
               >
@@ -338,29 +340,27 @@ export function EarningsCalendar() {
                 <Link
                   key={e.symbol}
                   href={`/stocks/${e.symbol}`}
-                  className="rounded-lg border border-app-border bg-app-surface-2 p-3 hover:border-app-fg-faint"
+                  className="rounded-card border border-app-border bg-app-surface-2 p-3 hover:border-app-fg-faint"
                 >
                   <p className="text-xs text-app-fg-muted">
                     {e.symbol} <span className="text-app-fg-faint">{e.companyName}</span>
                   </p>
                   <div className="mt-1 flex items-center gap-2">
-                    <span className="text-lg font-semibold text-app-fg">{formatCurrency(e.price)}</span>
+                    <span className="text-lg font-semibold tabular-nums text-app-fg">{formatCurrency(e.price)}</span>
                     {e.changePct !== null && (
-                      <span className={e.changePct >= 0 ? "text-xs text-emerald-400" : "text-xs text-red-400"}>
+                      <span
+                        className={`text-xs tabular-nums ${e.changePct >= 0 ? "text-positive" : "text-negative"}`}
+                      >
                         {e.changePct >= 0 ? "+" : ""}
                         {e.changePct.toFixed(1)}%
                       </span>
                     )}
                   </div>
                   {e.surprisePercent !== null ? (
-                    <span
-                      className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                        e.surprisePercent >= 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
-                      }`}
-                    >
+                    <Badge variant={e.surprisePercent >= 0 ? "success" : "danger"} className="mt-1 tabular-nums">
                       BPA {e.surprisePercent >= 0 ? "+" : ""}
                       {e.surprisePercent.toFixed(1)}%
-                    </span>
+                    </Badge>
                   ) : (
                     <span className="mt-1 inline-block text-xs text-app-fg-faint">BPA: Dato no disponible</span>
                   )}
@@ -384,26 +384,21 @@ export function EarningsCalendar() {
                   {formatDayHeader(day)} · {dayEvents.length} reportes
                 </p>
                 <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-                      <th className="px-4 py-2">Acción</th>
-                      <th className="px-4 py-2 text-right">Precio</th>
-                      <th className="px-4 py-2 text-right">Cap.</th>
-                      <th className="px-4 py-2 text-right">BPA vs. Est.</th>
-                      <th className="px-4 py-2 text-right">Ingresos vs. Est.</th>
-                      <th className="px-4 py-2 text-right">Mov. esp.</th>
-                      <th className="px-4 py-2 text-right">Valor justo</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                  <Thead>
+                    <Th>Acción</Th>
+                    <Th align="right">Precio</Th>
+                    <Th align="right">Cap.</Th>
+                    <Th align="right">BPA vs. Est.</Th>
+                    <Th align="right">Ingresos vs. Est.</Th>
+                    <Th align="right">Mov. esp.</Th>
+                    <Th align="right">Valor justo</Th>
+                  </Thead>
+                  <Tbody>
                     {dayEvents.map((e) => {
                       const surprise = e.surprisePercent;
                       return (
-                        <tr
-                          key={`${e.symbol}-${e.reportTimeIso}`}
-                          className="border-b border-app-border last:border-0 hover:bg-app-surface-2"
-                        >
-                          <td className="px-4 py-2">
+                        <Tr key={`${e.symbol}-${e.reportTimeIso}`}>
+                          <Td>
                             <Link href={`/stocks/${e.symbol}`} className="font-medium text-app-fg hover:underline">
                               {e.symbol}
                             </Link>
@@ -411,15 +406,15 @@ export function EarningsCalendar() {
                             <span className="ml-2 inline-block align-middle">
                               <TimingIcon timing={e.timing} />
                             </span>
-                          </td>
-                          <td className="px-4 py-2 text-right text-app-fg">{formatCurrency(e.price)}</td>
-                          <td className="px-4 py-2 text-right text-app-fg-muted">{formatCompact(e.marketCap)}</td>
-                          <td className="px-4 py-2 text-right">
+                          </Td>
+                          <Td align="right" className="text-app-fg">{formatCurrency(e.price)}</Td>
+                          <Td align="right" className="text-app-fg-muted">{formatCompact(e.marketCap)}</Td>
+                          <Td align="right">
                             {e.epsActual !== null ? (
                               <>
                                 <span className="text-app-fg">{e.epsActual.toFixed(2)}</span>{" "}
                                 {surprise !== null && (
-                                  <span className={surprise >= 0 ? "text-emerald-400" : "text-red-400"}>
+                                  <span className={surprise >= 0 ? "text-positive" : "text-negative"}>
                                     {surprise >= 0 ? "+" : ""}
                                     {surprise.toFixed(1)}%
                                   </span>
@@ -430,18 +425,18 @@ export function EarningsCalendar() {
                             ) : (
                               <span className="text-app-fg-faint">—</span>
                             )}
-                          </td>
-                          <td className="px-4 py-2 text-right text-app-fg-faint">Dato no disponible</td>
-                          <td className="px-4 py-2 text-right">
+                          </Td>
+                          <Td align="right" className="text-app-fg-faint">Dato no disponible</Td>
+                          <Td align="right">
                             <Lock size={13} strokeWidth={2} className="ml-auto text-app-fg-faint" aria-label="Función PRO" />
-                          </td>
-                          <td className="px-4 py-2 text-right">
+                          </Td>
+                          <Td align="right">
                             <Lock size={13} strokeWidth={2} className="ml-auto text-app-fg-faint" aria-label="Función PRO" />
-                          </td>
-                        </tr>
+                          </Td>
+                        </Tr>
                       );
                     })}
-                  </tbody>
+                  </Tbody>
                 </table>
               </div>
             ))

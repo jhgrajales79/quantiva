@@ -10,7 +10,7 @@ export async function GreetingHeader() {
   return (
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-emerald-500">Tu panel</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-brand">Tu panel</p>
         <h1 className="text-2xl font-semibold text-app-fg">
           <GreetingText firstName={firstName} />
         </h1>

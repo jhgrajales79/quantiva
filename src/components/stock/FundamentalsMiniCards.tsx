@@ -45,7 +45,7 @@ function TrendBars({ points }: { points: { fiscalDate: string; value: number | n
         return (
           <div key={p.fiscalDate} className="group relative flex-1">
             <div
-              className={`w-full rounded-sm ${isNegative ? "bg-red-500/70" : "bg-emerald-500/70"} group-hover:opacity-100`}
+              className={`w-full rounded-sm ${isNegative ? "bg-negative/70" : "bg-positive/70"} group-hover:opacity-100`}
               style={{ height: `${Math.max(6, (Math.abs(value) / maxAbs) * 48)}px` }}
             />
             <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-app-surface-2 px-1.5 py-0.5 text-[10px] text-app-fg opacity-0 shadow group-hover:opacity-100">

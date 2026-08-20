@@ -2,10 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import clsx from "clsx";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
 import { Pencil, Trash2 } from "lucide-react";
 import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
+import { Dialog } from "@/components/ui/Dialog";
 
 interface Holding {
   symbol: string;
@@ -142,7 +147,7 @@ export default function PortfolioDetailPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-app-fg">{portfolioName || "Portafolio"}</h1>
+      <PageHeader title={portfolioName || "Portafolio"} />
 
       {summary && (
         <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -162,7 +167,7 @@ export default function PortfolioDetailPage() {
         </div>
       )}
 
-      <div className="rounded-lg border border-app-border bg-app-surface">
+      <div className="rounded-card border border-app-border bg-app-surface shadow-card">
         <h3 className="border-b border-app-border p-3 text-sm font-semibold text-app-fg">
           Posiciones
         </h3>
@@ -175,58 +180,56 @@ export default function PortfolioDetailPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-                  <th className="px-3 py-2">Ticker</th>
-                  <th className="px-3 py-2">Cantidad</th>
-                  <th className="px-3 py-2">Costo prom.</th>
-                  <th className="px-3 py-2">Precio actual</th>
-                  <th className="px-3 py-2">Valor actual</th>
-                  <th className="px-3 py-2">P&L no realiz.</th>
-                  <th className="px-3 py-2">Peso</th>
-                </tr>
-              </thead>
-              <tbody>
+              <Thead>
+                <Th>Ticker</Th>
+                <Th>Cantidad</Th>
+                <Th>Costo prom.</Th>
+                <Th>Precio actual</Th>
+                <Th>Valor actual</Th>
+                <Th>P&L no realiz.</Th>
+                <Th>Peso</Th>
+              </Thead>
+              <Tbody>
                 {holdings.map((h) => (
-                  <tr key={h.symbol} className="border-b border-app-border hover:bg-app-surface-2/40">
-                    <td className="px-3 py-2 font-medium">{h.symbol}</td>
-                    <td className="px-3 py-2">{h.quantity}</td>
-                    <td className="px-3 py-2">{formatCurrency(h.averageCost)}</td>
-                    <td className="px-3 py-2">{formatCurrency(h.currentPrice)}</td>
-                    <td className="px-3 py-2">{formatCurrency(h.currentValue)}</td>
-                    <td
-                      className={`px-3 py-2 ${
+                  <Tr key={h.symbol}>
+                    <Td className="font-medium">{h.symbol}</Td>
+                    <Td>{h.quantity}</Td>
+                    <Td>{formatCurrency(h.averageCost)}</Td>
+                    <Td>{formatCurrency(h.currentPrice)}</Td>
+                    <Td>{formatCurrency(h.currentValue)}</Td>
+                    <Td
+                      className={
                         h.unrealizedPnl === null
                           ? "text-app-fg-muted"
                           : h.unrealizedPnl >= 0
-                            ? "text-emerald-400"
-                            : "text-red-400"
-                      }`}
+                            ? "text-positive"
+                            : "text-negative"
+                      }
                     >
                       {formatCurrency(h.unrealizedPnl)} ({formatPercent(h.unrealizedPnlPct)})
-                    </td>
-                    <td className="px-3 py-2">
+                    </Td>
+                    <Td>
                       <div className="flex items-center gap-2">
-                        <div className="h-1.5 w-16 overflow-hidden rounded-full bg-app-surface-2">
+                        <div className="h-1.5 w-16 overflow-hidden rounded-pill bg-app-surface-2">
                           <div
-                            className="h-full rounded-full bg-emerald-500"
+                            className="h-full rounded-pill bg-brand"
                             style={{ width: `${Math.max(0, Math.min(100, (h.weightPct ?? 0) * 100))}%` }}
                           />
                         </div>
-                        <span className="whitespace-nowrap text-xs text-app-fg-muted">
+                        <span className="whitespace-nowrap text-xs tabular-nums text-app-fg-muted">
                           {formatPercent(h.weightPct)}
                         </span>
                       </div>
-                    </td>
-                  </tr>
+                    </Td>
+                  </Tr>
                 ))}
-              </tbody>
+              </Tbody>
             </table>
           </div>
         )}
       </div>
 
-      <div className="rounded-lg border border-app-border bg-app-surface">
+      <div className="rounded-card border border-app-border bg-app-surface shadow-card">
         <h3 className="border-b border-app-border p-3 text-sm font-semibold text-app-fg">
           Transacciones
         </h3>
@@ -237,27 +240,25 @@ export default function PortfolioDetailPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-                  <th className="px-3 py-2">Fecha</th>
-                  <th className="px-3 py-2">Ticker</th>
-                  <th className="px-3 py-2">Tipo</th>
-                  <th className="px-3 py-2">Cantidad</th>
-                  <th className="px-3 py-2">Precio</th>
-                  <th className="px-3 py-2">Comisión</th>
-                  <th className="px-3 py-2 text-right">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
+              <Thead>
+                <Th>Fecha</Th>
+                <Th>Ticker</Th>
+                <Th>Tipo</Th>
+                <Th>Cantidad</Th>
+                <Th>Precio</Th>
+                <Th>Comisión</Th>
+                <Th align="right">Acciones</Th>
+              </Thead>
+              <Tbody>
                 {transactions.map((tx) => (
-                  <tr key={tx.id} className="border-b border-app-border hover:bg-app-surface-2/40">
-                    <td className="px-3 py-2 text-app-fg-muted">{tx.executedAt.slice(0, 10)}</td>
-                    <td className="px-3 py-2 font-medium">{tx.symbol}</td>
-                    <td className="px-3 py-2">{TYPE_LABELS[tx.type]}</td>
-                    <td className="px-3 py-2">{tx.quantity}</td>
-                    <td className="px-3 py-2">{formatCurrency(tx.price)}</td>
-                    <td className="px-3 py-2">{formatCurrency(tx.fees)}</td>
-                    <td className="px-3 py-2">
+                  <Tr key={tx.id}>
+                    <Td className="text-app-fg-muted">{tx.executedAt.slice(0, 10)}</Td>
+                    <Td className="font-medium">{tx.symbol}</Td>
+                    <Td>{TYPE_LABELS[tx.type]}</Td>
+                    <Td>{tx.quantity}</Td>
+                    <Td>{formatCurrency(tx.price)}</Td>
+                    <Td>{formatCurrency(tx.fees)}</Td>
+                    <Td align="right">
                       <div className="flex justify-end gap-3">
                         <button
                           onClick={() => setEditingTx(tx)}
@@ -269,21 +270,21 @@ export default function PortfolioDetailPage() {
                         <button
                           onClick={() => handleDeleteTx(tx)}
                           aria-label="Eliminar transacción"
-                          className="text-app-fg-muted hover:text-red-400"
+                          className="text-app-fg-muted hover:text-negative"
                         >
                           <Trash2 size={14} strokeWidth={2} />
                         </button>
                       </div>
-                    </td>
-                  </tr>
+                    </Td>
+                  </Tr>
                 ))}
-              </tbody>
+              </Tbody>
             </table>
           </div>
         )}
       </div>
 
-      <div className="rounded-lg border border-app-border bg-app-surface p-4">
+      <Card>
         <h3 className="mb-3 text-sm font-semibold text-app-fg">Registrar transacción</h3>
         <form onSubmit={handleSubmit} className="grid gap-2 sm:grid-cols-5">
           <div className="relative">
@@ -297,7 +298,7 @@ export default function PortfolioDetailPage() {
               }}
               onFocus={() => setSuggestOpen(true)}
               onBlur={() => setSuggestOpen(false)}
-              className="w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+              className="w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm text-app-fg outline-none focus:border-brand"
             />
             {suggestOpen && (
               <TickerSuggestions
@@ -312,7 +313,7 @@ export default function PortfolioDetailPage() {
           <select
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value as typeof form.type })}
-            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm text-app-fg outline-none focus:border-brand"
           >
             <option value="buy">Compra</option>
             <option value="sell">Venta</option>
@@ -325,7 +326,7 @@ export default function PortfolioDetailPage() {
             placeholder="Cantidad"
             value={form.quantity}
             onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm tabular-nums text-app-fg outline-none focus:border-brand"
           />
           <input
             required
@@ -334,23 +335,23 @@ export default function PortfolioDetailPage() {
             placeholder="Precio"
             value={form.price}
             onChange={(e) => setForm({ ...form, price: e.target.value })}
-            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm tabular-nums text-app-fg outline-none focus:border-brand"
           />
           <input
             type="date"
             value={form.executedAt}
             onChange={(e) => setForm({ ...form, executedAt: e.target.value })}
-            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm outline-none focus:border-emerald-500"
+            className="rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm tabular-nums text-app-fg outline-none focus:border-brand"
           />
           <button
             type="submit"
-            className="col-span-full rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500 sm:col-span-1"
+            className="col-span-full rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 sm:col-span-1"
           >
             Registrar
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
-      </div>
+        {error && <p className="mt-2 text-sm text-negative">{error}</p>}
+      </Card>
 
       {editingTx && (
         <EditTransactionModal
@@ -396,85 +397,79 @@ function EditTransactionModal({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-sm rounded-lg border border-app-border bg-app-surface p-5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="mb-3 text-lg font-semibold text-app-fg">Editar transacción de {tx.symbol}</h3>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <label className="block text-xs text-app-fg-muted">
-            Tipo
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value as Transaction["type"])}
-              className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm text-app-fg outline-none focus:border-emerald-500"
-            >
-              <option value="buy">Compra</option>
-              <option value="sell">Venta</option>
-              <option value="dividend">Dividendo</option>
-            </select>
-          </label>
-          <label className="block text-xs text-app-fg-muted">
-            Cantidad
-            <input
-              required
-              type="number"
-              step="any"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm text-app-fg outline-none focus:border-emerald-500"
-            />
-          </label>
-          <label className="block text-xs text-app-fg-muted">
-            Precio
-            <input
-              required
-              type="number"
-              step="any"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm text-app-fg outline-none focus:border-emerald-500"
-            />
-          </label>
-          <label className="block text-xs text-app-fg-muted">
-            Comisión
-            <input
-              type="number"
-              step="any"
-              value={fees}
-              onChange={(e) => setFees(e.target.value)}
-              className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm text-app-fg outline-none focus:border-emerald-500"
-            />
-          </label>
-          <label className="block text-xs text-app-fg-muted">
-            Fecha
-            <input
-              type="date"
-              value={executedAt}
-              onChange={(e) => setExecutedAt(e.target.value)}
-              className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm text-app-fg outline-none focus:border-emerald-500"
-            />
-          </label>
+    <Dialog open onOpenChange={(next) => !next && onClose()} title={`Editar transacción de ${tx.symbol}`}>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <label className="block text-xs text-app-fg-muted">
+          Tipo
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value as Transaction["type"])}
+            className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm text-app-fg outline-none focus:border-brand"
+          >
+            <option value="buy">Compra</option>
+            <option value="sell">Venta</option>
+            <option value="dividend">Dividendo</option>
+          </select>
+        </label>
+        <label className="block text-xs text-app-fg-muted">
+          Cantidad
+          <input
+            required
+            type="number"
+            step="any"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm tabular-nums text-app-fg outline-none focus:border-brand"
+          />
+        </label>
+        <label className="block text-xs text-app-fg-muted">
+          Precio
+          <input
+            required
+            type="number"
+            step="any"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm tabular-nums text-app-fg outline-none focus:border-brand"
+          />
+        </label>
+        <label className="block text-xs text-app-fg-muted">
+          Comisión
+          <input
+            type="number"
+            step="any"
+            value={fees}
+            onChange={(e) => setFees(e.target.value)}
+            className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm tabular-nums text-app-fg outline-none focus:border-brand"
+          />
+        </label>
+        <label className="block text-xs text-app-fg-muted">
+          Fecha
+          <input
+            type="date"
+            value={executedAt}
+            onChange={(e) => setExecutedAt(e.target.value)}
+            className="mt-1 w-full rounded-md border border-app-border bg-app-bg px-2 py-1.5 text-sm tabular-nums text-app-fg outline-none focus:border-brand"
+          />
+        </label>
 
-          <div className="mt-5 flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-app-border px-3 py-1.5 text-sm font-medium text-app-fg hover:bg-app-surface-2"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500"
-            >
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-app-border px-3 py-1.5 text-sm font-medium text-app-fg hover:bg-app-surface-2"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </Dialog>
   );
 }
 
@@ -488,15 +483,16 @@ function SummaryCard({
   positive?: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-app-border bg-app-surface p-3">
+    <Card>
       <p className="text-xs text-app-fg-muted">{label}</p>
       <p
-        className={`text-lg font-semibold ${
-          positive === undefined ? "text-app-fg" : positive ? "text-emerald-400" : "text-red-400"
-        }`}
+        className={clsx(
+          "text-lg font-semibold tabular-nums",
+          positive === undefined ? "text-app-fg" : positive ? "text-positive" : "text-negative",
+        )}
       >
         {value}
       </p>
-    </div>
+    </Card>
   );
 }

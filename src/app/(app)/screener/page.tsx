@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Table, Thead, Th, Tbody, Tr, Td, TableEmpty } from "@/components/ui/Table";
 import { SlidersHorizontal } from "lucide-react";
 
 interface ScreenerResult {
@@ -76,18 +78,18 @@ export default function ScreenerPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-          <SlidersHorizontal size={20} strokeWidth={2} />
-          Screener
-        </h1>
-        <p className="text-sm text-app-fg-muted">
-          Universo: S&amp;P 500 ({meta.universeSize ?? "…"} activos) · datos del{" "}
-          {meta.date ?? "…"}. Los filtros de calidad (ROE) y Fair Value solo aplican a los
-          activos que ya tienen historial propio en Quantiva — el resto muestra "Sin cobertura"
-          en vez de un valor inventado.
-        </p>
-      </div>
+      <PageHeader
+        title="Screener"
+        icon={SlidersHorizontal}
+        description={
+          <>
+            Universo: S&amp;P 500 ({meta.universeSize ?? "…"} activos) · datos del{" "}
+            {meta.date ?? "…"}. Los filtros de calidad (ROE) y Fair Value solo aplican a los
+            activos que ya tienen historial propio en Quantiva — el resto muestra "Sin cobertura"
+            en vez de un valor inventado.
+          </>
+        }
+      />
 
       <Card>
         <CardHeader title="Filtros" />
@@ -172,58 +174,56 @@ export default function ScreenerPage() {
         </div>
       </Card>
 
-      <Card padded={false}>
-        {results === null ? (
+      {results === null ? (
+        <Card padded={false}>
           <Spinner className="p-4" />
-        ) : results.length === 0 ? (
-          <p className="p-4 text-sm text-app-fg-muted">Sin resultados para estos filtros.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-                  <th className="px-3 py-2">Ticker</th>
-                  <th className="px-3 py-2">Sector</th>
-                  <th className="px-3 py-2">Precio</th>
-                  <th className="px-3 py-2">Var.</th>
-                  <th className="px-3 py-2">Cap.</th>
-                  <th className="px-3 py-2">P/E</th>
-                  <th className="px-3 py-2">P/B</th>
-                  <th className="px-3 py-2">Div. Yield</th>
-                  <th className="px-3 py-2">ROE (propio)</th>
-                  <th className="px-3 py-2">Investment Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((r) => (
-                  <tr key={r.symbol} className="border-b border-app-border last:border-0 hover:bg-app-surface-2">
-                    <td className="px-3 py-2">
-                      <Link href={`/stocks/${r.symbol}`} className="font-medium text-app-fg hover:underline">
-                        {r.symbol}
-                      </Link>
-                    </td>
-                    <td className="px-3 py-2 text-app-fg-muted">{r.sector ?? "—"}</td>
-                    <td className="px-3 py-2">{formatCurrency(r.price)}</td>
-                    <td className={r.changePct !== null && r.changePct >= 0 ? "px-3 py-2 text-emerald-400" : "px-3 py-2 text-red-400"}>
-                      {formatPercent(r.changePct === null ? null : r.changePct / 100)}
-                    </td>
-                    <td className="px-3 py-2">{formatCompact(r.marketCap)}</td>
-                    <td className="px-3 py-2">{r.pe !== null ? r.pe.toFixed(1) : "—"}</td>
-                    <td className="px-3 py-2">{r.pb !== null ? r.pb.toFixed(1) : "—"}</td>
-                    <td className="px-3 py-2">{formatPercent(r.dividendYield)}</td>
-                    <td className="px-3 py-2">
-                      {r.qualityCoverage ? formatPercent(r.roe) : <span className="text-app-fg-faint">Sin cobertura</span>}
-                    </td>
-                    <td className="px-3 py-2">
-                      {r.investmentScore !== null ? r.investmentScore.toFixed(0) : <span className="text-app-fg-faint">Sin cobertura</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
+        </Card>
+      ) : (
+        <Table>
+          <Thead>
+            <Th>Ticker</Th>
+            <Th>Sector</Th>
+            <Th align="right">Precio</Th>
+            <Th align="right">Var.</Th>
+            <Th align="right">Cap.</Th>
+            <Th align="right">P/E</Th>
+            <Th align="right">P/B</Th>
+            <Th align="right">Div. Yield</Th>
+            <Th align="right">ROE (propio)</Th>
+            <Th align="right">Investment Score</Th>
+          </Thead>
+          <Tbody>
+            {results.length === 0 ? (
+              <TableEmpty colSpan={10}>Sin resultados para estos filtros.</TableEmpty>
+            ) : (
+              results.map((r) => (
+                <Tr key={r.symbol}>
+                  <Td>
+                    <Link href={`/stocks/${r.symbol}`} className="font-medium text-app-fg hover:underline">
+                      {r.symbol}
+                    </Link>
+                  </Td>
+                  <Td className="text-app-fg-muted">{r.sector ?? "—"}</Td>
+                  <Td align="right">{formatCurrency(r.price)}</Td>
+                  <Td align="right" className={r.changePct !== null && r.changePct >= 0 ? "text-positive" : "text-negative"}>
+                    {formatPercent(r.changePct === null ? null : r.changePct / 100)}
+                  </Td>
+                  <Td align="right">{formatCompact(r.marketCap)}</Td>
+                  <Td align="right">{r.pe !== null ? r.pe.toFixed(1) : "—"}</Td>
+                  <Td align="right">{r.pb !== null ? r.pb.toFixed(1) : "—"}</Td>
+                  <Td align="right">{formatPercent(r.dividendYield)}</Td>
+                  <Td align="right">
+                    {r.qualityCoverage ? formatPercent(r.roe) : <span className="text-app-fg-faint">Sin cobertura</span>}
+                  </Td>
+                  <Td align="right">
+                    {r.investmentScore !== null ? r.investmentScore.toFixed(0) : <span className="text-app-fg-faint">Sin cobertura</span>}
+                  </Td>
+                </Tr>
+              ))
+            )}
+          </Tbody>
+        </Table>
+      )}
     </div>
   );
 }

@@ -85,10 +85,10 @@ export function EarningsRevenueCard({ symbol }: { symbol: string }) {
       : null;
 
   const bars: Bar[] = [
-    { label: "Ingresos", value: revenue, color: "bg-sky-500" },
-    { label: "Coste de los ingresos", value: costOfRevenue, color: "bg-red-500" },
-    { label: "Beneficio bruto", value: grossProfit, color: "bg-emerald-500" },
-    { label: "Otros gastos", value: otherExpenses, color: "bg-red-500" },
+    { label: "Ingresos", value: revenue, color: "bg-info" },
+    { label: "Coste de los ingresos", value: costOfRevenue, color: "bg-negative" },
+    { label: "Beneficio bruto", value: grossProfit, color: "bg-positive" },
+    { label: "Otros gastos", value: otherExpenses, color: "bg-negative" },
     { label: "Beneficios", value: netIncome, color: "bg-teal-400" },
   ];
 

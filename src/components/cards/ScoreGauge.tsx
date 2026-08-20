@@ -98,7 +98,7 @@ export function ScoreGauge({ label, value, size = "sm", sublabel, breakdown, tre
       </svg>
 
       <div
-        className={`-mt-7 rounded-full font-bold text-white ${size === "lg" ? "px-4 py-1.5 text-2xl" : "px-3 py-1 text-lg"}`}
+        className={`-mt-7 rounded-pill font-bold tabular-nums text-white ${size === "lg" ? "px-4 py-1.5 text-2xl" : "px-3 py-1 text-lg"}`}
         style={{ backgroundColor: zone?.color ?? "var(--color-app-surface-2)" }}
       >
         {clamped !== null ? clamped.toFixed(0) : "—"}
@@ -117,7 +117,7 @@ export function ScoreGauge({ label, value, size = "sm", sublabel, breakdown, tre
       {clamped !== null && (
         <p className="mt-1 text-xs text-app-fg-faint">
           {trend ? (
-            <span className={`flex items-center gap-1 ${trend.deltaPts >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+            <span className={`flex items-center gap-1 tabular-nums ${trend.deltaPts >= 0 ? "text-positive" : "text-negative"}`}>
               {trend.deltaPts >= 0 ? <TrendingUp size={12} strokeWidth={2} /> : <TrendingDown size={12} strokeWidth={2} />}
               {trend.deltaPts >= 0 ? "+" : ""}
               {trend.deltaPts.toFixed(0)} pts {trend.sinceLabel}

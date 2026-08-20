@@ -4,6 +4,8 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { LineChart } from "lucide-react";
+import { Card } from "@/components/ui/Card";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -48,8 +50,15 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-app-bg px-4">
-      <div className="w-full max-w-sm rounded-xl border border-app-border bg-app-surface p-8">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-app-bg px-4">
+      <Link
+        href="/"
+        className="mb-6 flex items-center gap-2 text-xl font-semibold text-app-fg"
+      >
+        <LineChart size={28} strokeWidth={2.25} className="text-brand" />
+        Quantiva
+      </Link>
+      <Card className="w-full max-w-sm p-8">
         <h1 className="mb-1 text-xl font-semibold text-app-fg">
           Crear cuenta
         </h1>
@@ -65,7 +74,7 @@ export default function RegisterPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none focus:border-emerald-500"
+              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none"
             />
           </div>
           <div>
@@ -77,7 +86,7 @@ export default function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none focus:border-emerald-500"
+              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none"
             />
           </div>
           <div>
@@ -90,25 +99,25 @@ export default function RegisterPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none focus:border-emerald-500"
+              className="w-full rounded-md border border-app-border bg-app-bg px-3 py-2 text-sm text-app-fg outline-none"
             />
           </div>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-negative">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:opacity-60"
+            className="w-full rounded-md bg-brand px-3 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
           >
             {loading ? "Creando..." : "Crear cuenta"}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-app-fg-muted">
           ¿Ya tienes cuenta?{" "}
-          <Link href="/login" className="text-emerald-400 hover:underline">
+          <Link href="/login" className="text-brand hover:underline">
             Inicia sesión
           </Link>
         </p>
-      </div>
+      </Card>
     </div>
   );
 }

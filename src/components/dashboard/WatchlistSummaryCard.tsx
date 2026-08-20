@@ -48,7 +48,7 @@ export function WatchlistSummaryCard() {
               </li>
             ))}
           </ul>
-          <Link href="/watchlist" className="inline-flex text-sm text-emerald-400 hover:underline">
+          <Link href="/watchlist" className="inline-flex text-sm text-brand hover:underline">
             Ver todo mi watchlist →
           </Link>
         </div>

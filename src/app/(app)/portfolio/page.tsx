@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Spinner } from "@/components/ui/Spinner";
 import { Briefcase } from "lucide-react";
 import { AllocationBar } from "@/components/portfolio/AllocationBar";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface Portfolio {
   id: string;
@@ -40,22 +43,23 @@ export default function PortfolioListPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-        <Briefcase size={20} strokeWidth={2} />
-        Mis Portafolios
-      </h1>
+    <div className="space-y-6">
+      <PageHeader
+        title="Mis Portafolios"
+        icon={Briefcase}
+        description="Gestiona tus portafolios de inversión y da seguimiento a tus posiciones."
+      />
 
       <form onSubmit={handleCreate} className="flex gap-2">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ej. Portafolio largo plazo"
-          className="w-64 rounded-md border border-app-border bg-app-surface px-3 py-1.5 text-sm text-app-fg outline-none focus:border-emerald-500"
+          className="w-64 rounded-md border border-app-border bg-app-surface px-3 py-1.5 text-sm text-app-fg outline-none focus:border-brand"
         />
         <button
           type="submit"
-          className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500"
+          className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
           Crear portafolio
         </button>
@@ -64,12 +68,15 @@ export default function PortfolioListPage() {
       {!portfolios ? (
         <Spinner />
       ) : portfolios.length === 0 ? (
-        <p className="text-sm text-app-fg-muted">Aún no tienes portafolios. Crea el primero arriba.</p>
+        <EmptyState
+          icon={Briefcase}
+          message="Aún no tienes portafolios. Crea el primero arriba."
+        />
       ) : (
-        <ul className="divide-y divide-app-border rounded-lg border border-app-border bg-app-surface">
+        <div className="space-y-3">
           {portfolios.map((p) => (
-            <li key={p.id}>
-              <Link href={`/portfolio/${p.id}`} className="block p-3 hover:bg-app-surface-2/50">
+            <Link key={p.id} href={`/portfolio/${p.id}`} className="block">
+              <Card className="transition-colors hover:bg-app-surface-2/50">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-app-fg">{p.name}</span>
                   <span className="text-xs text-app-fg-muted">{p.baseCurrency}</span>
@@ -77,10 +84,10 @@ export default function PortfolioListPage() {
                 <div className="mt-2">
                   <AllocationBar allocation={p.allocation} />
                 </div>
-              </Link>
-            </li>
+              </Card>
+            </Link>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

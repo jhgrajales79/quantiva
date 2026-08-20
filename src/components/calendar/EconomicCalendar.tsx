@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { countryName } from "@/lib/country-names";
 import { Spinner } from "@/components/ui/Spinner";
+import { Badge } from "@/components/ui/Badge";
+import { Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
 
 interface EconomicEvent {
   event: string;
@@ -217,9 +219,9 @@ export function EconomicCalendar() {
               <button
                 key={value}
                 onClick={() => setPreset(value)}
-                className={`rounded-md border px-2 py-1.5 text-xs ${
+                className={`rounded-card border px-2 py-1.5 text-xs ${
                   preset === value
-                    ? "border-orange-500 bg-orange-500/10 text-orange-400"
+                    ? "border-brand bg-brand/10 text-brand"
                     : "border-app-border text-app-fg-muted hover:bg-app-surface-2"
                 }`}
               >
@@ -239,9 +241,9 @@ export function EconomicCalendar() {
               <button
                 key={value}
                 onClick={() => setImpact(value)}
-                className={`rounded-md border px-2 py-1.5 text-xs ${
+                className={`rounded-card border px-2 py-1.5 text-xs ${
                   impact === value
-                    ? "border-orange-500 bg-orange-500/10 text-orange-400"
+                    ? "border-brand bg-brand/10 text-brand"
                     : "border-app-border text-app-fg-muted hover:bg-app-surface-2"
                 }`}
               >
@@ -276,7 +278,7 @@ export function EconomicCalendar() {
             <button
               onClick={() => downloadCsv(filtered)}
               disabled={filtered.length === 0}
-              className="text-xs font-medium text-orange-400 hover:underline disabled:opacity-40"
+              className="text-xs font-medium text-brand hover:underline disabled:opacity-40"
             >
               Exportar CSV
             </button>
@@ -303,21 +305,17 @@ export function EconomicCalendar() {
                 return (
                   <div
                     key={`${e.countryCode}-${e.event}-${e.eventTimeIso}`}
-                    className="rounded-lg border border-app-border bg-app-surface-2 p-3"
+                    className="rounded-card border border-app-border bg-app-surface-2 p-3"
                   >
                     <p className="text-xs text-app-fg-muted">
                       {e.event} {e.period ? `(${e.period})` : ""}
                     </p>
                     <div className="mt-1 flex items-center gap-2">
-                      <span className="text-xl font-semibold text-app-fg">{e.actual}</span>
+                      <span className="text-xl font-semibold tabular-nums text-app-fg">{e.actual}</span>
                       {delta !== null && (
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                            delta >= 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
-                          }`}
-                        >
+                        <Badge variant={delta >= 0 ? "success" : "danger"} className="tabular-nums">
                           {delta >= 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(2)} vs. anterior
-                        </span>
+                        </Badge>
                       )}
                     </div>
                     <p className="text-xs text-app-fg-muted">
@@ -349,43 +347,36 @@ export function EconomicCalendar() {
                   {formatDayHeader(dayEvents[0].eventTimeIso)} · {dayEvents.length} eventos
                 </p>
                 <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-                      <th className="px-4 py-2">Hora</th>
-                      <th className="px-4 py-2">Imp.</th>
-                      <th className="px-4 py-2">País</th>
-                      <th className="px-4 py-2">Evento</th>
-                      <th className="px-4 py-2 text-right">Actual</th>
-                      <th className="px-4 py-2 text-right">Estimado</th>
-                      <th className="px-4 py-2 text-right">Anterior</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                  <Thead>
+                    <Th>Hora</Th>
+                    <Th>Imp.</Th>
+                    <Th>País</Th>
+                    <Th>Evento</Th>
+                    <Th align="right">Actual</Th>
+                    <Th align="right">Estimado</Th>
+                    <Th align="right">Anterior</Th>
+                  </Thead>
+                  <Tbody>
                     {dayEvents.map((e) => (
-                      <tr
-                        key={`${e.countryCode}-${e.event}-${e.eventTimeIso}`}
-                        className="border-b border-app-border last:border-0 hover:bg-app-surface-2"
-                      >
-                        <td className="px-4 py-2 text-app-fg-muted">{formatTime(e.eventTimeIso)}</td>
-                        <td className="px-4 py-2">
+                      <Tr key={`${e.countryCode}-${e.event}-${e.eventTimeIso}`}>
+                        <Td className="text-app-fg-muted">{formatTime(e.eventTimeIso)}</Td>
+                        <Td>
                           {e.highImportance ? (
-                            <span className="rounded bg-red-500/15 px-1.5 py-0.5 text-xs text-red-400">Alto</span>
+                            <Badge variant="danger">Alto</Badge>
                           ) : (
-                            <span className="rounded bg-app-surface-2 px-1.5 py-0.5 text-xs text-app-fg-muted">
-                              Normal
-                            </span>
+                            <Badge variant="neutral">Normal</Badge>
                           )}
-                        </td>
-                        <td className="px-4 py-2 text-app-fg-muted">{e.countryCode}</td>
-                        <td className="px-4 py-2 text-app-fg">
+                        </Td>
+                        <Td className="text-app-fg-muted">{e.countryCode}</Td>
+                        <Td className="text-app-fg">
                           {e.event} {e.period ? <span className="text-app-fg-muted">({e.period})</span> : null}
-                        </td>
-                        <td className="px-4 py-2 text-right text-app-fg">{e.actual ?? "—"}</td>
-                        <td className="px-4 py-2 text-right text-app-fg-faint">Dato no disponible</td>
-                        <td className="px-4 py-2 text-right text-app-fg-muted">{e.prior ?? "—"}</td>
-                      </tr>
+                        </Td>
+                        <Td align="right" className="text-app-fg">{e.actual ?? "—"}</Td>
+                        <Td align="right" className="text-app-fg-faint">Dato no disponible</Td>
+                        <Td align="right" className="text-app-fg-muted">{e.prior ?? "—"}</Td>
+                      </Tr>
                     ))}
-                  </tbody>
+                  </Tbody>
                 </table>
               </div>
             ))

@@ -95,7 +95,7 @@ function SectorAxis({ sectors, period }: { sectors: SectorResult[]; period: Peri
   const rowIndexes = assignLabelRows(leftPcts, ROW_OFFSETS.length, 9);
 
   return (
-    <div className="relative mt-14 mb-14 h-1.5 w-full rounded-full bg-gradient-to-r from-red-500 via-amber-400 to-emerald-500">
+    <div className="relative mt-14 mb-14 h-1.5 w-full rounded-full bg-gradient-to-r from-negative via-warning to-positive">
       {withValues.map((s, i) => (
         <div
           key={s.symbol}
@@ -106,7 +106,7 @@ function SectorAxis({ sectors, period }: { sectors: SectorResult[]; period: Peri
             className={`absolute left-1/2 w-max -translate-x-1/2 text-center ${ROW_OFFSETS[rowIndexes[i]]}`}
           >
             <p className="text-[11px] font-medium text-app-fg-muted">{s.label}</p>
-            <p className={s.value >= 0 ? "text-[11px] text-emerald-400" : "text-[11px] text-red-400"}>
+            <p className={s.value >= 0 ? "text-[11px] text-positive" : "text-[11px] text-negative"}>
               {formatPercent(s.value)}
             </p>
           </div>

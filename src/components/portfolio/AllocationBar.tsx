@@ -30,7 +30,7 @@ export function AllocationBar({
 
   return (
     <div>
-      <div className="flex h-2 w-full overflow-hidden rounded-full bg-app-surface-2">
+      <div className="flex h-2 w-full overflow-hidden rounded-pill bg-app-surface-2">
         {segments.map((s) => (
           <div
             key={s.label}
@@ -43,8 +43,8 @@ export function AllocationBar({
       <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
         {segments.map((s) => (
           <span key={s.label} className="flex items-center gap-1 text-xs text-app-fg-muted">
-            <span className={`inline-block h-2 w-2 rounded-full ${s.color}`} />
-            {s.label} {formatPercent(s.pct)}
+            <span className={`inline-block h-2 w-2 rounded-pill ${s.color}`} />
+            {s.label} <span className="tabular-nums">{formatPercent(s.pct)}</span>
           </span>
         ))}
       </div>

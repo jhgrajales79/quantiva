@@ -4,9 +4,9 @@ import { Badge, type BadgeVariant } from "@/components/ui/Badge";
 import { useMarketStatus, formatCountdown } from "@/lib/useMarketStatus";
 
 const LABELS: Record<string, { label: string; variant: BadgeVariant; transitionVerb: string; dot: string }> = {
-  "pre-market": { label: "Pre-market", variant: "warning", transitionVerb: "abre en", dot: "bg-amber-400" },
-  open: { label: "Mercado abierto", variant: "success", transitionVerb: "cierra en", dot: "bg-emerald-400" },
-  "after-hours": { label: "After-hours", variant: "warning", transitionVerb: "cierra en", dot: "bg-amber-400" },
+  "pre-market": { label: "Pre-market", variant: "warning", transitionVerb: "abre en", dot: "bg-warning" },
+  open: { label: "Mercado abierto", variant: "success", transitionVerb: "cierra en", dot: "bg-positive" },
+  "after-hours": { label: "After-hours", variant: "warning", transitionVerb: "cierra en", dot: "bg-warning" },
   closed: { label: "Mercado cerrado", variant: "neutral", transitionVerb: "", dot: "bg-app-fg-faint" },
 };
 

@@ -74,7 +74,7 @@ export function MacroStrip() {
                     {displayValue === null ? "—" : `${(displayValue * 100).toFixed(1)}%`}
                   </p>
                   {deltaPp !== null && (
-                    <span className={deltaPp >= 0 ? "text-xs text-emerald-400" : "text-xs text-red-400"}>
+                    <span className={deltaPp >= 0 ? "text-xs text-positive" : "text-xs text-negative"}>
                       {deltaPp >= 0 ? "+" : ""}
                       {deltaPp.toFixed(1)} pp
                     </span>

@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Newspaper } from "lucide-react";
 
 interface NewsItem {
@@ -29,23 +32,20 @@ export default function NewsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-          <Newspaper size={20} strokeWidth={2} />
-          Noticias
-        </h1>
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="flex gap-2"
-        >
-          <input
-            value={symbol}
-            onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-            placeholder="Filtrar por ticker (ej. AAPL)"
-            className="rounded-md border border-app-border bg-app-surface px-2 py-1 text-xs text-app-fg outline-none focus:border-emerald-500"
-          />
-        </form>
-      </div>
+      <PageHeader
+        icon={Newspaper}
+        title="Noticias"
+        action={
+          <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
+            <input
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+              placeholder="Filtrar por ticker (ej. AAPL)"
+              className="rounded-md border border-app-border bg-app-surface px-2 py-1 text-xs text-app-fg outline-none focus:border-brand"
+            />
+          </form>
+        }
+      />
 
       {!items ? (
         <Spinner />
@@ -58,21 +58,27 @@ export default function NewsPage() {
       ) : (
         <ul className="space-y-3">
           {items.map((item) => (
-            <li key={item.id} className="rounded-lg border border-app-border bg-app-surface p-4">
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm font-medium text-app-fg hover:underline"
-              >
-                {item.title}
-              </a>
-              {item.summary && (
-                <p className="mt-1 line-clamp-2 text-sm text-app-fg-muted">{item.summary}</p>
-              )}
-              <p className="mt-2 text-xs text-app-fg-muted">
-                {item.source} · {formatDateTime(item.publishedAt)} · {item.relatedSymbols.join(", ")}
-              </p>
+            <li key={item.id}>
+              <Card>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-medium text-app-fg hover:underline"
+                >
+                  {item.title}
+                </a>
+                {item.summary && (
+                  <p className="mt-1 line-clamp-2 text-sm text-app-fg-muted">{item.summary}</p>
+                )}
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-app-fg-muted">
+                  <Badge variant="info">{item.source}</Badge>
+                  <span className="tabular-nums">{formatDateTime(item.publishedAt)}</span>
+                  {item.relatedSymbols.length > 0 && (
+                    <span>{item.relatedSymbols.join(", ")}</span>
+                  )}
+                </div>
+              </Card>
             </li>
           ))}
         </ul>

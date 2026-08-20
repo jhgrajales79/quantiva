@@ -47,10 +47,10 @@ export function PortfolioSummaryCard() {
           <p className="text-lg font-semibold text-app-fg">
             {formatCurrency(summary.totalCurrentValue)}
           </p>
-          <p className={summary.totalUnrealizedPnl >= 0 ? "text-sm text-emerald-400" : "text-sm text-red-400"}>
+          <p className={summary.totalUnrealizedPnl >= 0 ? "text-sm text-positive" : "text-sm text-negative"}>
             {formatCurrency(summary.totalUnrealizedPnl)} no realizado
           </p>
-          <Link href="/portfolio" className="inline-flex text-sm text-emerald-400 hover:underline">
+          <Link href="/portfolio" className="inline-flex text-sm text-brand hover:underline">
             Ver mis portafolios →
           </Link>
         </div>

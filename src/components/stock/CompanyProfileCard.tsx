@@ -35,7 +35,7 @@ export function CompanyProfileCard({ symbol }: { symbol: string }) {
           {profile.businessSummary ? (
             <p className="text-sm text-app-fg-muted">
               {expanded ? profile.businessSummary : profile.businessSummary.slice(0, 280) + "…"}{" "}
-              <button onClick={() => setExpanded(!expanded)} className="text-emerald-400 hover:underline">
+              <button onClick={() => setExpanded(!expanded)} className="text-brand hover:underline">
                 {expanded ? "Ver menos" : "Ver más"}
               </button>
             </p>
@@ -69,7 +69,7 @@ function Field({ label, value, href }: { label: string; value: string | null; hr
         {value === null ? (
           "Dato no disponible"
         ) : href ? (
-          <a href={href} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline">
+          <a href={href} target="_blank" rel="noreferrer" className="text-brand hover:underline">
             {value}
           </a>
         ) : (

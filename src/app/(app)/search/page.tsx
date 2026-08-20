@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Spinner } from "@/components/ui/Spinner";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Table, Thead, Th, Tbody, Tr, Td, TableEmpty } from "@/components/ui/Table";
 import { Search } from "lucide-react";
 
 interface SymbolMatch {
@@ -44,32 +46,42 @@ function SearchResults() {
 
   return (
     <div className="space-y-4">
-      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-        <Search size={20} strokeWidth={2} />
-        Buscar
-      </h1>
+      <PageHeader icon={Search} title="Buscar" />
       {!q && <p className="text-sm text-app-fg-muted">Escribe un ticker o nombre en el buscador.</p>}
       {error && <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>}
-      {results && results.length === 0 && q && (
-        <p className="text-sm text-app-fg-muted">Sin resultados para &quot;{q}&quot;.</p>
-      )}
-      {results && results.length > 0 && (
-        <ul className="divide-y divide-app-border rounded-lg border border-app-border bg-app-surface">
-          {results.map((r) => (
-            <li key={r.symbol}>
-              <Link
-                href={`/stocks/${r.symbol}`}
-                className="flex items-center justify-between p-3 hover:bg-app-surface-2/50"
-              >
-                <span>
-                  <span className="font-medium text-app-fg">{r.symbol}</span>
-                  <span className="ml-2 text-sm text-app-fg-muted">{r.name}</span>
-                </span>
-                <span className="text-xs text-app-fg-muted">{r.exchange}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      {results && q && (
+        <Table>
+          <Thead>
+            <Th>Símbolo</Th>
+            <Th>Nombre</Th>
+            <Th align="right">Bolsa</Th>
+          </Thead>
+          <Tbody>
+            {results.length === 0 ? (
+              <TableEmpty colSpan={3}>Sin resultados para &quot;{q}&quot;.</TableEmpty>
+            ) : (
+              results.map((r) => (
+                <Tr key={r.symbol} className="cursor-pointer">
+                  <Td>
+                    <Link href={`/stocks/${r.symbol}`} className="block font-medium text-app-fg hover:underline">
+                      {r.symbol}
+                    </Link>
+                  </Td>
+                  <Td>
+                    <Link href={`/stocks/${r.symbol}`} className="block text-app-fg-muted">
+                      {r.name}
+                    </Link>
+                  </Td>
+                  <Td align="right">
+                    <Link href={`/stocks/${r.symbol}`} className="block text-xs text-app-fg-muted">
+                      {r.exchange}
+                    </Link>
+                  </Td>
+                </Tr>
+              ))
+            )}
+          </Tbody>
+        </Table>
       )}
     </div>
   );

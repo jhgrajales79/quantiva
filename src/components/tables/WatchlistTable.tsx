@@ -7,6 +7,7 @@ import { valuationBadge } from "@/lib/valuation/consensus";
 import { ValuationBadgePill } from "@/components/cards/ValuationBadgePill";
 import { Spinner } from "@/components/ui/Spinner";
 import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
+import { Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
 
 interface WatchlistRow {
   symbol: string;
@@ -107,7 +108,7 @@ export function WatchlistTable() {
     : [];
 
   return (
-    <div className="rounded-lg border border-app-border bg-app-surface">
+    <div className="rounded-card border border-app-border bg-app-surface shadow-card">
       <div className="flex items-center justify-between border-b border-app-border p-3">
         <h2 className="text-sm font-semibold text-app-fg">Watchlist</h2>
         <form onSubmit={handleAdd} className="flex gap-2">
@@ -121,7 +122,7 @@ export function WatchlistTable() {
               onFocus={() => setSuggestOpen(true)}
               onBlur={() => setSuggestOpen(false)}
               placeholder="AAPL"
-              className="w-28 rounded-md border border-app-border bg-app-bg px-2 py-1 text-xs text-app-fg outline-none focus:border-emerald-500"
+              className="w-28 rounded-md border border-app-border bg-app-bg px-2 py-1 text-xs text-app-fg outline-none focus:border-brand"
             />
             {suggestOpen && (
               <TickerSuggestions results={suggestions} onSelect={(m) => addSymbol(m.symbol)} />
@@ -129,14 +130,14 @@ export function WatchlistTable() {
           </div>
           <button
             type="submit"
-            className="rounded-md bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-500"
+            className="rounded-md bg-brand px-3 py-1 text-xs font-medium text-white transition-opacity hover:opacity-90"
           >
             Agregar
           </button>
         </form>
       </div>
 
-      {error && <p className="p-3 text-sm text-red-400">{error}</p>}
+      {error && <p className="p-3 text-sm text-negative">{error}</p>}
 
       {!rows ? (
         <Spinner className="p-4" />
@@ -147,48 +148,47 @@ export function WatchlistTable() {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-                {[
-                  { key: "symbol", label: "Ticker" },
-                  { key: "price", label: "Precio" },
-                  { key: "changePct", label: "Var. día" },
-                  { key: "upsidePct", label: "Fair Value / Upside" },
-                  { key: "investmentScore", label: "Investment Score" },
-                ].map((col) => (
-                  <th
-                    key={col.key}
-                    className="cursor-pointer px-3 py-2 hover:text-app-fg-muted"
-                    onClick={() => setSortKey(col.key as SortKey)}
-                  >
-                    {col.label}
-                  </th>
-                ))}
-                <th className="px-3 py-2" />
-              </tr>
-            </thead>
-            <tbody>
+            <Thead>
+              {[
+                { key: "symbol", label: "Ticker" },
+                { key: "price", label: "Precio" },
+                { key: "changePct", label: "Var. día" },
+                { key: "upsidePct", label: "Fair Value / Upside" },
+                { key: "investmentScore", label: "Investment Score" },
+              ].map((col) => (
+                <Th
+                  key={col.key}
+                  sortable
+                  active={sortKey === col.key}
+                  onClick={() => setSortKey(col.key as SortKey)}
+                >
+                  {col.label}
+                </Th>
+              ))}
+              <Th />
+            </Thead>
+            <Tbody>
               {sortedRows.map((row) => (
-                <tr key={row.symbol} className="border-b border-app-border hover:bg-app-surface-2/50">
-                  <td className="px-3 py-2">
+                <Tr key={row.symbol}>
+                  <Td>
                     <Link href={`/stocks/${row.symbol}`} className="font-medium text-app-fg hover:underline">
                       {row.symbol}
                     </Link>
                     <div className="text-xs text-app-fg-muted">{row.name}</div>
-                  </td>
-                  <td className="px-3 py-2">{formatCurrency(row.price)}</td>
-                  <td
-                    className={`px-3 py-2 ${
+                  </Td>
+                  <Td>{formatCurrency(row.price)}</Td>
+                  <Td
+                    className={
                       row.changePct === null
                         ? "text-app-fg-muted"
                         : row.changePct >= 0
-                          ? "text-emerald-400"
-                          : "text-red-400"
-                    }`}
+                          ? "text-positive"
+                          : "text-negative"
+                    }
                   >
                     {formatPercent(row.changePct === null ? null : row.changePct / 100)}
-                  </td>
-                  <td className="px-3 py-2">
+                  </Td>
+                  <Td>
                     {row.fairValueConsensus === null ? (
                       <span className="text-xs text-app-fg-muted">
                         Sin cálculo — abre la ficha del activo
@@ -199,21 +199,19 @@ export function WatchlistTable() {
                         <ValuationBadgePill badge={valuationBadge(row.upsidePct)} />
                       </div>
                     )}
-                  </td>
-                  <td className="px-3 py-2">
-                    {row.investmentScore === null ? "—" : row.investmentScore.toFixed(0)}
-                  </td>
-                  <td className="px-3 py-2 text-right">
+                  </Td>
+                  <Td>{row.investmentScore === null ? "—" : row.investmentScore.toFixed(0)}</Td>
+                  <Td align="right">
                     <button
                       onClick={() => handleRemove(row.symbol)}
-                      className="text-xs text-app-fg-muted hover:text-red-400"
+                      className="text-xs text-app-fg-muted hover:text-negative"
                     >
                       Quitar
                     </button>
-                  </td>
-                </tr>
+                  </Td>
+                </Tr>
               ))}
-            </tbody>
+            </Tbody>
           </table>
         </div>
       )}

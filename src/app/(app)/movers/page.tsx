@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { MoversTable } from "@/components/market/MoversTable";
 import { Spinner } from "@/components/ui/Spinner";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { TrendingUp } from "lucide-react";
 
 interface MoversResponse {
@@ -30,10 +31,7 @@ export default function MoversPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-        <TrendingUp size={20} strokeWidth={2} />
-        Market Movers
-      </h1>
+      <PageHeader title="Market Movers" icon={TrendingUp} />
       {error && <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>}
       {!data && !error && <Spinner />}
       {data && (

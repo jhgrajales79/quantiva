@@ -12,7 +12,7 @@ export function Card({
   return (
     <div
       className={clsx(
-        "rounded-lg border border-app-border bg-app-surface",
+        "rounded-card border border-app-border bg-app-surface shadow-card",
         padded && "p-4",
         className,
       )}

@@ -42,16 +42,16 @@ export function MarketBreadthWidget() {
       ) : (
         <>
           <div className="mb-1 flex items-center justify-between text-sm">
-            <span className="font-semibold text-emerald-400">{data.advancing} suben</span>
-            <span className="font-semibold text-red-400">{data.declining} bajan</span>
+            <span className="font-semibold text-positive">{data.advancing} suben</span>
+            <span className="font-semibold text-negative">{data.declining} bajan</span>
           </div>
           <div className="flex h-2 w-full overflow-hidden rounded-full bg-app-surface-2">
             <div
-              className="bg-emerald-500"
+              className="bg-positive"
               style={{ width: `${(data.advancing / (data.advancing + data.declining || 1)) * 100}%` }}
             />
             <div
-              className="bg-red-500"
+              className="bg-negative"
               style={{ width: `${(data.declining / (data.advancing + data.declining || 1)) * 100}%` }}
             />
           </div>
@@ -71,7 +71,7 @@ export function MarketBreadthWidget() {
 function Stat({ label, value, tone }: { label: string; value: string; tone: "success" | "danger" }) {
   return (
     <div>
-      <p className={tone === "success" ? "text-lg font-semibold text-emerald-400" : "text-lg font-semibold text-red-400"}>
+      <p className={tone === "success" ? "text-lg font-semibold text-positive" : "text-lg font-semibold text-negative"}>
         {value}
       </p>
       <p className="text-xs text-app-fg-muted">{label}</p>

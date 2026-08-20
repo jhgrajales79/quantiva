@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatCurrency } from "@/lib/format";
+import { Card, CardHeader } from "@/components/ui/Card";
 
 interface ModelResult {
   model: string;
@@ -22,22 +23,23 @@ export function FairValueModels({ models }: { models: ModelResult[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
-    <div className="rounded-lg border border-app-border bg-app-surface">
-      <h3 className="border-b border-app-border p-3 text-sm font-semibold text-app-fg">
-        Modelos de valoración
-      </h3>
+    <Card padded={false}>
+      <CardHeader
+        title="Modelos de valoración"
+        className="mb-0 border-b border-app-border px-4 py-3"
+      />
       <ul className="divide-y divide-app-border">
         {models.map((m) => (
-          <li key={m.model} className="p-3">
+          <li key={m.model} className="p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-app-fg-muted">{MODEL_LABELS[m.model] ?? m.model}</span>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-app-fg">
+                <span className="text-sm font-medium tabular-nums text-app-fg">
                   {m.fairValue !== null ? formatCurrency(m.fairValue) : "Dato no disponible"}
                 </span>
                 <button
                   onClick={() => setExpanded(expanded === m.model ? null : m.model)}
-                  className="text-xs text-emerald-400 hover:underline"
+                  className="text-xs text-brand hover:underline"
                 >
                   ¿Cómo se calculó?
                 </button>
@@ -57,6 +59,6 @@ export function FairValueModels({ models }: { models: ModelResult[] }) {
           </li>
         ))}
       </ul>
-    </div>
+    </Card>
   );
 }

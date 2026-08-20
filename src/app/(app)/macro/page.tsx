@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
+import { Card } from "@/components/ui/Card";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Landmark } from "lucide-react";
+import clsx from "clsx";
 
 interface MacroIndicator {
   code: string;
@@ -28,14 +31,11 @@ export default function MacroPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-        <Landmark size={20} strokeWidth={2} />
-        Macro Dashboard
-      </h1>
-      <p className="text-sm text-app-fg-muted">
-        Fuente: Federal Reserve Economic Data (FRED). Se muestra la fecha de publicación oficial
-        de cada indicador, no un timestamp de refresco artificial.
-      </p>
+      <PageHeader
+        icon={Landmark}
+        title="Macro Dashboard"
+        description="Fuente: Federal Reserve Economic Data (FRED). Se muestra la fecha de publicación oficial de cada indicador, no un timestamp de refresco artificial."
+      />
 
       {!indicators ? (
         <Spinner />
@@ -47,7 +47,7 @@ export default function MacroPage() {
                 ? ind.value - ind.previousValue
                 : null;
             return (
-              <div key={ind.code} className="rounded-lg border border-app-border bg-app-surface p-4">
+              <Card key={ind.code}>
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium text-app-fg-muted">{ind.label}</h3>
                   <span className="text-xs text-app-fg-muted">{ind.unit}</span>
@@ -56,11 +56,16 @@ export default function MacroPage() {
                   <p className="mt-2 text-sm text-app-fg-muted">Dato no disponible</p>
                 ) : (
                   <>
-                    <p className="mt-2 text-2xl font-semibold text-app-fg">
+                    <p className="mt-2 text-2xl font-semibold tabular-nums text-app-fg">
                       {ind.value?.toFixed(2)}
                     </p>
                     {change !== null && (
-                      <p className={change >= 0 ? "text-sm text-emerald-400" : "text-sm text-red-400"}>
+                      <p
+                        className={clsx(
+                          "text-sm tabular-nums",
+                          change >= 0 ? "text-positive" : "text-negative",
+                        )}
+                      >
                         {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(2)} vs. anterior
                       </p>
                     )}
@@ -72,7 +77,7 @@ export default function MacroPage() {
                     </p>
                   </>
                 )}
-              </div>
+              </Card>
             );
           })}
         </div>

@@ -22,11 +22,11 @@ interface AnalystData {
 }
 
 const SEGMENT_COLORS: Record<string, string> = {
-  strongBuy: "bg-emerald-500",
-  buy: "bg-emerald-400",
-  hold: "bg-amber-400",
-  sell: "bg-red-400",
-  strongSell: "bg-red-500",
+  strongBuy: "bg-positive",
+  buy: "bg-positive/70",
+  hold: "bg-warning",
+  sell: "bg-negative/70",
+  strongSell: "bg-negative",
 };
 
 export function AnalystConsensusCard({ symbol }: { symbol: string }) {
