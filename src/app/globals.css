@@ -111,20 +111,20 @@ html {
   border-radius: 2px;
 }
 
-/* Manija de resize de los widgets (dashboard y ficha de acción) más grande
-   que el tamaño por defecto de react-resizable, para que sea fácil de
-   agarrar con el mouse. */
-.quantiva-widget-grid .react-resizable-handle-se {
-  width: 32px !important;
-  height: 32px !important;
-  padding: 0 8px 8px 0 !important;
-  opacity: 0.6 !important;
-  /* z-index alto: algunos widgets (ej. gráficos con canvas interactivo)
-     pueden pintarse encima de la manija de resize si no se fuerza esto. */
-  z-index: 30 !important;
+/* Las manijas de resize de los widgets ahora se renderizan como componentes
+   propios (ver renderResizeHandle en WidgetGrid.tsx) en vez de depender del
+   ícono SVG por defecto de react-resizable, que es casi invisible sobre el
+   fondo oscuro de la app. */
+
+/* Cuadrícula de fondo visible en el área de widgets — guía de alineación
+   mientras se arrastra/redimensiona. Sutil en reposo, más marcada durante
+   la interacción (clase aplicada dinámicamente desde WidgetGrid). */
+.quantiva-widget-grid-lines {
+  opacity: 0.25;
+  transition: opacity 150ms ease-out;
 }
-.quantiva-widget-grid .react-resizable-handle-se:hover {
-  opacity: 1 !important;
+.quantiva-widget-grid-lines.is-interacting {
+  opacity: 0.6;
 }
 
 /* Animaciones de entrada/salida para popovers/menús/diálogos de Radix,

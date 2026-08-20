@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import ReactGridLayout, { useContainerWidth, type Layout } from "react-grid-layout";
+import { useCallback, useEffect, useRef, useState } from "react";
+import ReactGridLayout, { type Layout, type ResizeHandleAxis } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { LayoutGrid, GripVertical, StretchHorizontal } from "lucide-react";
+import clsx from "clsx";
+import { LayoutGrid, GripVertical, GripHorizontal, MoveDiagonal2, StretchHorizontal } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
 import { WidgetCustomizePanel, type WidgetDef, type WidthChoice } from "@/components/widgets/WidgetCustomizePanel";
 import { generateDefaultLayout, GRID_COLS, type GridLayoutItem } from "@/lib/widget-list";
@@ -22,6 +23,35 @@ interface WidgetGridDef extends WidgetDef {
 
 const ROW_HEIGHT = 32;
 const MARGIN: [number, number] = [16, 16];
+
+// Manijas de resize visibles y fáciles de encontrar (las de react-resizable
+// por defecto son un ícono SVG minúsculo casi invisible sobre el fondo
+// oscuro): una barra con grip para ancho ("e"/"w"), otra para alto ("s") —
+// que es la que permite "estirar" el widget verticalmente — y un ícono de
+// esquina para "se"/"sw" (ancho + alto a la vez).
+const RESIZE_HANDLE_POSITION: Record<string, string> = {
+  e: "right-1 top-1/2 h-9 w-4 -translate-y-1/2 cursor-ew-resize",
+  w: "left-1 top-1/2 h-9 w-4 -translate-y-1/2 cursor-ew-resize",
+  s: "bottom-1 left-1/2 h-4 w-9 -translate-x-1/2 cursor-ns-resize",
+  se: "bottom-1 right-1 h-5 w-5 cursor-nwse-resize",
+  sw: "bottom-1 left-1 h-5 w-5 cursor-nesw-resize",
+};
+
+function renderResizeHandle(axis: ResizeHandleAxis, ref: React.Ref<HTMLElement>) {
+  const isCorner = axis === "se" || axis === "sw";
+  const Icon = axis === "s" ? GripHorizontal : isCorner ? MoveDiagonal2 : GripVertical;
+  return (
+    <span
+      ref={ref as React.Ref<HTMLSpanElement>}
+      className={clsx(
+        "absolute z-30 flex items-center justify-center rounded-md bg-app-surface-2/90 text-app-fg-muted opacity-70 shadow-sm transition hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100",
+        RESIZE_HANDLE_POSITION[axis],
+      )}
+    >
+      <Icon size={12} strokeWidth={2.5} />
+    </span>
+  );
+}
 
 export function WidgetGrid({
   apiPath,
@@ -46,11 +76,42 @@ export function WidgetGrid({
   sanitizeLayout: (input: unknown) => GridLayoutItem[];
   renderWidget: (id: string) => React.ReactNode;
 }) {
-  const { width, containerRef, mounted } = useContainerWidth();
+  // Medición propia del ancho del contenedor con ResizeObserver — el hook
+  // useContainerWidth de react-grid-layout se queda pegado en su
+  // initialWidth por defecto (1280) en esta app y nunca se corrige con el
+  // ancho real, lo que hacía que "ancho completo" no llegara a ocupar el
+  // 100% del contenedor real ni la cuadrícula de fondo coincidiera con los
+  // widgets.
+  const [width, setWidth] = useState(0);
+  const [mounted, setMounted] = useState(false);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  // Ref callback en vez de useRef+useEffect: el contenedor solo existe en el
+  // DOM una vez que `widgets` termina de cargar (antes se muestra un
+  // Spinner), así que un useEffect con deps [] que corre justo después del
+  // primer render nunca vería el nodo real. El callback ref, en cambio, se
+  // ejecuta cada vez que React monta/desmonta el nodo, sin importar en qué
+  // render ocurra.
+  const containerRef = useCallback((node: HTMLDivElement | null) => {
+    resizeObserverRef.current?.disconnect();
+    resizeObserverRef.current = null;
+    if (!node) return;
+    setWidth(Math.round(node.getBoundingClientRect().width));
+    setMounted(true);
+    const observer = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setWidth(Math.round(w));
+    });
+    observer.observe(node);
+    resizeObserverRef.current = observer;
+  }, []);
+
   const [widgets, setWidgets] = useState<string[] | null>(null);
   const [layout, setLayout] = useState<GridLayoutItem[]>([]);
   const [panelOpen, setPanelOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  // Resalta la cuadrícula de fondo mientras el usuario arrastra o
+  // redimensiona un widget, como guía visual de alineación.
+  const [interacting, setInteracting] = useState(false);
   // ReactGridLayout solo lee `layout` como valor inicial al montar — no lo
   // vuelve a aplicar si cambia por una actualización externa (como el botón
   // "usar todo el ancho" o agregar/quitar widgets desde "Personalizar"), a
@@ -113,9 +174,14 @@ export function WidgetGrid({
     setLayout(next as GridLayoutItem[]);
   }
 
+  function handleInteractionStart() {
+    setInteracting(true);
+  }
+
   function handleInteractionStop(next: Layout) {
     const nextLayout = next as GridLayoutItem[];
     setLayout(nextLayout);
+    setInteracting(false);
     persist(widgets ?? defaultIds, nextLayout);
   }
 
@@ -142,22 +208,53 @@ export function WidgetGrid({
       {widgets === null ? (
         <Spinner className="p-4" />
       ) : widgets.length === 0 ? (
-        <p className="rounded-lg border border-app-border bg-app-surface p-6 text-center text-sm text-app-fg-muted">
+        <p className="rounded-card border border-app-border bg-app-surface p-6 text-center text-sm text-app-fg-muted">
           {emptyMessage}
         </p>
       ) : (
-        <div ref={containerRef}>
+        <div ref={containerRef} className="relative">
+          {mounted && width > 0 && (
+            <div
+              aria-hidden
+              className={`quantiva-widget-grid-lines pointer-events-none absolute inset-0 z-0${
+                interacting ? " is-interacting" : ""
+              }`}
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right, var(--color-app-border) 1px, transparent 1px), linear-gradient(to bottom, var(--color-app-border) 1px, transparent 1px)",
+                // Debe coincidir exactamente con calcGridColWidth de react-grid-layout:
+                // colWidth = (containerWidth - margin*(cols-1) - containerPadding*2) / cols.
+                // containerPadding se fuerza a [0,0] más abajo (ver gridConfig), así que
+                // aquí también se usa 0 en vez de asumir que containerPadding = margin.
+                backgroundSize: `${(width - MARGIN[0] * (GRID_COLS - 1)) / GRID_COLS + MARGIN[0]}px ${
+                  ROW_HEIGHT + MARGIN[1]
+                }px`,
+                backgroundPosition: "0px 0px",
+              }}
+            />
+          )}
           {mounted && layout.length === widgets.length && (
             <ReactGridLayout
               key={layoutVersion}
               layout={layout}
               width={width}
-              gridConfig={{ cols: GRID_COLS, rowHeight: ROW_HEIGHT, margin: MARGIN }}
+              gridConfig={{
+                cols: GRID_COLS,
+                rowHeight: ROW_HEIGHT,
+                margin: MARGIN,
+                // Sin esto, react-grid-layout usa el margen como padding del
+                // contenedor por defecto, dejando un hueco a cada lado y
+                // haciendo que "ancho completo" (w = GRID_COLS) nunca llegue
+                // a tocar los bordes reales del contenedor.
+                containerPadding: [0, 0],
+              }}
               dragConfig={{ handle: ".widget-drag-handle" }}
-              resizeConfig={{ handles: ["se"] }}
-              className="quantiva-widget-grid"
+              resizeConfig={{ handles: ["e", "w", "s", "se", "sw"], handleComponent: renderResizeHandle }}
+              className="quantiva-widget-grid relative z-10"
               onLayoutChange={handleLayoutChange}
+              onDragStart={handleInteractionStart}
               onDragStop={handleInteractionStop}
+              onResizeStart={handleInteractionStart}
               onResizeStop={handleInteractionStop}
             >
               {widgets.map((id) => (

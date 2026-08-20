@@ -136,7 +136,7 @@ export function WidgetCustomizePanel({
                       onClick={() => setWidth(id, "half")}
                       className={`rounded px-2 py-0.5 text-xs font-medium ${
                         width === "half"
-                          ? "bg-emerald-600 text-white"
+                          ? "bg-brand text-white"
                           : "border border-app-border text-app-fg-muted hover:bg-app-surface"
                       }`}
                     >
@@ -146,7 +146,7 @@ export function WidgetCustomizePanel({
                       onClick={() => setWidth(id, "full")}
                       className={`rounded px-2 py-0.5 text-xs font-medium ${
                         width === "full"
-                          ? "bg-emerald-600 text-white"
+                          ? "bg-brand text-white"
                           : "border border-app-border text-app-fg-muted hover:bg-app-surface"
                       }`}
                     >
@@ -175,7 +175,7 @@ export function WidgetCustomizePanel({
             </button>
             <button
               onClick={() => onSave(draft, widthChoices)}
-              className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500"
+              className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
             >
               Guardar
             </button>

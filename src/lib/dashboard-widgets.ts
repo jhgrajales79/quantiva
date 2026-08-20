@@ -13,9 +13,9 @@ export interface DashboardWidgetDef {
 }
 
 export const DASHBOARD_WIDGET_DEFS: DashboardWidgetDef[] = [
-  { id: "watchlist", label: "Watchlist", description: "Resumen de las acciones que sigues.", span: "half", defaultH: 7 },
-  { id: "portfolio", label: "Mi portafolio", description: "Valor, ganancia y número de carteras.", span: "half", defaultH: 7 },
-  { id: "news", label: "Noticias", description: "Últimas noticias de tus acciones seguidas.", span: "half", defaultH: 7 },
+  { id: "watchlist", label: "Watchlist", description: "Resumen de las acciones que sigues.", span: "half", defaultH: 5 },
+  { id: "portfolio", label: "Mi portafolio", description: "Valor, ganancia y número de carteras.", span: "half", defaultH: 5 },
+  { id: "news", label: "Noticias", description: "Últimas noticias de tus acciones seguidas.", span: "half", defaultH: 5 },
   { id: "market_monitor", label: "Mercado", description: "Índices, cripto, materias primas y divisas.", span: "full", defaultH: 6 },
   { id: "sector_rotation", label: "Rotación sectorial", description: "Desempeño de los 11 sectores del S&P 500.", span: "full", defaultH: 7 },
   { id: "fear_greed", label: "Miedo y codicia", description: "Índice de sentimiento de mercado (CNN).", span: "half", defaultH: 6 },
