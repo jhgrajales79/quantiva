@@ -55,7 +55,7 @@ export default function RegisterPage() {
         href="/"
         className="mb-6 flex items-center gap-2 text-xl font-semibold text-app-fg"
       >
-        <Logo size={30} />
+        <Logo size={35} />
         Quantiva
       </Link>
       <Card className="w-full max-w-sm p-8">

@@ -84,7 +84,7 @@ export default async function LandingPage() {
       <header className="border-b border-app-border">
         <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 py-4">
           <div className="flex items-center gap-1.5 text-lg font-semibold text-app-fg">
-            <Logo size={24} />
+            <Logo size={28} />
             Quantiva
           </div>
           <div className="flex items-center gap-2">

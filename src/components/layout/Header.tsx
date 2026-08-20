@@ -15,7 +15,7 @@ export function Header() {
     <header className="border-b border-app-border bg-app-bg">
       <div className="mx-auto flex w-full max-w-[1440px] items-center gap-4 px-4 py-3">
         <Link href="/dashboard" className="flex items-center gap-1.5 text-lg font-semibold text-app-fg">
-          <Logo size={22} />
+          <Logo size={25} />
           Quantiva
         </Link>
         <SearchBox />
