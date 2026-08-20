@@ -111,6 +111,75 @@ html {
   border-radius: 2px;
 }
 
+/* Logo animado (src/components/layout/Logo.tsx) — núcleo pulsante, halo de
+   partículas rotando despacio y centelleando, como una partícula/paquete de
+   energía localizado en movimiento constante. */
+@keyframes quantiva-logo-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+@keyframes quantiva-logo-halo-pulse {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.16;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+}
+@keyframes quantiva-logo-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes quantiva-logo-twinkle {
+  0%,
+  100% {
+    opacity: var(--dot-o, 0.5);
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.quantiva-logo-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: quantiva-logo-pulse 2.6s ease-in-out infinite;
+}
+.quantiva-logo-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: quantiva-logo-halo-pulse 2.6s ease-in-out infinite;
+}
+.quantiva-logo-particles {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: quantiva-logo-rotate 22s linear infinite;
+}
+.quantiva-logo-dot {
+  animation: quantiva-logo-twinkle 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quantiva-logo-core,
+  .quantiva-logo-halo,
+  .quantiva-logo-particles,
+  .quantiva-logo-dot {
+    animation: none;
+  }
+}
+
 /* Las manijas de resize de los widgets ahora se renderizan como componentes
    propios (ver renderResizeHandle en WidgetGrid.tsx) en vez de depender del
    ícono SVG por defecto de react-resizable, que es casi invisible sobre el

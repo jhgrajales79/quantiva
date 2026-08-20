@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  LineChart,
   Eye,
   Briefcase,
   Gauge,
@@ -16,6 +15,7 @@ import { getMarketDataProvider } from "@/lib/providers/registry";
 import { getMarketStatusDetail } from "@/lib/cache";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
+import { Logo } from "@/components/layout/Logo";
 import { Disclaimer } from "@/components/layout/Disclaimer";
 
 const TICKER_STRIP = [
@@ -84,7 +84,7 @@ export default async function LandingPage() {
       <header className="border-b border-app-border">
         <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 py-4">
           <div className="flex items-center gap-1.5 text-lg font-semibold text-app-fg">
-            <LineChart size={22} strokeWidth={2.25} className="text-brand" />
+            <Logo size={24} />
             Quantiva
           </div>
           <div className="flex items-center gap-2">

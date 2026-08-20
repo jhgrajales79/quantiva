@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LineChart } from "lucide-react";
+import { Logo } from "@/components/layout/Logo";
 import { Card } from "@/components/ui/Card";
 
 export default function LoginPage() {
@@ -38,7 +38,7 @@ export default function LoginPage() {
         href="/"
         className="mb-6 flex items-center gap-2 text-xl font-semibold text-app-fg"
       >
-        <LineChart size={28} strokeWidth={2.25} className="text-brand" />
+        <Logo size={30} />
         Quantiva
       </Link>
       <Card className="w-full max-w-sm p-8">
