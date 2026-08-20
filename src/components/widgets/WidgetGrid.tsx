@@ -44,7 +44,10 @@ function renderResizeHandle(axis: ResizeHandleAxis, ref: React.Ref<HTMLElement>)
     <span
       ref={ref as React.Ref<HTMLSpanElement>}
       className={clsx(
-        "absolute z-30 flex items-center justify-center rounded-md bg-app-surface-2/90 text-app-fg-muted opacity-70 shadow-sm transition hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100",
+        // Oculto en reposo — solo aparece al pasar el mouse sobre el widget
+        // (o al enfocar la manija con teclado), para no saturar la vista con
+        // marcadores permanentes sobre cada widget.
+        "absolute z-30 flex items-center justify-center rounded-md bg-app-surface-2/90 text-app-fg-muted opacity-0 shadow-sm transition group-hover:opacity-100 hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100 focus-visible:opacity-100",
         RESIZE_HANDLE_POSITION[axis],
       )}
     >
@@ -260,14 +263,14 @@ export function WidgetGrid({
               {widgets.map((id) => (
                 <div key={id} id={`widget-${id}`} className="group relative h-full">
                   <div
-                    className="widget-drag-handle absolute left-2 top-2 z-10 flex cursor-move items-center gap-1 rounded-md bg-app-surface-2/90 px-2 py-1.5 text-app-fg-muted opacity-60 shadow-sm transition hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100 group-hover:opacity-100"
+                    className="widget-drag-handle absolute left-2 top-2 z-10 flex cursor-move items-center gap-1 rounded-md bg-app-surface-2/90 px-2 py-1.5 text-app-fg-muted opacity-0 shadow-sm transition group-hover:opacity-100 hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100"
                     title="Arrastrar para mover"
                   >
                     <GripVertical size={16} strokeWidth={2} />
                   </div>
                   <button
                     onClick={() => handleUseFullWidth(id)}
-                    className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md bg-app-surface-2/90 px-2 py-1.5 text-app-fg-muted opacity-60 shadow-sm transition hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100 group-hover:opacity-100"
+                    className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md bg-app-surface-2/90 px-2 py-1.5 text-app-fg-muted opacity-0 shadow-sm transition group-hover:opacity-100 hover:bg-app-surface-2 hover:text-app-fg hover:opacity-100"
                     title="Usar todo el ancho de la pantalla"
                   >
                     <StretchHorizontal size={16} strokeWidth={2} />
