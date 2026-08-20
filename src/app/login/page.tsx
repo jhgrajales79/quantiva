@@ -38,7 +38,7 @@ export default function LoginPage() {
         href="/"
         className="mb-6 flex items-center gap-2 text-xl font-semibold text-app-fg"
       >
-        <Logo size={35} />
+        <Logo size={42} />
         Quantiva
       </Link>
       <Card className="w-full max-w-sm p-8">
