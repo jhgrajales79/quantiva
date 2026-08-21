@@ -82,6 +82,11 @@ export function SectorRotationWidget() {
 // una etiqueta — lo que las hacía chocar igual aunque el algoritmo de
 // colisión horizontal las hubiera puesto en filas "distintas".
 const ROW_OFFSETS_PX = [-80, -40, 6, 46];
+// Alto aproximado del bloque de 2 líneas de una etiqueta (nombre + %) — se
+// usa para saber en qué borde (inferior si la etiqueta queda arriba de la
+// línea, superior si queda abajo) debe terminar la línea conectora, en vez
+// de que la línea atraviese el texto.
+const LABEL_HEIGHT_PX = 30;
 const LABEL_FONT = "500 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 // Espacio entre el borde de una etiqueta y la de su vecina, además de la
 // mitad de cada ancho — evita que queden pegadas incluso cuando el gap
@@ -160,6 +165,35 @@ function SectorAxis({ sectors, period }: { sectors: SectorResult[]; period: Peri
       ref={containerRef}
       className="relative mt-24 mb-24 h-1.5 w-full rounded-full bg-gradient-to-r from-negative via-warning to-positive"
     >
+      {/* Línea conectora entre cada etiqueta y su punto — con varias filas
+          alternando arriba/abajo y etiquetas que a veces se deslizan hacia
+          adentro para no salirse del contenedor, sin esto no queda claro a
+          qué sector pertenece cada texto. Se dibuja primero para quedar
+          detrás de los puntos y las etiquetas. */}
+      {hasWidth && (
+        <svg
+          className="pointer-events-none absolute left-0 top-0 overflow-visible"
+          width={containerWidth}
+          height="6"
+        >
+          {withValues.map((s, i) => {
+            const row = ROW_OFFSETS_PX[rowIndexes[i]];
+            const labelAbove = row < 0;
+            return (
+              <line
+                key={`connector-${s.symbol}`}
+                x1={(leftPcts[i] / 100) * containerWidth}
+                y1={3}
+                x2={centersPx[i]}
+                y2={labelAbove ? row + LABEL_HEIGHT_PX : row}
+                stroke="var(--color-app-fg-faint)"
+                strokeWidth="1"
+                strokeDasharray="2 2"
+              />
+            );
+          })}
+        </svg>
+      )}
       {withValues.map((s, i) => (
         <div
           key={s.symbol}
