@@ -179,13 +179,13 @@ function SectorAxis({ sectors, period }: { sectors: SectorResult[]; period: Peri
           {withValues.map((s, i) => {
             const row = ROW_OFFSETS_PX[rowIndexes[i]];
             const labelAbove = row < 0;
+            const dotX = (leftPcts[i] / 100) * containerWidth;
+            const labelEdgeY = labelAbove ? row + LABEL_HEIGHT_PX : row;
             return (
-              <line
+              <polyline
                 key={`connector-${s.symbol}`}
-                x1={(leftPcts[i] / 100) * containerWidth}
-                y1={3}
-                x2={centersPx[i]}
-                y2={labelAbove ? row + LABEL_HEIGHT_PX : row}
+                points={`${dotX},3 ${dotX},${labelEdgeY} ${centersPx[i]},${labelEdgeY}`}
+                fill="none"
                 stroke="var(--color-app-fg-faint)"
                 strokeWidth="1"
                 strokeDasharray="2 2"
