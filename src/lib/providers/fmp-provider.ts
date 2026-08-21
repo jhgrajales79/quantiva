@@ -256,15 +256,18 @@ export class FmpProvider implements MarketDataProvider {
   }
 
   async getRatiosHistory(symbol: string, limit: number): Promise<Ratios[]> {
+    // Sin `period`, /ratios devuelve un punto real por año fiscal (FY) — se
+    // pide explícito para no depender de un default no documentado. El plan
+    // de FMP configurado limita esta ruta a 5 períodos (ver llamador).
     const data = await fetchJson(
       "/ratios",
-      { symbol, limit: String(limit) },
+      { symbol, period: "annual", limit: String(limit) },
       z.array(ratiosSchema),
     );
 
     return (data ?? []).map((r) => ({
       symbol,
-      period: "ttm" as const,
+      period: "annual" as const,
       fiscalDate: r.date,
       pe: r.priceToEarningsRatio,
       forwardPe: null,

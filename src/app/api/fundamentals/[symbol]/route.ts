@@ -3,7 +3,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { fundamentals, ratios } from "@/lib/db/schema";
 import { getOrCreateAsset } from "@/lib/assets";
-import { getMarketDataProvider } from "@/lib/providers/registry";
+import { getMarketDataProvider, getRatiosHistoryProvider } from "@/lib/providers/registry";
 import { getAnnualFinancialsHistory } from "@/lib/providers/yahoo-financials-history";
 import { isStale, TTL } from "@/lib/cache";
 import { newId } from "@/lib/id";
@@ -26,10 +26,21 @@ export async function GET(
   if (isStale(latestFundamentals?.fetchedAt, TTL.FUNDAMENTALS_MS)) {
     try {
       const provider = getMarketDataProvider();
-      const [freshFundamentals, ratiosHistory] = await Promise.all([
-        provider.getFundamentals(symbol),
-        provider.getRatiosHistory(symbol, 8),
-      ]);
+      const freshFundamentals = await provider.getFundamentals(symbol);
+
+      // Histórico de ratios por período fiscal, no solo el TTM — best-effort:
+      // si el proveedor de histórico (FMP) falla, no debe bloquear el resto
+      // de fundamentales, que ya se obtuvieron correctamente de Yahoo. El
+      // plan de FMP configurado limita `/ratios` a 5 períodos (con más,
+      // responde 402 "Premium Query Parameter"), suficiente para los
+      // modelos relativos que solo requieren 2+ muestras.
+      let ratiosHistory: Awaited<ReturnType<typeof provider.getRatiosHistory>> = [];
+      try {
+        ratiosHistory = await getRatiosHistoryProvider().getRatiosHistory(symbol, 5);
+      } catch {
+        // se sigue sin histórico de ratios; los modelos relativos quedarán
+        // no disponibles hasta el próximo refresh exitoso
+      }
 
       if (freshFundamentals) {
         await db
