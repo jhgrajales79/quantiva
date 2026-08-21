@@ -4,6 +4,18 @@ const DEFAULT_EQUITY_RISK_PREMIUM = 0.045; // supuesto de mercado estándar, doc
 const DEFAULT_TERMINAL_GROWTH = 0.025;
 const DEFAULT_PROJECTION_YEARS = 5;
 
+// El revenue growth YoY más reciente puede reflejar un evento puntual (una
+// adquisición, una base de comparación baja) que no es sostenible 5 años
+// seguidos — proyectarlo sin límite compone un FCF final varias veces mayor
+// al real. Se capa a una tasa de crecimiento orgánico "alto pero creíble".
+const MAX_PROJECTED_GROWTH_RATE = 0.2;
+
+// Cuando el WACC calculado por CAPM queda casi pegado al crecimiento
+// terminal (típico con betas muy bajos), el denominador de Gordon Growth
+// (wacc - terminalGrowth) se acerca a cero y el valor terminal se dispara a
+// magnitudes sin sentido económico. Se exige un colchón mínimo entre ambos.
+const MIN_WACC_TERMINAL_SPREAD = 0.035;
+
 export interface DcfInputs {
   fcf: number | null;
   revenueGrowth: number | null; // usado como proxy de crecimiento del FCF proyectado
@@ -64,19 +76,13 @@ export function valueDcf(inputs: DcfInputs): ValuationResult {
   }
 
   const effectiveBeta = beta ?? 1;
-  const wacc = riskFreeRate + effectiveBeta * equityRiskPremium;
+  const rawWacc = riskFreeRate + effectiveBeta * equityRiskPremium;
+  const waccFloored = rawWacc - terminalGrowth < MIN_WACC_TERMINAL_SPREAD;
+  const wacc = waccFloored ? terminalGrowth + MIN_WACC_TERMINAL_SPREAD : rawWacc;
 
-  if (wacc <= terminalGrowth) {
-    return {
-      model: "dcf",
-      fairValue: null,
-      assumptions: { wacc, terminalGrowth },
-      unavailableReason:
-        "Dato no disponible: WACC calculado es menor o igual al crecimiento terminal, el modelo no converge.",
-    };
-  }
-
-  const growthRate = revenueGrowth ?? 0;
+  const rawGrowthRate = revenueGrowth ?? 0;
+  const growthCapped = rawGrowthRate > MAX_PROJECTED_GROWTH_RATE;
+  const growthRate = growthCapped ? MAX_PROJECTED_GROWTH_RATE : rawGrowthRate;
 
   let presentValueSum = 0;
   let projectedFcf = fcf;
@@ -94,25 +100,41 @@ export function valueDcf(inputs: DcfInputs): ValuationResult {
   const equityValue = enterpriseValue - netDebt;
   const fairValue = equityValue / sharesOutstanding;
 
+  const notes: string[] = [];
+  if (beta === null) {
+    notes.push("Beta no disponible del proveedor: se usó beta=1 (mercado) como supuesto explícito.");
+  }
+  if (growthCapped) {
+    notes.push(
+      `Crecimiento proyectado capado de ${(rawGrowthRate * 100).toFixed(1)}% a ${(MAX_PROJECTED_GROWTH_RATE * 100).toFixed(0)}% anual: el dato del proveedor refleja un salto puntual (ej. una adquisición), no una tasa sostenible por 5 años.`,
+    );
+  }
+  if (waccFloored) {
+    notes.push(
+      `WACC ajustado de ${(rawWacc * 100).toFixed(2)}% a ${(wacc * 100).toFixed(2)}% para mantener un colchón mínimo de ${(MIN_WACC_TERMINAL_SPREAD * 100).toFixed(1)} pp sobre el crecimiento terminal (beta muy bajo hacía que el valor terminal se disparara).`,
+    );
+  }
+
   return {
     model: "dcf",
     fairValue,
     assumptions: {
       fcfYear0: fcf,
       growthRateUsed: growthRate,
+      rawGrowthRate,
+      growthCapped,
       beta: effectiveBeta,
       riskFreeRate,
       equityRiskPremium,
+      rawWacc,
       wacc,
+      waccFloored,
       terminalGrowth,
       projectionYears,
       enterpriseValue,
       netDebt,
       sharesOutstanding,
-      note:
-        beta === null
-          ? "Beta no disponible del proveedor: se usó beta=1 (mercado) como supuesto explícito."
-          : undefined,
+      note: notes.length > 0 ? notes.join(" ") : undefined,
     },
     unavailableReason: null,
   };
