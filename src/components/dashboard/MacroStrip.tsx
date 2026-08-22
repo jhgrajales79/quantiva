@@ -33,7 +33,12 @@ const STRIP_CODES: Record<
   CPIAUCSL: { label: "Inflación", yoyPeriods: 12, periodsPerYear: 12 },
   GDPC1: { label: "PIB real (anual)", yoyPeriods: 4, periodsPerYear: 4 },
   UNRATE: { label: "Desempleo", periodsPerYear: 12, decimals: 2 },
-  FEDFUNDS: { label: "Tasa de la Fed (objetivo)", periodsPerYear: 12, decimals: 2 },
+  // DFEDTARU = límite superior del rango objetivo del FOMC — lo que se
+  // reporta como "la tasa de la Fed" en la prensa. Antes se usaba FEDFUNDS
+  // (la tasa efectiva a la que de verdad se presta overnight, que flota
+  // dentro del rango objetivo), lo que hacía que el valor mostrado (3.63%)
+  // no coincidiera con la tasa objetivo real (3.75%).
+  DFEDTARU: { label: "Tasa de la Fed (objetivo)", periodsPerYear: 12, decimals: 2 },
 };
 
 export function MacroStrip() {

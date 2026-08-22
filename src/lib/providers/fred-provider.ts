@@ -12,6 +12,14 @@ const responseSchema = z.object({
   observations: z.array(observationSchema),
 });
 
+// DFEDTARU/DFEDTARL (rango objetivo del FOMC) se publican como serie diaria
+// que solo cambia ~8 veces al año (en cada reunión) — pedir las últimas 24
+// observaciones diarias sin más solo cubriría unas semanas, no el último
+// año que necesita el sparkline. Se agregan a fin de mes (eop, no promedio,
+// para no diluir un cambio de tasa dentro del mes) para que se comporten
+// igual que el resto de series mensuales del dashboard.
+const MONTHLY_AGGREGATED_DAILY_SERIES = new Set(["DFEDTARU", "DFEDTARL"]);
+
 /**
  * Common series codes used by the Macro Dashboard:
  * CPIAUCSL (CPI), CPILFESL (Core CPI), GDPC1 (Real GDP), UNRATE (Unemployment),
@@ -35,6 +43,10 @@ export class FredProvider implements MacroDataProvider {
     url.searchParams.set("file_type", "json");
     url.searchParams.set("sort_order", "desc");
     url.searchParams.set("limit", "24");
+    if (MONTHLY_AGGREGATED_DAILY_SERIES.has(code)) {
+      url.searchParams.set("frequency", "m");
+      url.searchParams.set("aggregation_method", "eop");
+    }
 
     const res = await fetch(url.toString(), { cache: "no-store" });
     if (!res.ok) {
