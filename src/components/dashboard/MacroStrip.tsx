@@ -23,8 +23,9 @@ interface MacroIndicator {
 // según su frecuencia (12 puntos mensuales vs. 4 trimestrales para PIB) —
 // antes se le pasaban los 15 puntos crudos que trae /api/macro (pensados
 // para el cálculo YoY, no para el gráfico), mostrando ~3.75 años en el caso
-// de PIB en vez de un año. `decimals` permite que Desempleo muestre 2
-// decimales en vez del 1 decimal por defecto, para no redondear su valor.
+// de PIB en vez de un año. `decimals` permite que Desempleo y la Tasa de la
+// Fed muestren 2 decimales en vez del 1 decimal por defecto, para no
+// redondear su valor.
 const STRIP_CODES: Record<
   string,
   { label: string; yoyPeriods?: number; periodsPerYear: number; decimals?: number }
@@ -32,7 +33,7 @@ const STRIP_CODES: Record<
   CPIAUCSL: { label: "Inflación", yoyPeriods: 12, periodsPerYear: 12 },
   GDPC1: { label: "PIB real (anual)", yoyPeriods: 4, periodsPerYear: 4 },
   UNRATE: { label: "Desempleo", periodsPerYear: 12, decimals: 2 },
-  FEDFUNDS: { label: "Tasa de la Fed (objetivo)", periodsPerYear: 12 },
+  FEDFUNDS: { label: "Tasa de la Fed (objetivo)", periodsPerYear: 12, decimals: 2 },
 };
 
 export function MacroStrip() {
