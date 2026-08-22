@@ -17,9 +17,18 @@ interface WatchlistRow {
   fairValueConsensus: number | null;
   upsidePct: number | null;
   investmentScore: number | null;
+  intrinsicValue: number | null;
+  relativeValue: number | null;
 }
 
-type SortKey = "symbol" | "price" | "changePct" | "upsidePct" | "investmentScore";
+type SortKey =
+  | "symbol"
+  | "price"
+  | "changePct"
+  | "upsidePct"
+  | "investmentScore"
+  | "intrinsicValue"
+  | "relativeValue";
 
 export function WatchlistTable() {
   const [rows, setRows] = useState<WatchlistRow[] | null>(null);
@@ -55,6 +64,8 @@ export function WatchlistTable() {
           fairValueConsensus: valuation?.consensus?.fairValueConsensus ?? null,
           upsidePct: valuation?.consensus?.upsidePct ?? null,
           investmentScore: valuation?.consensus?.investmentScore ?? null,
+          intrinsicValue: valuation?.intrinsicValue ?? null,
+          relativeValue: valuation?.relativeValue ?? null,
         } satisfies WatchlistRow;
       }),
     );
@@ -154,6 +165,8 @@ export function WatchlistTable() {
                 { key: "price", label: "Precio" },
                 { key: "changePct", label: "Var. día" },
                 { key: "upsidePct", label: "Fair Value / Upside" },
+                { key: "intrinsicValue", label: "Valor intrínseco (DCF)" },
+                { key: "relativeValue", label: "Valor relativo (múltiplos)" },
                 { key: "investmentScore", label: "Investment Score" },
               ].map((col) => (
                 <Th
@@ -198,6 +211,36 @@ export function WatchlistTable() {
                         <span>{formatCurrency(row.fairValueConsensus)}</span>
                         <ValuationBadgePill badge={valuationBadge(row.upsidePct)} />
                       </div>
+                    )}
+                  </Td>
+                  <Td
+                    className={
+                      row.intrinsicValue === null || row.price === null
+                        ? "text-app-fg-muted"
+                        : row.intrinsicValue >= row.price
+                          ? "text-positive"
+                          : "text-negative"
+                    }
+                  >
+                    {row.intrinsicValue === null ? (
+                      <span className="text-xs text-app-fg-muted">No disponible</span>
+                    ) : (
+                      formatCurrency(row.intrinsicValue)
+                    )}
+                  </Td>
+                  <Td
+                    className={
+                      row.relativeValue === null || row.price === null
+                        ? "text-app-fg-muted"
+                        : row.relativeValue >= row.price
+                          ? "text-positive"
+                          : "text-negative"
+                    }
+                  >
+                    {row.relativeValue === null ? (
+                      <span className="text-xs text-app-fg-muted">No disponible</span>
+                    ) : (
+                      formatCurrency(row.relativeValue)
                     )}
                   </Td>
                   <Td>{row.investmentScore === null ? "—" : row.investmentScore.toFixed(0)}</Td>
