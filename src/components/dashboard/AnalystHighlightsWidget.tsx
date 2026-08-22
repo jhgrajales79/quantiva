@@ -1,0 +1,82 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { formatCurrency, formatDateTime } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
+import { ArrowUp, ArrowDown, Minus } from "lucide-react";
+
+interface AnalystHighlight {
+  symbol: string;
+  name: string | null;
+  date: string;
+  firm: string;
+  action: string;
+  fromGrade: string | null;
+  toGrade: string;
+  priceTarget: number | null;
+}
+
+// Valores típicos que Yahoo reporta en `action`: "up"/"down" para cambios de
+// calificación, "main"/"init"/"reit" para reiteraciones o coberturas nuevas
+// sin cambio de sentido — no todo cambio de calificación es alcista/bajista.
+function actionIcon(action: string) {
+  if (action === "up") return <ArrowUp size={14} strokeWidth={2.5} className="text-positive" />;
+  if (action === "down") return <ArrowDown size={14} strokeWidth={2.5} className="text-negative" />;
+  return <Minus size={14} strokeWidth={2.5} className="text-app-fg-muted" />;
+}
+
+export function AnalystHighlightsWidget() {
+  const [highlights, setHighlights] = useState<AnalystHighlight[] | null>(null);
+
+  useEffect(() => {
+    fetch("/api/dashboard/analyst-highlights")
+      .then((res) => (res.ok ? res.json() : { highlights: [] }))
+      .then((data) => setHighlights(data.highlights))
+      .catch(() => setHighlights([]));
+  }, []);
+
+  return (
+    <Card>
+      <CardHeader
+        title="Análisis de analistas"
+        action={<span className="text-xs text-app-fg-muted">últimos cambios de calificación · Yahoo Finance</span>}
+      />
+      {!highlights ? (
+        <Spinner />
+      ) : highlights.length === 0 ? (
+        <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-3">
+          {highlights.map((h, i) => (
+            <Link
+              key={`${h.symbol}-${h.date}-${h.firm}-${i}`}
+              href={`/stocks/${h.symbol}`}
+              className="rounded-card border border-app-border p-3 transition-colors hover:border-brand"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-app-fg">{h.symbol}</span>
+                {actionIcon(h.action)}
+              </div>
+              <p className="mt-1 text-xs text-app-fg-muted">{h.firm}</p>
+              <p className="mt-2 text-sm text-app-fg">
+                {h.fromGrade && h.fromGrade !== h.toGrade ? (
+                  <>
+                    <span className="text-app-fg-muted">{h.fromGrade}</span> → {h.toGrade}
+                  </>
+                ) : (
+                  h.toGrade
+                )}
+              </p>
+              {h.priceTarget !== null && (
+                <p className="mt-1 text-xs text-app-fg-muted">Precio objetivo: {formatCurrency(h.priceTarget)}</p>
+              )}
+              <p className="mt-2 text-xs text-app-fg-faint">{formatDateTime(h.date)}</p>
+            </Link>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}

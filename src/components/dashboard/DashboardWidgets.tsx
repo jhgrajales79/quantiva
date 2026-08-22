@@ -15,6 +15,7 @@ import { SectorRotationWidget } from "./SectorRotationWidget";
 import { FearGreedWidget } from "./FearGreedWidget";
 import { MarketBreadthWidget } from "./MarketBreadthWidget";
 import { MacroStrip } from "./MacroStrip";
+import { AnalystHighlightsWidget } from "./AnalystHighlightsWidget";
 
 const WIDGET_COMPONENTS: Record<string, React.ComponentType> = {
   watchlist: WatchlistSummaryCard,
@@ -25,6 +26,7 @@ const WIDGET_COMPONENTS: Record<string, React.ComponentType> = {
   fear_greed: FearGreedWidget,
   market_breadth: MarketBreadthWidget,
   macro: MacroStrip,
+  analyst_highlights: AnalystHighlightsWidget,
 };
 
 export function DashboardWidgets() {

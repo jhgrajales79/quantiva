@@ -487,6 +487,32 @@ export const marketMoversCache = pgTable(
   ],
 );
 
+// Cambios de calificación de analistas (upgrade/downgrade) por activo —
+// caché del historial real de Yahoo Finance (firma, de qué a qué
+// calificación, price target, fecha), usado por el widget "Análisis de
+// analistas" del dashboard para no golpear el endpoint con crumb de Yahoo
+// en cada carga del panel para cada símbolo del universo considerado.
+export const analystRatingChanges = pgTable(
+  "analyst_rating_changes",
+  {
+    id: text("id").primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assets.id, { onDelete: "cascade" }),
+    date: text("date").notNull(),
+    firm: text("firm").notNull(),
+    action: text("action").notNull(),
+    fromGrade: text("from_grade"),
+    toGrade: text("to_grade").notNull(),
+    priceTarget: doublePrecision("price_target"),
+    fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("analyst_changes_asset_date_firm_idx").on(table.assetId, table.date, table.firm),
+    index("analyst_changes_date_idx").on(table.date),
+  ],
+);
+
 // Preferencia de widgets del panel principal por usuario: qué widgets están
 // activos y en qué orden. `widgets` guarda solo los ids habilitados, en el
 // orden elegido por el usuario; si no hay fila, el dashboard usa el orden

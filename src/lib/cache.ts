@@ -12,6 +12,7 @@ export const TTL = {
   MOVERS_MS: 5 * 60_000,
   FEAR_GREED_MS: 3 * 60 * 60_000, // 3h
   MARKET_BREADTH_MS: 6 * 60 * 60_000, // 6h
+  ANALYST_CHANGES_MS: 6 * 60 * 60_000, // 6h: los cambios de calificación no ocurren cada minuto
 } as const;
 
 export type MarketStatus = "pre-market" | "open" | "after-hours" | "closed";
