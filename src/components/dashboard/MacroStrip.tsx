@@ -19,11 +19,20 @@ interface MacroIndicator {
 
 // Series mostradas en la tira macro del dashboard, igual a la imagen:
 // Inflación, PIB real, Desempleo, Tasa de la Fed.
-const STRIP_CODES: Record<string, { label: string; yoyPeriods?: number }> = {
-  CPIAUCSL: { label: "Inflación", yoyPeriods: 12 },
-  GDPC1: { label: "PIB real (anual)", yoyPeriods: 4 },
-  UNRATE: { label: "Desempleo" },
-  FEDFUNDS: { label: "Tasa de la Fed (objetivo)" },
+// `periodsPerYear` acota el minigráfico al último año real de cada serie
+// según su frecuencia (12 puntos mensuales vs. 4 trimestrales para PIB) —
+// antes se le pasaban los 15 puntos crudos que trae /api/macro (pensados
+// para el cálculo YoY, no para el gráfico), mostrando ~3.75 años en el caso
+// de PIB en vez de un año. `decimals` permite que Desempleo muestre 2
+// decimales en vez del 1 decimal por defecto, para no redondear su valor.
+const STRIP_CODES: Record<
+  string,
+  { label: string; yoyPeriods?: number; periodsPerYear: number; decimals?: number }
+> = {
+  CPIAUCSL: { label: "Inflación", yoyPeriods: 12, periodsPerYear: 12 },
+  GDPC1: { label: "PIB real (anual)", yoyPeriods: 4, periodsPerYear: 4 },
+  UNRATE: { label: "Desempleo", periodsPerYear: 12, decimals: 2 },
+  FEDFUNDS: { label: "Tasa de la Fed (objetivo)", periodsPerYear: 12 },
 };
 
 export function MacroStrip() {
@@ -66,22 +75,24 @@ export function MacroStrip() {
                 ? (displayValue - prevDisplayValue) * 100
                 : null;
 
+            const decimals = config.decimals ?? 1;
+
             return (
               <Card key={ind.code}>
                 <p className="text-xs text-app-fg-muted">{config.label}</p>
                 <div className="mt-1 flex items-baseline gap-2">
                   <p className="text-lg font-semibold text-app-fg">
-                    {displayValue === null ? "—" : `${(displayValue * 100).toFixed(1)}%`}
+                    {displayValue === null ? "—" : `${(displayValue * 100).toFixed(decimals)}%`}
                   </p>
                   {deltaPp !== null && (
                     <span className={deltaPp >= 0 ? "text-xs text-positive" : "text-xs text-negative"}>
                       {deltaPp >= 0 ? "+" : ""}
-                      {deltaPp.toFixed(1)} pp
+                      {deltaPp.toFixed(decimals)} pp
                     </span>
                   )}
                 </div>
                 <MiniSparkline
-                  data={ind.history}
+                  data={ind.history.slice(-config.periodsPerYear)}
                   positive={deltaPp === null ? null : deltaPp >= 0}
                 />
                 <p className="text-xs text-app-fg-muted">
