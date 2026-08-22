@@ -41,8 +41,12 @@ function tileStyle(changePct: number | null): React.CSSProperties {
   if (changePct === null || changePct === 0) {
     return { fill: "var(--color-app-surface-2)", stroke: "var(--color-app-border)" };
   }
-  const magnitude = Math.min(1, Math.abs(changePct) / 5); // ±5% ya se ve al tope de intensidad
-  const opacity = 0.35 + magnitude * 0.55;
+  const magnitude = Math.min(1, Math.abs(changePct) / 4); // ±4% ya se ve al tope de intensidad
+  // Curva (no lineal): raíz cuadrada empuja hacia arriba los cambios chicos
+  // para que se vean vivos, no lavados, sin perder la diferenciación con
+  // los cambios grandes (que igual llegan primero al tope).
+  const intensity = Math.sqrt(magnitude);
+  const opacity = 0.55 + intensity * 0.45;
   return {
     fill: changePct >= 0 ? "var(--color-positive)" : "var(--color-negative)",
     fillOpacity: opacity,
