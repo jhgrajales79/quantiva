@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { MoversTable } from "@/components/market/MoversTable";
-import { Spinner } from "@/components/ui/Spinner";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TrendingUp } from "lucide-react";
 
@@ -32,8 +34,21 @@ export default function MoversPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="Market Movers" icon={TrendingUp} />
-      {error && <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>}
-      {!data && !error && <Spinner />}
+      {error && <EmptyState icon={TrendingUp} message={`Dato no disponible: ${error}`} />}
+      {!data && !error && (
+        <div className="grid gap-4 md:grid-cols-3">
+          {["Top Gainers", "Top Losers", "Most Active"].map((title) => (
+            <Card key={title} padded={false}>
+              <CardHeader title={title} className="mb-0 border-b border-app-border px-4 py-3" />
+              <div className="space-y-2 p-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-4 w-full" />
+                ))}
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
       {data && (
         <div className="grid gap-4 md:grid-cols-3">
           <MoversTable title="Top Gainers" rows={data.gainers} />

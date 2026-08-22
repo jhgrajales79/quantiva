@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonTableRows } from "@/components/ui/Skeleton";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Table, Thead, Th, Tbody, Tr, Td, TableEmpty } from "@/components/ui/Table";
 import { SlidersHorizontal } from "lucide-react";
@@ -174,29 +174,26 @@ export default function ScreenerPage() {
         </div>
       </Card>
 
-      {results === null ? (
-        <Card padded={false}>
-          <Spinner className="p-4" />
-        </Card>
-      ) : (
-        <Table>
-          <Thead>
-            <Th>Ticker</Th>
-            <Th>Sector</Th>
-            <Th align="right">Precio</Th>
-            <Th align="right">Var.</Th>
-            <Th align="right">Cap.</Th>
-            <Th align="right">P/E</Th>
-            <Th align="right">P/B</Th>
-            <Th align="right">Div. Yield</Th>
-            <Th align="right">ROE (propio)</Th>
-            <Th align="right">Investment Score</Th>
-          </Thead>
-          <Tbody>
-            {results.length === 0 ? (
-              <TableEmpty colSpan={10}>Sin resultados para estos filtros.</TableEmpty>
-            ) : (
-              results.map((r) => (
+      <Table>
+        <Thead>
+          <Th>Ticker</Th>
+          <Th>Sector</Th>
+          <Th align="right">Precio</Th>
+          <Th align="right">Var.</Th>
+          <Th align="right">Cap.</Th>
+          <Th align="right">P/E</Th>
+          <Th align="right">P/B</Th>
+          <Th align="right">Div. Yield</Th>
+          <Th align="right">ROE (propio)</Th>
+          <Th align="right">Investment Score</Th>
+        </Thead>
+        <Tbody>
+          {results === null ? (
+            <SkeletonTableRows rows={8} cols={10} />
+          ) : results.length === 0 ? (
+            <TableEmpty colSpan={10}>Sin resultados para estos filtros.</TableEmpty>
+          ) : (
+            results.map((r) => (
                 <Tr key={r.symbol}>
                   <Td>
                     <Link href={`/stocks/${r.symbol}`} className="font-medium text-app-fg hover:underline">
@@ -220,10 +217,9 @@ export default function ScreenerPage() {
                   </Td>
                 </Tr>
               ))
-            )}
-          </Tbody>
-        </Table>
-      )}
+          )}
+        </Tbody>
+      </Table>
     </div>
   );
 }

@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { StatCard } from "@/components/ui/StatCard";
-import { Spinner } from "@/components/ui/Spinner";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { MarketStatusBadge } from "@/components/layout/MarketStatusBadge";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 
@@ -53,15 +55,17 @@ export default function EtfDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-semibold text-app-fg">
-          {symbol}
-          {quote?.companyName && (
-            <span className="ml-2 text-lg font-normal text-app-fg-muted">— {quote.companyName}</span>
-          )}
-        </h1>
-        <MarketStatusBadge />
-      </div>
+      <PageHeader
+        title={
+          <>
+            {symbol}
+            {quote?.companyName && (
+              <span className="ml-2 text-lg font-normal text-app-fg-muted">— {quote.companyName}</span>
+            )}
+          </>
+        }
+        action={<MarketStatusBadge />}
+      />
 
       {quote ? (
         <div>
@@ -78,13 +82,20 @@ export default function EtfDetailPage() {
           )}
         </div>
       ) : (
-        <Spinner label="Cargando cotización..." />
+        <Skeleton className="h-7 w-40" />
       )}
 
       {error ? (
         <p className="text-sm text-app-fg-muted">Dato no disponible: {error}</p>
       ) : !profile ? (
-        <Spinner label="Cargando ficha del ETF..." />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="mt-2 h-5 w-2/3" />
+            </Card>
+          ))}
+        </div>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -112,7 +123,7 @@ export default function EtfDetailPage() {
             <Card>
               <CardHeader title="Top 10 holdings" />
               {profile.holdings.length === 0 ? (
-                <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
+                <EmptyState message="Dato no disponible." />
               ) : (
                 <ul className="space-y-1 text-sm">
                   {profile.holdings.map((h) => (
@@ -130,7 +141,7 @@ export default function EtfDetailPage() {
             <Card>
               <CardHeader title="Exposición sectorial" />
               {profile.sectorWeightings.length === 0 ? (
-                <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
+                <EmptyState message="Dato no disponible." />
               ) : (
                 <ul className="space-y-1.5 text-sm">
                   {[...profile.sectorWeightings]

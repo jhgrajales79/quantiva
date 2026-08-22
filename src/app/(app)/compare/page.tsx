@@ -3,8 +3,11 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/Card";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Thead, Th, Tbody, Tr, Td, TableEmpty } from "@/components/ui/Table";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
 import { GitCompareArrows } from "lucide-react";
 import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
 
@@ -122,15 +125,11 @@ function CompareInner() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="flex items-center gap-2 text-xl font-semibold text-app-fg">
-          <GitCompareArrows size={20} strokeWidth={2} />
-          Comparar
-        </h1>
-        <p className="text-sm text-app-fg-muted">
-          Compara hasta 5 activos por valoración, crecimiento, calidad, rentabilidad, dividendos y Fair Value.
-        </p>
-      </div>
+      <PageHeader
+        title="Comparar"
+        icon={GitCompareArrows}
+        description="Compara hasta 5 activos por valoración, crecimiento, calidad, rentabilidad, dividendos y Fair Value."
+      />
 
       <Card>
         <div className="flex gap-2">
@@ -154,7 +153,7 @@ function CompareInner() {
           </div>
           <button
             onClick={submit}
-            className="rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             Comparar
           </button>
@@ -162,54 +161,55 @@ function CompareInner() {
       </Card>
 
       {loading ? (
-        <p className="text-sm text-app-fg-muted">Cargando comparación...</p>
+        <Card padded={false}>
+          <div className="space-y-3 p-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-4 w-full" />
+            ))}
+          </div>
+        </Card>
       ) : !entries ? (
-        <p className="text-sm text-app-fg-muted">Ingresa entre 2 y 5 tickers separados por coma.</p>
+        <EmptyState icon={GitCompareArrows} message="Ingresa entre 2 y 5 tickers separados por coma." />
       ) : (
         <Card padded={false}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-                  <th className="px-3 py-2">Métrica</th>
-                  {entries.map((e) => (
-                    <th key={e.symbol} className="px-3 py-2">
-                      <div className="font-medium text-app-fg">{e.symbol}</div>
-                      {e.error ? (
-                        <div className="text-app-fg-faint">Dato no disponible</div>
-                      ) : (
-                        <div className="text-app-fg-muted">{e.companyName ?? ""}</div>
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {ROWS.map((row) => {
-                  const winner = valid.length >= 2 ? winnerIndex(entries, row) : null;
-                  return (
-                    <tr key={row.key} className="border-b border-app-border last:border-0">
-                      <td className="px-3 py-2 text-app-fg-muted">{row.label}</td>
-                      {entries.map((e, idx) => {
-                        const value = e[row.key] as number | null;
-                        const isWinner = winner !== null && winner === idx && !e.error;
-                        return (
-                          <td
-                            key={e.symbol}
-                            className={
-                              isWinner
-                                ? "px-3 py-2 font-semibold text-emerald-400"
-                                : "px-3 py-2 text-app-fg"
-                            }
-                          >
-                            {e.error ? "—" : row.format(value)}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
+              <Thead>
+                <Th>Métrica</Th>
+                {entries.map((e) => (
+                  <Th key={e.symbol}>
+                    <div className="font-medium text-app-fg">{e.symbol}</div>
+                    {e.error ? (
+                      <div className="text-app-fg-faint">Dato no disponible</div>
+                    ) : (
+                      <div className="text-app-fg-muted">{e.companyName ?? ""}</div>
+                    )}
+                  </Th>
+                ))}
+              </Thead>
+              <Tbody>
+                {entries.length === 0 ? (
+                  <TableEmpty colSpan={1}>Dato no disponible</TableEmpty>
+                ) : (
+                  ROWS.map((row) => {
+                    const winner = valid.length >= 2 ? winnerIndex(entries, row) : null;
+                    return (
+                      <Tr key={row.key}>
+                        <Td className="text-app-fg-muted">{row.label}</Td>
+                        {entries.map((e, idx) => {
+                          const value = e[row.key] as number | null;
+                          const isWinner = winner !== null && winner === idx && !e.error;
+                          return (
+                            <Td key={e.symbol} className={isWinner ? "font-semibold text-positive" : "text-app-fg"}>
+                              {e.error ? "—" : row.format(value)}
+                            </Td>
+                          );
+                        })}
+                      </Tr>
+                    );
+                  })
+                )}
+              </Tbody>
             </table>
           </div>
         </Card>
@@ -220,7 +220,14 @@ function CompareInner() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={<Spinner />}>
+    <Suspense
+      fallback={
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+      }
+    >
       <CompareInner />
     </Suspense>
   );

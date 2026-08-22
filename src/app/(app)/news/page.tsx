@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonText } from "@/components/ui/Skeleton";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Newspaper } from "lucide-react";
 
 interface NewsItem {
@@ -48,13 +49,22 @@ export default function NewsPage() {
       />
 
       {!items ? (
-        <Spinner />
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i}>
+              <SkeletonText lines={2} />
+            </Card>
+          ))}
+        </div>
       ) : items.length === 0 ? (
-        <p className="text-sm text-app-fg-muted">
-          {symbol
-            ? `Dato no disponible: sin noticias recientes para ${symbol}.`
-            : "Sin noticias todavía. Busca un ticker para poblar el feed."}
-        </p>
+        <EmptyState
+          icon={Newspaper}
+          message={
+            symbol
+              ? `Sin noticias recientes para ${symbol}.`
+              : "Sin noticias todavía. Busca un ticker para poblar el feed."
+          }
+        />
       ) : (
         <ul className="space-y-3">
           {items.map((item) => (

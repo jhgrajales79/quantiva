@@ -4,8 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Spinner } from "@/components/ui/Spinner";
-import { PieChart } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { SkeletonText } from "@/components/ui/Skeleton";
+import { PieChart, SearchX } from "lucide-react";
 
 interface SearchResult {
   symbol: string;
@@ -58,11 +59,11 @@ export default function EtfsPage() {
 
       <Card padded={false}>
         {loading ? (
-          <Spinner label="Buscando..." className="p-4" />
+          <SkeletonText lines={4} className="p-4" />
         ) : results === null ? (
-          <p className="p-4 text-sm text-app-fg-muted">Escribe para buscar un ETF.</p>
+          <EmptyState icon={PieChart} message="Escribe para buscar un ETF." />
         ) : results.length === 0 ? (
-          <p className="p-4 text-sm text-app-fg-muted">Sin resultados para "{query}".</p>
+          <EmptyState icon={SearchX} message={`Sin resultados para "${query}".`} />
         ) : (
           <ul className="divide-y divide-app-border">
             {results.map((r) => (

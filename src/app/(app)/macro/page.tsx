@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Landmark } from "lucide-react";
@@ -38,7 +38,15 @@ export default function MacroPage() {
       />
 
       {!indicators ? (
-        <Spinner />
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <Card key={i}>
+              <Skeleton className="h-3 w-2/3" />
+              <Skeleton className="mt-3 h-7 w-1/2" />
+              <Skeleton className="mt-2 h-3 w-1/3" />
+            </Card>
+          ))}
+        </div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {indicators.map((ind) => {
