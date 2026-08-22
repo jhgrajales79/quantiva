@@ -26,6 +26,13 @@ export function QuoteStatGrid({ symbols }: { symbols: MarketSymbol[] }) {
           value={row.error ? "—" : formatCurrency(row.price)}
           deltaLabel={row.error ? "Dato no disponible" : formatPercent(row.changePct)}
           deltaPositive={row.error ? null : row.changePct !== null ? row.changePct >= 0 : null}
+          extra={
+            row.extendedHours && (
+              <p className="mt-0.5 text-xs tabular-nums text-info">
+                {row.extendedHours.label} {formatCurrency(row.extendedHours.price)}
+              </p>
+            )
+          }
         />
       ))}
     </div>

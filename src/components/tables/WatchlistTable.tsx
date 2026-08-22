@@ -9,11 +9,17 @@ import { Spinner } from "@/components/ui/Spinner";
 import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
 import { Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
 
+interface ExtendedHoursQuote {
+  label: string;
+  price: number;
+}
+
 interface WatchlistRow {
   symbol: string;
   name: string;
   price: number | null;
   changePct: number | null;
+  extendedHours: ExtendedHoursQuote | null;
   fairValueConsensus: number | null;
   upsidePct: number | null;
   investmentScore: number | null;
@@ -61,6 +67,7 @@ export function WatchlistTable() {
           name: item.name,
           price: quote?.price ?? null,
           changePct: quote?.changePct ?? null,
+          extendedHours: quote?.extendedHours ?? null,
           fairValueConsensus: valuation?.consensus?.fairValueConsensus ?? null,
           upsidePct: valuation?.consensus?.upsidePct ?? null,
           investmentScore: valuation?.consensus?.investmentScore ?? null,
@@ -189,7 +196,14 @@ export function WatchlistTable() {
                     </Link>
                     <div className="text-xs text-app-fg-muted">{row.name}</div>
                   </Td>
-                  <Td>{formatCurrency(row.price)}</Td>
+                  <Td>
+                    {formatCurrency(row.price)}
+                    {row.extendedHours && (
+                      <div className="text-xs tabular-nums text-info">
+                        {row.extendedHours.label} {formatCurrency(row.extendedHours.price)}
+                      </div>
+                    )}
+                  </Td>
                   <Td
                     className={
                       row.changePct === null

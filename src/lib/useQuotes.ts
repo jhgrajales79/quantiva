@@ -2,11 +2,18 @@
 
 import { useEffect, useState } from "react";
 
+export interface ExtendedHoursQuote {
+  label: string; // "Antes de la apertura" | "Tras el cierre"
+  price: number;
+  changePct: number | null; // ya viene como porcentaje entero (no fracción), ver formatPercent
+}
+
 export interface QuoteRow {
   symbol: string;
   label: string;
   price: number | null;
   changePct: number | null; // fracción (ya dividida entre 100), lista para formatPercent
+  extendedHours: ExtendedHoursQuote | null;
   error?: string;
 }
 
@@ -33,7 +40,14 @@ export function useQuotes(symbols: { symbol: string; label: string }[]): QuoteRo
           const res = await fetch(`/api/quotes/${symbol}`);
           if (!res.ok) {
             const body = await res.json().catch(() => ({}));
-            return { symbol, label, price: null, changePct: null, error: body.error ?? "Dato no disponible" };
+            return {
+              symbol,
+              label,
+              price: null,
+              changePct: null,
+              extendedHours: null,
+              error: body.error ?? "Dato no disponible",
+            };
           }
           const data = await res.json();
           return {
@@ -41,9 +55,17 @@ export function useQuotes(symbols: { symbol: string; label: string }[]): QuoteRo
             label,
             price: data.price,
             changePct: data.changePct === null ? null : data.changePct / 100,
+            extendedHours: data.extendedHours ?? null,
           };
         } catch {
-          return { symbol, label, price: null, changePct: null, error: "Dato no disponible" };
+          return {
+            symbol,
+            label,
+            price: null,
+            changePct: null,
+            extendedHours: null,
+            error: "Dato no disponible",
+          };
         }
       }),
     ).then((results) => {

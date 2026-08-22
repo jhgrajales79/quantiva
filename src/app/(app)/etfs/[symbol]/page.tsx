@@ -12,6 +12,7 @@ interface QuoteData {
   price: number;
   changePct: number | null;
   companyName: string | null;
+  extendedHours: { label: string; price: number; changePct: number | null } | null;
 }
 
 interface EtfProfile {
@@ -63,12 +64,19 @@ export default function EtfDetailPage() {
       </div>
 
       {quote ? (
-        <p className="text-lg tabular-nums text-app-fg-muted">
-          {formatCurrency(quote.price)}{" "}
-          <span className={quote.changePct !== null && quote.changePct >= 0 ? "text-positive" : "text-negative"}>
-            {formatPercent(quote.changePct === null ? null : quote.changePct / 100)}
-          </span>
-        </p>
+        <div>
+          <p className="text-lg tabular-nums text-app-fg-muted">
+            {formatCurrency(quote.price)}{" "}
+            <span className={quote.changePct !== null && quote.changePct >= 0 ? "text-positive" : "text-negative"}>
+              {formatPercent(quote.changePct === null ? null : quote.changePct / 100)}
+            </span>
+          </p>
+          {quote.extendedHours && (
+            <p className="text-xs tabular-nums text-info">
+              {quote.extendedHours.label} {formatCurrency(quote.extendedHours.price)}
+            </p>
+          )}
+        </div>
       ) : (
         <Spinner label="Cargando cotización..." />
       )}

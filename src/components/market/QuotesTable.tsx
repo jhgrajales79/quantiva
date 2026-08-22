@@ -6,11 +6,17 @@ import { formatCurrency, formatPercent } from "@/lib/format";
 import { Table, Thead, Th, Tbody, Tr, Td, TableEmpty } from "@/components/ui/Table";
 import { Spinner } from "@/components/ui/Spinner";
 
+interface ExtendedHoursQuote {
+  label: string;
+  price: number;
+}
+
 interface QuoteRow {
   symbol: string;
   label: string;
   price: number | null;
   changePct: number | null;
+  extendedHours: ExtendedHoursQuote | null;
   error?: string;
 }
 
@@ -25,12 +31,32 @@ export function QuotesTable({ symbols }: { symbols: { symbol: string; label: str
           const res = await fetch(`/api/quotes/${symbol}`);
           if (!res.ok) {
             const body = await res.json().catch(() => ({}));
-            return { symbol, label, price: null, changePct: null, error: body.error ?? "Dato no disponible" };
+            return {
+              symbol,
+              label,
+              price: null,
+              changePct: null,
+              extendedHours: null,
+              error: body.error ?? "Dato no disponible",
+            };
           }
           const data = await res.json();
-          return { symbol, label, price: data.price, changePct: data.changePct };
+          return {
+            symbol,
+            label,
+            price: data.price,
+            changePct: data.changePct,
+            extendedHours: data.extendedHours ?? null,
+          };
         } catch {
-          return { symbol, label, price: null, changePct: null, error: "Dato no disponible" };
+          return {
+            symbol,
+            label,
+            price: null,
+            changePct: null,
+            extendedHours: null,
+            error: "Dato no disponible",
+          };
         }
       }),
     ).then((results) => {
@@ -69,7 +95,14 @@ export function QuotesTable({ symbols }: { symbols: { symbol: string; label: str
                 {row.error ? (
                   <span className="text-xs text-app-fg-muted">Dato no disponible</span>
                 ) : (
-                  formatCurrency(row.price)
+                  <>
+                    {formatCurrency(row.price)}
+                    {row.extendedHours && (
+                      <div className="text-xs tabular-nums text-info">
+                        {row.extendedHours.label} {formatCurrency(row.extendedHours.price)}
+                      </div>
+                    )}
+                  </>
                 )}
               </Td>
               <Td

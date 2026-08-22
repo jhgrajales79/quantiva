@@ -5,6 +5,54 @@ import { pricesIntradayCache } from "@/lib/db/schema";
 import { getOrCreateAsset } from "@/lib/assets";
 import { getMarketDataProvider } from "@/lib/providers/registry";
 import { isStale, isUsMarketOpen, TTL } from "@/lib/cache";
+import type { MarketStatus } from "@/lib/cache";
+import { getExtendedQuote } from "@/lib/providers/yahoo-extended-quote";
+
+/**
+ * El precio "regular" (regularMarketPrice) se queda fijo en el cierre de la
+ * sesión mientras dura el pre-market/after-hours — el precio que sí sigue
+ * moviéndose en esas ventanas requiere el endpoint v7/quote (con crumb), no
+ * el /chart que usa el proveedor por defecto. Se pide best-effort y solo
+ * fuera de horario regular, para no gastar una llamada extra en cada
+ * cotización durante la sesión normal (donde nunca hay dato pre/post).
+ */
+async function attachExtendedHours(
+  base: Record<string, unknown>,
+  symbol: string,
+  marketStatus: MarketStatus,
+) {
+  if (marketStatus !== "pre-market" && marketStatus !== "after-hours") return base;
+  try {
+    const extended = await getExtendedQuote(symbol);
+    if (!extended) return base;
+    if (extended.marketState === "PRE" && extended.preMarketPrice !== null) {
+      return {
+        ...base,
+        extendedHours: {
+          label: "Antes de la apertura",
+          price: extended.preMarketPrice,
+          changeAbs: extended.preMarketChange,
+          changePct: extended.preMarketChangePercent,
+        },
+      };
+    }
+    if (extended.marketState === "POST" && extended.postMarketPrice !== null) {
+      return {
+        ...base,
+        extendedHours: {
+          label: "Tras el cierre",
+          price: extended.postMarketPrice,
+          changeAbs: extended.postMarketChange,
+          changePct: extended.postMarketChangePercent,
+        },
+      };
+    }
+  } catch {
+    // best-effort: si falla el endpoint con crumb, se sirve el precio
+    // regular sin dato extendido en vez de romper la cotización completa.
+  }
+  return base;
+}
 
 export async function GET(
   _request: Request,
@@ -63,26 +111,32 @@ export async function GET(
             },
           });
 
-        return NextResponse.json({
-          symbol,
-          companyName: quote.companyName,
-          price: quote.price,
-          changeAbs: quote.changeAbs,
-          changePct: quote.changePct,
-          dayHigh: quote.dayHigh,
-          dayLow: quote.dayLow,
-          volume: quote.volume,
-          marketCap: quote.marketCap,
-          // No persistidos en el cache (cambian poco, no vale la pena una
-          // migración de columnas); solo disponibles cuando el fetch es
-          // fresco, null cuando se sirve desde cache.
-          fiftyTwoWeekLow: quote.fiftyTwoWeekLow,
-          fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh,
-          exchangeName: quote.exchangeName,
-          marketStatus,
-          source: quote.source,
-          fetchedAt: new Date().toISOString(),
-        });
+        return NextResponse.json(
+          await attachExtendedHours(
+            {
+              symbol,
+              companyName: quote.companyName,
+              price: quote.price,
+              changeAbs: quote.changeAbs,
+              changePct: quote.changePct,
+              dayHigh: quote.dayHigh,
+              dayLow: quote.dayLow,
+              volume: quote.volume,
+              marketCap: quote.marketCap,
+              // No persistidos en el cache (cambian poco, no vale la pena una
+              // migración de columnas); solo disponibles cuando el fetch es
+              // fresco, null cuando se sirve desde cache.
+              fiftyTwoWeekLow: quote.fiftyTwoWeekLow,
+              fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh,
+              exchangeName: quote.exchangeName,
+              marketStatus,
+              source: quote.source,
+              fetchedAt: new Date().toISOString(),
+            },
+            symbol,
+            marketStatus,
+          ),
+        );
       }
     } catch (error) {
       // Si falla el proveedor pero hay algo cacheado, se sirve el cache
@@ -103,21 +157,27 @@ export async function GET(
     );
   }
 
-  return NextResponse.json({
-    symbol,
-    companyName: null, // no persistido en cache
-    price: cached.price,
-    changeAbs: cached.changeAbs,
-    changePct: cached.changePct,
-    dayHigh: cached.dayHigh,
-    dayLow: cached.dayLow,
-    volume: cached.volume,
-    marketCap: cached.marketCap,
-    fiftyTwoWeekLow: null,
-    fiftyTwoWeekHigh: null,
-    exchangeName: null,
-    marketStatus: cached.marketStatus,
-    source: cached.source,
-    fetchedAt: cached.fetchedAt.toISOString(),
-  });
+  return NextResponse.json(
+    await attachExtendedHours(
+      {
+        symbol,
+        companyName: null, // no persistido en cache
+        price: cached.price,
+        changeAbs: cached.changeAbs,
+        changePct: cached.changePct,
+        dayHigh: cached.dayHigh,
+        dayLow: cached.dayLow,
+        volume: cached.volume,
+        marketCap: cached.marketCap,
+        fiftyTwoWeekLow: null,
+        fiftyTwoWeekHigh: null,
+        exchangeName: null,
+        marketStatus: cached.marketStatus,
+        source: cached.source,
+        fetchedAt: cached.fetchedAt.toISOString(),
+      },
+      symbol,
+      marketStatus, // estado en vivo, no el guardado en cache al momento del fetch
+    ),
+  );
 }

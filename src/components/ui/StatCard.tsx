@@ -8,12 +8,14 @@ export function StatCard({
   deltaLabel,
   deltaPositive,
   href,
+  extra,
 }: {
   label: string;
   value: React.ReactNode;
   deltaLabel?: React.ReactNode;
   deltaPositive?: boolean | null;
   href?: string;
+  extra?: React.ReactNode;
 }) {
   const content = (
     <Card className={clsx(href && "transition hover:border-app-border")}>
@@ -33,6 +35,7 @@ export function StatCard({
           {deltaLabel}
         </p>
       )}
+      {extra}
     </Card>
   );
 
