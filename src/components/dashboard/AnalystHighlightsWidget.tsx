@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 import { formatCurrency, formatDateTime } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
-import { ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { ArrowUp, ArrowDown, Minus, ExternalLink } from "lucide-react";
 
 interface AnalystHighlight {
   symbol: string;
@@ -49,15 +50,28 @@ export function AnalystHighlightsWidget() {
         <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-3">
-          {highlights.map((h, i) => (
-            <Link
-              key={`${h.symbol}-${h.date}-${h.firm}-${i}`}
-              href={`/stocks/${h.symbol}`}
+          {highlights.map((h) => (
+            <div
+              key={h.symbol}
               className="rounded-card border border-app-border p-3 transition-colors hover:border-brand"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-app-fg">{h.symbol}</span>
-                {actionIcon(h.action)}
+              <div className="flex items-start justify-between gap-2">
+                <Link href={`/stocks/${h.symbol}`} className="flex items-center gap-2 hover:underline">
+                  <CompanyLogo symbol={h.symbol} size={24} />
+                  <span className="font-semibold text-app-fg">{h.symbol}</span>
+                </Link>
+                <div className="flex items-center gap-2">
+                  {actionIcon(h.action)}
+                  <a
+                    href={`https://finance.yahoo.com/quote/${h.symbol}/analysis`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Ver análisis completo en Yahoo Finance"
+                    className="text-app-fg-faint hover:text-brand"
+                  >
+                    <ExternalLink size={14} strokeWidth={2} />
+                  </a>
+                </div>
               </div>
               <p className="mt-1 text-xs text-app-fg-muted">{h.firm}</p>
               <p className="mt-2 text-sm text-app-fg">
@@ -73,7 +87,7 @@ export function AnalystHighlightsWidget() {
                 <p className="mt-1 text-xs text-app-fg-muted">Precio objetivo: {formatCurrency(h.priceTarget)}</p>
               )}
               <p className="mt-2 text-xs text-app-fg-faint">{formatDateTime(h.date)}</p>
-            </Link>
+            </div>
           ))}
         </div>
       )}

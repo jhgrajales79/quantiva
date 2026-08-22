@@ -116,7 +116,7 @@ async function ensureAnalystChangesCached(symbol: string): Promise<void> {
 async function getRecentChangesForSymbols(
   symbols: string[],
   limit: number,
-  exclude: Set<string>,
+  usedSymbols: Set<string>,
 ): Promise<AnalystHighlight[]> {
   if (symbols.length === 0) return [];
 
@@ -135,14 +135,16 @@ async function getRecentChangesForSymbols(
     .where(inArray(analystRatingChanges.assetId, assetRows.map((a) => a.id)))
     .orderBy(desc(analystRatingChanges.date));
 
+  // Un solo cambio por ticker (el más reciente) — Yahoo puede reportar varias
+  // firmas el mismo día para un mismo activo, y mostrar 3 tarjetas del mismo
+  // ticker no aporta la variedad que el widget necesita.
   const results: AnalystHighlight[] = [];
   for (const change of changes) {
     if (change.firm === "__none__" || change.date === "") continue;
     const asset = assetById.get(change.assetId);
     if (!asset) continue;
-    const key = `${asset.symbol}:${change.date}:${change.firm}`;
-    if (exclude.has(key)) continue;
-    exclude.add(key);
+    if (usedSymbols.has(asset.symbol)) continue;
+    usedSymbols.add(asset.symbol);
     results.push({
       symbol: asset.symbol,
       name: asset.name,
@@ -159,9 +161,10 @@ async function getRecentChangesForSymbols(
 }
 
 /**
- * Los `limit` cambios de calificación más recientes, priorizando la
- * watchlist del usuario y completando con mega caps si no hay suficientes
- * ahí — nunca se mezclan al azar, la watchlist siempre gana el desempate.
+ * Los `limit` cambios de calificación más recientes, uno por ticker distinto
+ * (nunca repite símbolo entre las tarjetas), priorizando la watchlist del
+ * usuario y completando con mega caps si no hay suficientes ahí — nunca se
+ * mezclan al azar, la watchlist siempre gana el desempate.
  */
 export async function getAnalystHighlights(
   watchlistSymbols: string[],
