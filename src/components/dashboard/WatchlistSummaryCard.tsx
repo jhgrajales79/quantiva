@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonText } from "@/components/ui/Skeleton";
 import { Eye } from "lucide-react";
 
 interface WatchlistItem {
@@ -28,7 +28,7 @@ export function WatchlistSummaryCard() {
     <Card className="flex h-full flex-col">
       <CardHeader title={`Watchlist${items !== null ? ` · ${count} acciones` : ""}`} />
       {items === null ? (
-        <Spinner />
+        <SkeletonText lines={4} className="py-1" />
       ) : count === 0 ? (
         <EmptyState
           icon={Eye}

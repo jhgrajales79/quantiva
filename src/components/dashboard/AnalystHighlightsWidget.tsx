@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
 import { formatCurrency, formatDateTime } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { ArrowUp, ArrowDown, Minus, ExternalLink } from "lucide-react";
 
 interface AnalystHighlight {
@@ -45,7 +45,19 @@ export function AnalystHighlightsWidget() {
         action={<span className="text-xs text-app-fg-muted">últimos cambios de calificación · Yahoo Finance</span>}
       />
       {!highlights ? (
-        <Spinner />
+        <div className="grid gap-3 sm:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="rounded-card border border-app-border p-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-6 w-6 rounded-md" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <Skeleton className="mt-3 h-3 w-2/3" />
+              <Skeleton className="mt-2 h-4 w-1/2" />
+              <Skeleton className="mt-2 h-3 w-1/3" />
+            </div>
+          ))}
+        </div>
       ) : highlights.length === 0 ? (
         <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
       ) : (

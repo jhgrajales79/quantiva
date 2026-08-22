@@ -5,9 +5,10 @@ import Link from "next/link";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { valuationBadge } from "@/lib/valuation/consensus";
 import { ValuationBadgePill } from "@/components/cards/ValuationBadgePill";
-import { Spinner } from "@/components/ui/Spinner";
 import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
 import { Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { SkeletonTableRows } from "@/components/ui/Skeleton";
 
 interface ExtendedHoursQuote {
   label: string;
@@ -35,6 +36,16 @@ type SortKey =
   | "investmentScore"
   | "intrinsicValue"
   | "relativeValue";
+
+const COLUMNS: { key: SortKey; label: string }[] = [
+  { key: "symbol", label: "Ticker" },
+  { key: "price", label: "Precio" },
+  { key: "changePct", label: "Var. día" },
+  { key: "upsidePct", label: "Fair Value / Upside" },
+  { key: "intrinsicValue", label: "Valor intrínseco (DCF)" },
+  { key: "relativeValue", label: "Valor relativo (múltiplos)" },
+  { key: "investmentScore", label: "Investment Score" },
+];
 
 export function WatchlistTable() {
   const [rows, setRows] = useState<WatchlistRow[] | null>(null);
@@ -126,39 +137,57 @@ export function WatchlistTable() {
     : [];
 
   return (
-    <div className="rounded-card border border-app-border bg-app-surface shadow-card">
-      <div className="flex items-center justify-between border-b border-app-border p-3">
-        <h2 className="text-sm font-semibold text-app-fg">Watchlist</h2>
-        <form onSubmit={handleAdd} className="flex gap-2">
-          <div className="relative">
-            <input
-              value={newSymbol}
-              onChange={(e) => {
-                setNewSymbol(e.target.value);
-                setSuggestOpen(true);
-              }}
-              onFocus={() => setSuggestOpen(true)}
-              onBlur={() => setSuggestOpen(false)}
-              placeholder="AAPL"
-              className="w-28 rounded-md border border-app-border bg-app-bg px-2 py-1 text-xs text-app-fg outline-none focus:border-brand"
-            />
-            {suggestOpen && (
-              <TickerSuggestions results={suggestions} onSelect={(m) => addSymbol(m.symbol)} />
-            )}
-          </div>
-          <button
-            type="submit"
-            className="rounded-md bg-brand px-3 py-1 text-xs font-medium text-white transition-opacity hover:opacity-90"
-          >
-            Agregar
-          </button>
-        </form>
-      </div>
+    <Card padded={false}>
+      <CardHeader
+        title="Watchlist"
+        className="mb-0 border-b border-app-border px-4 py-3"
+        action={
+          <form onSubmit={handleAdd} className="flex gap-2">
+            <div className="relative">
+              <input
+                value={newSymbol}
+                onChange={(e) => {
+                  setNewSymbol(e.target.value);
+                  setSuggestOpen(true);
+                }}
+                onFocus={() => setSuggestOpen(true)}
+                onBlur={() => setSuggestOpen(false)}
+                placeholder="AAPL"
+                className="w-28 rounded-md border border-app-border bg-app-bg px-2 py-1 text-xs text-app-fg outline-none focus:border-brand"
+              />
+              {suggestOpen && (
+                <TickerSuggestions results={suggestions} onSelect={(m) => addSymbol(m.symbol)} />
+              )}
+            </div>
+            <button
+              type="submit"
+              className="rounded-md bg-brand px-3 py-1 text-xs font-medium text-white transition-opacity hover:opacity-90"
+            >
+              Agregar
+            </button>
+          </form>
+        }
+      />
 
       {error && <p className="p-3 text-sm text-negative">{error}</p>}
 
       {!rows ? (
-        <Spinner className="p-4" />
+        // Esqueleto con la misma forma de la tabla real en vez de un
+        // spinner genérico — la fila de columnas ya se conoce de antemano,
+        // así que mostrarla de una vez transmite mejor qué está cargando.
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <Thead>
+              {COLUMNS.map((col) => (
+                <Th key={col.key}>{col.label}</Th>
+              ))}
+              <Th />
+            </Thead>
+            <Tbody>
+              <SkeletonTableRows rows={4} cols={COLUMNS.length + 1} />
+            </Tbody>
+          </table>
+        </div>
       ) : rows.length === 0 ? (
         <p className="p-4 text-sm text-app-fg-muted">
           Tu watchlist está vacía. Agrega un ticker arriba.
@@ -167,20 +196,12 @@ export function WatchlistTable() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <Thead>
-              {[
-                { key: "symbol", label: "Ticker" },
-                { key: "price", label: "Precio" },
-                { key: "changePct", label: "Var. día" },
-                { key: "upsidePct", label: "Fair Value / Upside" },
-                { key: "intrinsicValue", label: "Valor intrínseco (DCF)" },
-                { key: "relativeValue", label: "Valor relativo (múltiplos)" },
-                { key: "investmentScore", label: "Investment Score" },
-              ].map((col) => (
+              {COLUMNS.map((col) => (
                 <Th
                   key={col.key}
                   sortable
                   active={sortKey === col.key}
-                  onClick={() => setSortKey(col.key as SortKey)}
+                  onClick={() => setSortKey(col.key)}
                 >
                   {col.label}
                 </Th>
@@ -272,6 +293,6 @@ export function WatchlistTable() {
           </table>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

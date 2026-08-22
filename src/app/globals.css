@@ -29,6 +29,14 @@
   --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.04);
   --shadow-popover: 0 8px 24px -4px rgb(0 0 0 / 0.18), 0 2px 8px -2px rgb(0 0 0 / 0.12);
 
+  /* Movimiento: misma duración/easing en toda la app en vez de valores ad
+     hoc por componente (150–250ms, curva de desaceleración, nunca
+     bounce/elastic). */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
   --app-font-scale: 1;
 }
 
@@ -100,6 +108,11 @@ html {
   --radius-pill: var(--radius-pill);
   --shadow-card: var(--shadow-card);
   --shadow-popover: var(--shadow-popover);
+
+  --duration-fast: var(--duration-fast);
+  --duration-base: var(--duration-base);
+  --duration-slow: var(--duration-slow);
+  --ease-out-quart: var(--ease-out-quart);
 }
 
 /* Foco de teclado consistente en toda la app — reemplaza el outline por

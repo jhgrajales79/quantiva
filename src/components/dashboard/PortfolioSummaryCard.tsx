@@ -6,7 +6,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Briefcase } from "lucide-react";
 
 interface PortfolioSummary {
@@ -34,7 +34,10 @@ export function PortfolioSummaryCard() {
         action={<Badge variant="success">P&amp;L en vivo</Badge>}
       />
       {!summary ? (
-        <Spinner />
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-1/2" />
+          <Skeleton className="h-4 w-1/3" />
+        </div>
       ) : count === 0 ? (
         <EmptyState
           icon={Briefcase}
