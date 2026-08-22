@@ -12,6 +12,8 @@ const batchQuoteItemSchema = z.object({
   fiftyTwoWeekHigh: nullableNumber,
   fiftyTwoWeekLow: nullableNumber,
   marketCap: nullableNumber,
+  netAssets: nullableNumber,
+  totalAssets: nullableNumber,
   trailingPE: nullableNumber,
   forwardPE: nullableNumber,
   priceToBook: nullableNumber,

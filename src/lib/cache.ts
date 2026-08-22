@@ -13,6 +13,7 @@ export const TTL = {
   FEAR_GREED_MS: 3 * 60 * 60_000, // 3h
   MARKET_BREADTH_MS: 6 * 60 * 60_000, // 6h
   ANALYST_CHANGES_MS: 6 * 60 * 60_000, // 6h: los cambios de calificación no ocurren cada minuto
+  HEATMAP_ETF_MS: 15 * 60_000, // 15 min: el universo de ~28 ETFs se refresca junto (una sola llamada batch), no necesita la cadencia de 1 min de una cotización individual
 } as const;
 
 export type MarketStatus = "pre-market" | "open" | "after-hours" | "closed";

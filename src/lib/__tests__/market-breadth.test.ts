@@ -12,6 +12,8 @@ function quote(overrides: Partial<BatchQuoteItem>): BatchQuoteItem {
     fiftyTwoWeekHigh: null,
     fiftyTwoWeekLow: null,
     marketCap: null,
+    netAssets: null,
+    totalAssets: null,
     trailingPE: null,
     forwardPE: null,
     priceToBook: null,

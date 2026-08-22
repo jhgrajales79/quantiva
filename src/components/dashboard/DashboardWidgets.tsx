@@ -16,6 +16,7 @@ import { FearGreedWidget } from "./FearGreedWidget";
 import { MarketBreadthWidget } from "./MarketBreadthWidget";
 import { MacroStrip } from "./MacroStrip";
 import { AnalystHighlightsWidget } from "./AnalystHighlightsWidget";
+import { MarketHeatmapWidget } from "./MarketHeatmapWidget";
 
 const WIDGET_COMPONENTS: Record<string, React.ComponentType> = {
   watchlist: WatchlistSummaryCard,
@@ -27,6 +28,7 @@ const WIDGET_COMPONENTS: Record<string, React.ComponentType> = {
   market_breadth: MarketBreadthWidget,
   macro: MacroStrip,
   analyst_highlights: AnalystHighlightsWidget,
+  market_heatmap: MarketHeatmapWidget,
 };
 
 export function DashboardWidgets() {

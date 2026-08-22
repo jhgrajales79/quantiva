@@ -27,6 +27,7 @@ export const DASHBOARD_WIDGET_DEFS: DashboardWidgetDef[] = [
   { id: "market_breadth", label: "Amplitud del mercado", description: "Avances/declives y % sobre medias móviles del S&P 500.", span: "half", defaultH: 6 },
   { id: "macro", label: "Panorama macro", description: "Inflación, PIB, desempleo y tasa de la Fed (FRED).", span: "full", defaultH: 4 },
   { id: "analyst_highlights", label: "Análisis de analistas", description: "Últimos cambios de calificación de Wall Street.", span: "full", defaultH: 5, minW: 8 },
+  { id: "market_heatmap", label: "Mapa de calor del mercado", description: "Acciones, ETFs y cripto por tamaño y variación del período.", span: "full", defaultH: 9, minW: 12 },
 ];
 
 export const DASHBOARD_WIDGET_IDS = DASHBOARD_WIDGET_DEFS.map((w) => w.id);
