@@ -1,6 +1,7 @@
 import { and, asc, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { assets, portfolios, portfolioTransactions, pricesIntradayCache } from "@/lib/db/schema";
+import { assets, portfolios, portfolioTransactions } from "@/lib/db/schema";
+import { getFreshQuote } from "@/lib/prices";
 
 export async function assertPortfolioOwnership(portfolioId: string, userId: string) {
   const [portfolio] = await db
@@ -99,11 +100,7 @@ export async function computeHoldings(portfolioId: string): Promise<HoldingSumma
       continue;
     }
 
-    const [quote] = await db
-      .select({ price: pricesIntradayCache.price })
-      .from(pricesIntradayCache)
-      .where(eq(pricesIntradayCache.assetId, position.assetId))
-      .limit(1);
+    const quote = await getFreshQuote(position.symbol, position.assetId);
 
     const currentPrice = quote?.price ?? null;
     const capitalInvested = position.quantity * position.averageCost;

@@ -1,8 +1,10 @@
 import { asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { pricesDaily } from "@/lib/db/schema";
+import { pricesDaily, pricesIntradayCache } from "@/lib/db/schema";
 import { getOrCreateAsset } from "@/lib/assets";
 import { getMarketDataProvider } from "@/lib/providers/registry";
+import { isStale, isUsMarketOpen, TTL } from "@/lib/cache";
+import type { MarketStatus } from "@/lib/cache";
 import { newId } from "@/lib/id";
 import type { PricePoint } from "@/lib/providers/types";
 
@@ -93,4 +95,127 @@ export async function getDailyPriceHistory(symbol: string): Promise<PricePoint[]
     close: p.close,
     volume: p.volume,
   }));
+}
+
+export interface FreshQuote {
+  price: number | null;
+  changeAbs: number | null;
+  changePct: number | null;
+  dayHigh: number | null;
+  dayLow: number | null;
+  volume: number | null;
+  marketCap: number | null;
+  marketStatus: MarketStatus;
+  companyName: string | null;
+  fiftyTwoWeekLow: number | null;
+  fiftyTwoWeekHigh: number | null;
+  exchangeName: string | null;
+  source: string | null;
+  fetchedAt: Date;
+}
+
+/**
+ * Cotización intradía con cache en `prices_intraday_cache`, refrescada según
+ * la fase de mercado (1 min en sesión regular, 5 min en pre/after-hours, 30
+ * min con el mercado cerrado). Punto único de verdad para el precio actual
+ * de un activo — usado por /api/quotes/[symbol] y por el cálculo de
+ * holdings del portafolio, para que este último nunca lea directo una fila
+ * de caché potencialmente vieja sin darle la oportunidad de refrescarse.
+ */
+export async function getFreshQuote(symbol: string, assetId: string): Promise<FreshQuote | null> {
+  const [cached] = await db
+    .select()
+    .from(pricesIntradayCache)
+    .where(eq(pricesIntradayCache.assetId, assetId))
+    .limit(1);
+
+  const marketStatus = isUsMarketOpen();
+  const refreshTtlMs =
+    marketStatus === "open"
+      ? TTL.QUOTE_MS
+      : marketStatus === "closed"
+        ? TTL.CLOSED_QUOTE_MS
+        : TTL.EXTENDED_QUOTE_MS;
+  const shouldRefresh = isStale(cached?.fetchedAt, refreshTtlMs);
+
+  if (shouldRefresh) {
+    try {
+      const provider = getMarketDataProvider();
+      const quote = await provider.getQuote(symbol);
+
+      if (quote) {
+        const fetchedAt = new Date();
+        await db
+          .insert(pricesIntradayCache)
+          .values({
+            assetId,
+            price: quote.price,
+            changeAbs: quote.changeAbs,
+            changePct: quote.changePct,
+            dayHigh: quote.dayHigh,
+            dayLow: quote.dayLow,
+            volume: quote.volume,
+            marketCap: quote.marketCap,
+            marketStatus,
+            source: quote.source,
+            fetchedAt,
+          })
+          .onConflictDoUpdate({
+            target: pricesIntradayCache.assetId,
+            set: {
+              price: quote.price,
+              changeAbs: quote.changeAbs,
+              changePct: quote.changePct,
+              dayHigh: quote.dayHigh,
+              dayLow: quote.dayLow,
+              volume: quote.volume,
+              marketCap: quote.marketCap,
+              marketStatus,
+              source: quote.source,
+              fetchedAt,
+            },
+          });
+
+        return {
+          price: quote.price,
+          changeAbs: quote.changeAbs,
+          changePct: quote.changePct,
+          dayHigh: quote.dayHigh,
+          dayLow: quote.dayLow,
+          volume: quote.volume,
+          marketCap: quote.marketCap,
+          marketStatus,
+          companyName: quote.companyName,
+          fiftyTwoWeekLow: quote.fiftyTwoWeekLow,
+          fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh,
+          exchangeName: quote.exchangeName,
+          source: quote.source,
+          fetchedAt,
+        };
+      }
+    } catch {
+      // Si falla el proveedor pero hay algo cacheado, se sirve el cache en
+      // vez de romper la lectura completa (Watchlist/portafolio con muchos
+      // símbolos no deben fallar entero por un solo ticker problemático).
+    }
+  }
+
+  if (!cached) return null;
+
+  return {
+    price: cached.price,
+    changeAbs: cached.changeAbs,
+    changePct: cached.changePct,
+    dayHigh: cached.dayHigh,
+    dayLow: cached.dayLow,
+    volume: cached.volume,
+    marketCap: cached.marketCap,
+    marketStatus: cached.marketStatus as MarketStatus,
+    companyName: null, // no persistido en cache
+    fiftyTwoWeekLow: null,
+    fiftyTwoWeekHigh: null,
+    exchangeName: null,
+    source: cached.source,
+    fetchedAt: cached.fetchedAt,
+  };
 }
