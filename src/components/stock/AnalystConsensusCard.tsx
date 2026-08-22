@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { Tooltip } from "@/components/ui/Tooltip";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCurrency, formatDateTime } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
 
 interface AnalystData {
   distribution: { strongBuy: number; buy: number; hold: number; sell: number; strongSell: number } | null;
@@ -29,6 +30,16 @@ const SEGMENT_COLORS: Record<string, string> = {
   strongSell: "bg-negative",
 };
 
+// La barra de distribución es puro color sin leyenda visible — el Tooltip
+// es la única forma de saber qué representa cada segmento sin adivinar.
+const SEGMENT_LABELS: Record<string, string> = {
+  strongBuy: "Compra fuerte",
+  buy: "Compra",
+  hold: "Mantener",
+  sell: "Venta",
+  strongSell: "Venta fuerte",
+};
+
 export function AnalystConsensusCard({ symbol }: { symbol: string }) {
   const [data, setData] = useState<AnalystData | null>(null);
 
@@ -47,18 +58,25 @@ export function AnalystConsensusCard({ symbol }: { symbol: string }) {
     <Card>
       <CardHeader title={`Consenso de analistas${data?.numberOfAnalysts ? ` · ${data.numberOfAnalysts}` : ""}`} />
       {!data ? (
-        <Spinner />
+        <div className="space-y-3">
+          <Skeleton className="h-2.5 w-full rounded-pill" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-24 w-full" />
+        </div>
       ) : (
         <>
           {data.distribution && total > 0 ? (
-            <div className="mb-3 flex h-2.5 overflow-hidden rounded-full">
-              {Object.entries(data.distribution).map(([key, value]) => (
-                <div
-                  key={key}
-                  className={SEGMENT_COLORS[key]}
-                  style={{ width: `${(value / total) * 100}%` }}
-                />
-              ))}
+            <div className="mb-3 flex h-2.5 overflow-hidden rounded-pill">
+              {Object.entries(data.distribution)
+                .filter(([, value]) => value > 0)
+                .map(([key, value]) => (
+                  <Tooltip
+                    key={key}
+                    content={`${SEGMENT_LABELS[key] ?? key}: ${value} (${((value / total) * 100).toFixed(0)}%)`}
+                  >
+                    <div className={SEGMENT_COLORS[key]} style={{ width: `${(value / total) * 100}%` }} />
+                  </Tooltip>
+                ))}
             </div>
           ) : (
             <p className="mb-3 text-sm text-app-fg-muted">Dato no disponible.</p>

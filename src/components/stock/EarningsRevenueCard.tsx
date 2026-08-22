@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
-import { Spinner } from "@/components/ui/Spinner";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 
 interface FundamentalsResponse {
@@ -52,7 +52,13 @@ export function EarningsRevenueCard({ symbol }: { symbol: string }) {
     return (
       <Card>
         <CardHeader title="Beneficios e ingresos" />
-        <Spinner />
+        <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+          <Skeleton className="h-40 w-full" />
+          <div className="space-y-3">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        </div>
       </Card>
     );
   }
@@ -89,7 +95,7 @@ export function EarningsRevenueCard({ symbol }: { symbol: string }) {
     { label: "Coste de los ingresos", value: costOfRevenue, color: "bg-negative" },
     { label: "Beneficio bruto", value: grossProfit, color: "bg-positive" },
     { label: "Otros gastos", value: otherExpenses, color: "bg-negative" },
-    { label: "Beneficios", value: netIncome, color: "bg-teal-400" },
+    { label: "Beneficios", value: netIncome, color: "bg-positive/70" },
   ];
 
   const maxAbs = Math.max(1, ...bars.map((b) => Math.abs(b.value ?? 0)));

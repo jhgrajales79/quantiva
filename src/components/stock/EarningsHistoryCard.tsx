@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
-import { Spinner } from "@/components/ui/Spinner";
+import { Thead, Th, Tbody, Tr, Td, TableEmpty } from "@/components/ui/Table";
+import { SkeletonTableRows } from "@/components/ui/Skeleton";
 import { formatCurrency, formatPercent } from "@/lib/format";
 
 interface HistoryQuarter {
@@ -29,44 +30,49 @@ export function EarningsHistoryCard({ symbol }: { symbol: string }) {
   return (
     <Card>
       <CardHeader title="Earnings" subtitle="BPA real vs. estimado, últimos trimestres reportados" />
-      {!loaded ? (
-        <Spinner />
-      ) : !history || history.length === 0 ? (
-        <p className="text-sm text-app-fg-muted">Dato no disponible</p>
-      ) : (
+      <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-app-border text-left text-xs text-app-fg-muted">
-              <th className="py-1.5">Trimestre</th>
-              <th className="py-1.5 text-right">Real</th>
-              <th className="py-1.5 text-right">Estimado</th>
-              <th className="py-1.5 text-right">Sorpresa</th>
-            </tr>
-          </thead>
-          <tbody>
-            {history.map((q) => (
-              <tr key={q.quarterEndDate} className="border-b border-app-border last:border-0">
-                <td className="py-1.5 text-app-fg-muted">{q.quarterEndDate ?? "—"}</td>
-                <td className="py-1.5 text-right text-app-fg">{formatCurrency(q.epsActual)}</td>
-                <td className="py-1.5 text-right text-app-fg-muted">{formatCurrency(q.epsEstimate)}</td>
-                <td
-                  className={`py-1.5 text-right font-medium tabular-nums ${
-                    q.surprisePercent === null
-                      ? "text-app-fg-faint"
-                      : q.surprisePercent >= 0
-                        ? "text-positive"
-                        : "text-negative"
-                  }`}
-                >
-                  {q.surprisePercent !== null
-                    ? `${q.surprisePercent >= 0 ? "+" : ""}${formatPercent(q.surprisePercent)}`
-                    : "—"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          <Thead>
+            <Th>Trimestre</Th>
+            <Th align="right">Real</Th>
+            <Th align="right">Estimado</Th>
+            <Th align="right">Sorpresa</Th>
+          </Thead>
+          <Tbody>
+            {!loaded ? (
+              <SkeletonTableRows rows={4} cols={4} />
+            ) : !history || history.length === 0 ? (
+              <TableEmpty colSpan={4}>Dato no disponible</TableEmpty>
+            ) : (
+              history.map((q) => (
+                <Tr key={q.quarterEndDate}>
+                  <Td className="text-app-fg-muted">{q.quarterEndDate ?? "—"}</Td>
+                  <Td align="right" className="text-app-fg">
+                    {formatCurrency(q.epsActual)}
+                  </Td>
+                  <Td align="right" className="text-app-fg-muted">
+                    {formatCurrency(q.epsEstimate)}
+                  </Td>
+                  <Td
+                    align="right"
+                    className={`font-medium ${
+                      q.surprisePercent === null
+                        ? "text-app-fg-faint"
+                        : q.surprisePercent >= 0
+                          ? "text-positive"
+                          : "text-negative"
+                    }`}
+                  >
+                    {q.surprisePercent !== null
+                      ? `${q.surprisePercent >= 0 ? "+" : ""}${formatPercent(q.surprisePercent)}`
+                      : "—"}
+                  </Td>
+                </Tr>
+              ))
+            )}
+          </Tbody>
         </table>
-      )}
+      </div>
     </Card>
   );
 }

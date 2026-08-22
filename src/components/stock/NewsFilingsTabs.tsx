@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/Card";
+import { Newspaper, FileText } from "lucide-react";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { SkeletonText } from "@/components/ui/Skeleton";
 import { formatDateTime } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
 
 interface NewsItem {
   id: string;
@@ -38,7 +40,7 @@ export function NewsFilingsTabs({ symbol }: { symbol: string }) {
 
   return (
     <Card>
-      <h3 className="mb-3 text-sm font-semibold text-app-fg">Noticias y reportes</h3>
+      <CardHeader title="Noticias y reportes" />
       <Tabs defaultValue="news">
         <TabsList>
           <TabsTrigger value="news">Noticias</TabsTrigger>
@@ -47,9 +49,9 @@ export function NewsFilingsTabs({ symbol }: { symbol: string }) {
 
         <TabsContent value="news">
           {news === null ? (
-            <Spinner />
+            <SkeletonText lines={4} className="py-1" />
           ) : news.length === 0 ? (
-            <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
+            <EmptyState icon={Newspaper} message="Todavía no hay noticias recientes para esta acción." />
           ) : (
             <ul className="space-y-2">
               {news.map((n) => (
@@ -68,9 +70,9 @@ export function NewsFilingsTabs({ symbol }: { symbol: string }) {
 
         <TabsContent value="filings">
           {filings === null ? (
-            <Spinner />
+            <SkeletonText lines={4} className="py-1" />
           ) : filings.length === 0 ? (
-            <p className="text-sm text-app-fg-muted">Dato no disponible.</p>
+            <EmptyState icon={FileText} message="No hay reportes SEC recientes disponibles para esta acción." />
           ) : (
             <ul className="space-y-2">
               {filings.map((f, i) => (

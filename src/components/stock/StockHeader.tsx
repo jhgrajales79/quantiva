@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { MarketStatusBadge } from "@/components/layout/MarketStatusBadge";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
+import { Card } from "@/components/ui/Card";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface QuoteData {
@@ -161,7 +162,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
         : null;
 
   return (
-    <div className="rounded-card border border-app-border bg-app-surface p-4 shadow-card">
+    <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           <CompanyLogo symbol={symbol} />
@@ -210,7 +211,10 @@ export function StockHeader({ symbol }: { symbol: string }) {
               )}
             </>
           ) : (
-            <Spinner className="mt-1" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-9 w-32" />
+              <Skeleton className="h-5 w-24" />
+            </div>
           )}
         </div>
 
@@ -252,7 +256,7 @@ export function StockHeader({ symbol }: { symbol: string }) {
           <SummaryCard key={tab.key} tab={tab} summary={summary} onClick={() => scrollToWidget(tab.target)} />
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -274,7 +278,7 @@ function SummaryCard({
     >
       <span className="text-xs text-app-fg-muted">{tab.label}</span>
       {!summary ? (
-        <Spinner className="mt-1" />
+        <Skeleton className="mt-1 h-4 w-14" />
       ) : content ? (
         <>
           <span className="mt-0.5 text-sm font-semibold tabular-nums text-app-fg">{content.value}</span>

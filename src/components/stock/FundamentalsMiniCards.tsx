@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
+import { Tooltip } from "@/components/ui/Tooltip";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCompact, formatCurrency, formatPercent } from "@/lib/format";
 import { computeCagrFromHistory } from "@/lib/growth";
 
@@ -43,15 +45,14 @@ function TrendBars({ points }: { points: { fiscalDate: string; value: number | n
         const value = p.value as number;
         const isNegative = value < 0;
         return (
-          <div key={p.fiscalDate} className="group relative flex-1">
-            <div
-              className={`w-full rounded-sm ${isNegative ? "bg-negative/70" : "bg-positive/70"} group-hover:opacity-100`}
-              style={{ height: `${Math.max(6, (Math.abs(value) / maxAbs) * 48)}px` }}
-            />
-            <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-app-surface-2 px-1.5 py-0.5 text-[10px] text-app-fg opacity-0 shadow group-hover:opacity-100">
-              {fiscalYear(p.fiscalDate)}
-            </span>
-          </div>
+          <Tooltip key={p.fiscalDate} content={fiscalYear(p.fiscalDate)}>
+            <div className="flex-1">
+              <div
+                className={`w-full rounded-sm ${isNegative ? "bg-negative/70" : "bg-positive/70"}`}
+                style={{ height: `${Math.max(6, (Math.abs(value) / maxAbs) * 48)}px` }}
+              />
+            </div>
+          </Tooltip>
         );
       })}
     </div>
@@ -67,6 +68,21 @@ export function FundamentalsMiniCards({ symbol }: { symbol: string }) {
       .then(setData)
       .catch(() => setData(null));
   }, [symbol]);
+
+  if (!data) {
+    return (
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {METRICS.map((metric) => (
+          <Card key={metric.key}>
+            <Skeleton className="h-3 w-2/3" />
+            <Skeleton className="mt-2 h-6 w-1/2" />
+            <Skeleton className="mt-2 h-3 w-3/4" />
+            <Skeleton className="mt-3 h-12 w-full" />
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

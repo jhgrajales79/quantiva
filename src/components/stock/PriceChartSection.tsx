@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { PriceChart } from "@/components/charts/PriceChart";
 import { formatPercent } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type Range = "1M" | "3M" | "6M" | "1A" | "3A" | "5A" | "10A";
 
@@ -75,8 +75,8 @@ export function PriceChartSection({ symbol }: { symbol: string }) {
               <button
                 key={r}
                 onClick={() => setRange(r)}
-                className={`rounded-md px-2 py-1 text-xs font-medium ${
-                  range === r ? "bg-app-surface-2 text-app-fg" : "text-app-fg-muted hover:text-app-fg-muted"
+                className={`rounded-md px-2 py-1 text-xs font-medium transition-colors duration-fast ${
+                  range === r ? "bg-app-surface-2 text-app-fg" : "text-app-fg-muted hover:text-app-fg"
                 }`}
               >
                 {r}
@@ -90,7 +90,7 @@ export function PriceChartSection({ symbol }: { symbol: string }) {
         el mismo período: {spyReturn !== null ? formatPercent(spyReturn) : "Dato no disponible"}
       </p>
       {stockPrices === null ? (
-        <Spinner />
+        <Skeleton className="h-[320px] w-full" />
       ) : (
         <PriceChart
           data={filteredStock}
