@@ -1,4 +1,5 @@
 import { formatPercent } from "@/lib/format";
+import { Tooltip } from "@/components/ui/Tooltip";
 
 const SEGMENT_COLORS = [
   "bg-emerald-500",
@@ -32,12 +33,12 @@ export function AllocationBar({
     <div>
       <div className="flex h-2 w-full overflow-hidden rounded-pill bg-app-surface-2">
         {segments.map((s) => (
-          <div
-            key={s.label}
-            className={s.color}
-            style={{ width: `${Math.max(0, Math.min(100, s.pct * 100))}%` }}
-            title={`${s.label}: ${formatPercent(s.pct)}`}
-          />
+          <Tooltip key={s.label} content={`${s.label}: ${formatPercent(s.pct)}`}>
+            <div
+              className={s.color}
+              style={{ width: `${Math.max(0, Math.min(100, s.pct * 100))}%` }}
+            />
+          </Tooltip>
         ))}
       </div>
       <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">

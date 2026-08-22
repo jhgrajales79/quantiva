@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import clsx from "clsx";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import { Spinner } from "@/components/ui/Spinner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Layers, Receipt } from "lucide-react";
 import { useTickerSearch, TickerSuggestions } from "@/components/ui/TickerSearch";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
 import { Dialog } from "@/components/ui/Dialog";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton, SkeletonTableRows } from "@/components/ui/Skeleton";
 
 interface Holding {
   symbol: string;
@@ -70,6 +71,7 @@ export default function PortfolioDetailPage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [deletingTx, setDeletingTx] = useState<Transaction | null>(null);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const { results: suggestions } = useTickerSearch(suggestOpen ? form.symbol : "");
 
@@ -116,10 +118,8 @@ export default function PortfolioDetailPage() {
   }
 
   async function handleDeleteTx(tx: Transaction) {
-    if (!confirm(`¿Eliminar la transacción de ${tx.symbol} (${TYPE_LABELS[tx.type]})? Esta acción no se puede deshacer.`)) {
-      return;
-    }
     await fetch(`/api/portfolio/${params.id}/transactions/${tx.id}`, { method: "DELETE" });
+    setDeletingTx(null);
     load();
   }
 
@@ -149,7 +149,16 @@ export default function PortfolioDetailPage() {
     <div className="space-y-6">
       <PageHeader title={portfolioName || "Portafolio"} />
 
-      {summary && (
+      {!summary ? (
+        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i}>
+              <Skeleton className="h-3 w-2/3" />
+              <Skeleton className="mt-2 h-5 w-1/2" />
+            </Card>
+          ))}
+        </div>
+      ) : (
         <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
           <SummaryCard label="Capital invertido" value={formatCurrency(summary.totalCapitalInvested)} />
           <SummaryCard label="Valor actual" value={formatCurrency(summary.totalCurrentValue)} />
@@ -163,20 +172,21 @@ export default function PortfolioDetailPage() {
             value={formatCurrency(summary.totalRealizedPnl)}
             positive={summary.totalRealizedPnl >= 0}
           />
-          <SummaryCard label="Retorno total" value={formatPercent(summary.totalReturnPct)} />
+          <SummaryCard
+            label="Retorno total"
+            value={formatPercent(summary.totalReturnPct)}
+            positive={summary.totalReturnPct !== null ? summary.totalReturnPct >= 0 : undefined}
+          />
         </div>
       )}
 
-      <div className="rounded-card border border-app-border bg-app-surface shadow-card">
-        <h3 className="border-b border-app-border p-3 text-sm font-semibold text-app-fg">
-          Posiciones
-        </h3>
-        {!holdings ? (
-          <Spinner className="p-4" />
-        ) : holdings.length === 0 ? (
-          <p className="p-4 text-sm text-app-fg-muted">
-            Sin posiciones todavía. Registra tu primera transacción abajo.
-          </p>
+      <Card padded={false}>
+        <CardHeader title="Posiciones" className="mb-0 border-b border-app-border px-3 py-3" />
+        {holdings && holdings.length === 0 ? (
+          <EmptyState
+            icon={Layers}
+            message="Sin posiciones todavía. Registra tu primera transacción abajo."
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -190,8 +200,11 @@ export default function PortfolioDetailPage() {
                 <Th>Peso</Th>
               </Thead>
               <Tbody>
-                {holdings.map((h) => (
-                  <Tr key={h.symbol}>
+                {!holdings ? (
+                  <SkeletonTableRows rows={3} cols={7} />
+                ) : (
+                  holdings.map((h) => (
+                    <Tr key={h.symbol}>
                     <Td className="font-medium">{h.symbol}</Td>
                     <Td>{h.quantity}</Td>
                     <Td>{formatCurrency(h.averageCost)}</Td>
@@ -221,22 +234,19 @@ export default function PortfolioDetailPage() {
                         </span>
                       </div>
                     </Td>
-                  </Tr>
-                ))}
+                    </Tr>
+                  ))
+                )}
               </Tbody>
             </table>
           </div>
         )}
-      </div>
+      </Card>
 
-      <div className="rounded-card border border-app-border bg-app-surface shadow-card">
-        <h3 className="border-b border-app-border p-3 text-sm font-semibold text-app-fg">
-          Transacciones
-        </h3>
-        {!transactions ? (
-          <Spinner className="p-4" />
-        ) : transactions.length === 0 ? (
-          <p className="p-4 text-sm text-app-fg-muted">Sin transacciones todavía.</p>
+      <Card padded={false}>
+        <CardHeader title="Transacciones" className="mb-0 border-b border-app-border px-3 py-3" />
+        {transactions && transactions.length === 0 ? (
+          <EmptyState icon={Receipt} message="Sin transacciones todavía." />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -250,42 +260,46 @@ export default function PortfolioDetailPage() {
                 <Th align="right">Acciones</Th>
               </Thead>
               <Tbody>
-                {transactions.map((tx) => (
-                  <Tr key={tx.id}>
-                    <Td className="text-app-fg-muted">{tx.executedAt.slice(0, 10)}</Td>
-                    <Td className="font-medium">{tx.symbol}</Td>
-                    <Td>{TYPE_LABELS[tx.type]}</Td>
-                    <Td>{tx.quantity}</Td>
-                    <Td>{formatCurrency(tx.price)}</Td>
-                    <Td>{formatCurrency(tx.fees)}</Td>
-                    <Td align="right">
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() => setEditingTx(tx)}
-                          aria-label="Editar transacción"
-                          className="text-app-fg-muted hover:text-app-fg"
-                        >
-                          <Pencil size={14} strokeWidth={2} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteTx(tx)}
-                          aria-label="Eliminar transacción"
-                          className="text-app-fg-muted hover:text-negative"
-                        >
-                          <Trash2 size={14} strokeWidth={2} />
-                        </button>
-                      </div>
-                    </Td>
-                  </Tr>
-                ))}
+                {!transactions ? (
+                  <SkeletonTableRows rows={4} cols={7} />
+                ) : (
+                  transactions.map((tx) => (
+                    <Tr key={tx.id}>
+                      <Td className="text-app-fg-muted">{tx.executedAt.slice(0, 10)}</Td>
+                      <Td className="font-medium">{tx.symbol}</Td>
+                      <Td>{TYPE_LABELS[tx.type]}</Td>
+                      <Td>{tx.quantity}</Td>
+                      <Td>{formatCurrency(tx.price)}</Td>
+                      <Td>{formatCurrency(tx.fees)}</Td>
+                      <Td align="right">
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => setEditingTx(tx)}
+                            aria-label="Editar transacción"
+                            className="text-app-fg-muted hover:text-app-fg"
+                          >
+                            <Pencil size={14} strokeWidth={2} />
+                          </button>
+                          <button
+                            onClick={() => setDeletingTx(tx)}
+                            aria-label="Eliminar transacción"
+                            className="text-app-fg-muted hover:text-negative"
+                          >
+                            <Trash2 size={14} strokeWidth={2} />
+                          </button>
+                        </div>
+                      </Td>
+                    </Tr>
+                  ))
+                )}
               </Tbody>
             </table>
           </div>
         )}
-      </div>
+      </Card>
 
       <Card>
-        <h3 className="mb-3 text-sm font-semibold text-app-fg">Registrar transacción</h3>
+        <CardHeader title="Registrar transacción" />
         <form onSubmit={handleSubmit} className="grid gap-2 sm:grid-cols-5">
           <div className="relative">
             <input
@@ -359,6 +373,32 @@ export default function PortfolioDetailPage() {
           onClose={() => setEditingTx(null)}
           onSave={handleSaveEdit}
         />
+      )}
+
+      {deletingTx && (
+        <Dialog
+          open
+          onOpenChange={(next) => !next && setDeletingTx(null)}
+          title="Eliminar transacción"
+          description={`¿Eliminar la transacción de ${deletingTx.symbol} (${TYPE_LABELS[deletingTx.type]})? Esta acción no se puede deshacer.`}
+        >
+          <div className="mt-2 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setDeletingTx(null)}
+              className="rounded-md border border-app-border px-3 py-1.5 text-sm font-medium text-app-fg hover:bg-app-surface-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDeleteTx(deletingTx)}
+              className="rounded-md bg-negative px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            >
+              Eliminar
+            </button>
+          </div>
+        </Dialog>
       )}
     </div>
   );

@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Spinner } from "@/components/ui/Spinner";
 import { Briefcase } from "lucide-react";
 import { AllocationBar } from "@/components/portfolio/AllocationBar";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 interface Portfolio {
   id: string;
@@ -66,7 +66,17 @@ export default function PortfolioListPage() {
       </form>
 
       {!portfolios ? (
-        <Spinner />
+        <div className="space-y-3">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <Card key={i}>
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-10" />
+              </div>
+              <Skeleton className="mt-3 h-2 w-full rounded-pill" />
+            </Card>
+          ))}
+        </div>
       ) : portfolios.length === 0 ? (
         <EmptyState
           icon={Briefcase}
