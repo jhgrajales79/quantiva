@@ -5,6 +5,8 @@ export function isStale(fetchedAt: Date | null | undefined, ttlMs: number): bool
 
 export const TTL = {
   QUOTE_MS: 60_000, // 1 min en horario de mercado
+  EXTENDED_QUOTE_MS: 5 * 60_000, // 5 min en pre-market/after-hours: el precio sigue moviéndose, solo con menos volumen que en sesión regular
+  CLOSED_QUOTE_MS: 30 * 60_000, // 30 min con el mercado totalmente cerrado: el precio no se mueve, pero igual se refresca de vez en cuando para no quedar pegado en el último tick de una sesión anterior (ej. si nadie consultó el ticker durante el after-hours previo)
   FUNDAMENTALS_MS: 24 * 60 * 60_000, // 24h
   NEWS_MS: 15 * 60_000, // 15 min
   MOVERS_MS: 5 * 60_000,

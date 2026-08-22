@@ -69,10 +69,20 @@ export async function GET(
     .limit(1);
 
   const marketStatus = isUsMarketOpen();
-  const shouldRefresh =
+  // TTL según fase: 1 min en sesión regular, 5 min en pre-market/after-hours
+  // (el precio sigue moviéndose, con menos volumen), 30 min con el mercado
+  // totalmente cerrado (nada se mueve, pero igual se refresca cada tanto).
+  // Antes "closed"/"pre-market"/"after-hours" nunca refrescaban si ya había
+  // algo cacheado, lo que dejaba congelado indefinidamente un precio
+  // intradía viejo en vez de mostrar el cierre real o el precio extendido
+  // en cuanto terminaba la sesión regular.
+  const refreshTtlMs =
     marketStatus === "open"
-      ? isStale(cached?.fetchedAt, TTL.QUOTE_MS)
-      : !cached; // fuera de horario, no se refresca si ya hay algo cacheado
+      ? TTL.QUOTE_MS
+      : marketStatus === "closed"
+        ? TTL.CLOSED_QUOTE_MS
+        : TTL.EXTENDED_QUOTE_MS;
+  const shouldRefresh = isStale(cached?.fetchedAt, refreshTtlMs);
 
   if (shouldRefresh) {
     try {
